@@ -14,7 +14,7 @@ set(CMAKE_BUILD_TYPE Release)
 
 find_package(Catch2 REQUIRED)
 find_package(xtensor REQUIRED)
-add_executable(main main.cpp Redraw.cpp)
+add_executable(main main.cpp Redraw.cpp Static.cpp)
 target_link_libraries(main PRIVATE Catch2::Catch2 QPot)
 
 if(WARNINGS)

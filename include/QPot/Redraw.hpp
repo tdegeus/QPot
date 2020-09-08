@@ -17,20 +17,20 @@ public:
 
     RedrawList() = default;
 
-    // Constructor.
+    // Constructor
     template <class F>
     RedrawList(const xt::xtensor<double,1>& x, F function_to_draw_distances);
 
-    // Customise parameters to control redrawing left/right.
+    // Customise parameters to control redrawing left/right
     void setBuffer(size_t ntotal, size_t nbuffer, size_t noffset);
 
     // Customise proximity search
     void setProximity(size_t proximity);
 
-    // Update current positions.
+    // Update current positions
     void setPosition(const xt::xtensor<double,1>& x);
 
-    // Get the yielding positions left/right, based on the current positions "x".
+    // Get the yielding positions left/right, based on the current positions "x"
     xt::xtensor<double,1> currentYieldLeft() const; // y[:, index]
     xt::xtensor<double,1> currentYieldRight() const; // y[:, index + 1]
 
@@ -39,7 +39,7 @@ public:
     // - "index + 1" : yielding positions right
     xt::xtensor<long,1> currentIndex() const;
 
-    // Output raw data.
+    // Output raw data
     xt::xtensor<double,1> raw_x() const;
     xt::xtensor<double,2> raw_val() const;
     xt::xtensor<double,2> raw_pos() const;
@@ -48,23 +48,23 @@ public:
 
 private:
 
-    // Initialise.
+    // Initialise
     void init();
 
-    // Compute current "index".
+    // Compute current "index"
     void updateIndex(); // all particles
     void updateIndex(size_t p); // particle "p" only
 
-    // (Check to) redraw left/right.
+    // (Check to) redraw left/right
     void extendRight();
     void extendLeft();
 
 private:
 
-    // Number of points.
+    // Number of points
     size_t m_N;
 
-    // Buffer settings.
+    // Buffer settings
     size_t m_ntot = 1000; // number of yield positions to keep in memory at all times
     size_t m_nbuf = 300; // number of yield positions to buffer
     size_t m_noff = 20; // number of yield positions at which to shift maximally
@@ -72,10 +72,10 @@ private:
     // Search settings
     size_t m_proximity = 10; // neighbourhood to search first
 
-    // Current positions.
+    // Current positions
     xt::xtensor<double,1> m_x;
 
-    // Yield positions.
+    // Yield positions
     xt::xtensor<double,2> m_val; // drawn random values
     xt::xtensor<double,2> m_pos; // yielding ositions = cumsum(m_val, axis=1) + init
                                  // ('init' is set during initialisation and redraw)
@@ -84,11 +84,11 @@ private:
     xt::xtensor<double,1> m_left; // current yielding position to the left == m_pos[:, m_idx]
     xt::xtensor<double,1> m_right; // current yielding position to the right == m_pos[:, m_idx + 1]
 
-    // Current "index".
+    // Current "index"
     xt::xtensor<size_t,1> m_idx; // since the last shift
     xt::xtensor<long,1> m_idx_t; // total up to the last shift
 
-    // Function to (re)draw positions.
+    // Function to (re)draw positions
     std::function<xt::xtensor<double,2>(std::initializer_list<size_t>)> m_draw;
 };
 
