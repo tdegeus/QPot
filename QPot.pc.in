@@ -1,0 +1,7 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+includedir=${prefix}/include
+
+Name: @PROJECT_NAME@
+Description: Library to keep track of a sequential potential energy landscape.
+Version: @QPOT_VERSION@
+Cflags: -I${includedir}
