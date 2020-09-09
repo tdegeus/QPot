@@ -17,6 +17,12 @@ SECTION("Index")
     REQUIRE(yield.currentIndex() == 5);
     EQ(yield.currentYieldLeft(), 5.0);
     EQ(yield.currentYieldRight(), 6.0);
+
+    yield.setPosition(6.5);
+
+    REQUIRE(yield.currentIndex() == 6);
+    EQ(yield.currentYieldLeft(), 6.0);
+    EQ(yield.currentYieldRight(), 7.0);
 }
 
 }

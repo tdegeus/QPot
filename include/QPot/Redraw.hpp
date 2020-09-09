@@ -20,7 +20,7 @@ public:
     // Constructor
     template <class E, class F>
     RedrawList(
-        E&& x,
+        const E& x,
         F function_to_draw_distances,
         size_t ntotal = 1000,
         size_t nbuffer = 300,
@@ -31,7 +31,7 @@ public:
 
     // Update current positions
     template <class E>
-    void setPosition(E&& x);
+    void setPosition(const E& x);
 
     // Get the yielding positions left/right, based on the current positions "x"
     xt::xtensor<double,1> currentYieldLeft() const; // y[:, index]
@@ -73,7 +73,7 @@ private:
     xt::xtensor<double,1> m_right; // current yielding position to the right == m_pos[:, m_idx + 1]
 
     // Function to (re)draw yield positions
-    std::function<xt::xtensor<double,2>(std::initializer_list<size_t>)> m_draw;
+    std::function<xt::xtensor<double,2>(std::vector<size_t>)> m_draw;
 };
 
 // --------------
@@ -81,9 +81,10 @@ private:
 // --------------
 
 template <class E, class F>
-RedrawList::RedrawList(E&& x, F draw, size_t ntotal, size_t nbuffer, size_t noffset)
+RedrawList::RedrawList(const E& x, F draw, size_t ntotal, size_t nbuffer, size_t noffset)
     : m_N(x.size()), m_ntot(ntotal), m_nbuf(nbuffer), m_noff(noffset), m_draw(draw)
 {
+    QPOT_ASSERT(x.dimension() == 1);
     QPOT_ASSERT(m_nbuf <= m_ntot);
     QPOT_ASSERT(m_noff <= m_nbuf);
 
@@ -129,7 +130,7 @@ void RedrawList::setProximity(size_t proximity)
 }
 
 template <class E>
-void RedrawList::setPosition(E&& x)
+void RedrawList::setPosition(const E& x)
 {
     QPOT_ASSERT(x.size() == m_N);
 

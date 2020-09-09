@@ -19,21 +19,21 @@ public:
 
     // Constructor
     template <class T>
-    Static(double x, T&& yield);
+    Static(double x, const T& yield);
 
     // Customise proximity search
     void setProximity(size_t proximity);
 
-    // Update current positions
+    // Update current position
     void setPosition(double x);
 
-    // Get the yielding positions left/right, based on the current positions "x"
+    // Get the yielding position left/right, based on the current position "x"
     double currentYieldLeft() const; // y[index]
     double currentYieldRight() const; // y[index + 1]
 
-    // Get the index of the current yielding positions. Note:
-    // - "index" : yielding positions left
-    // - "index + 1" : yielding positions right
+    // Get the index of the current minimum. Note:
+    // - "index" : yielding position left
+    // - "index + 1" : yielding position right
     size_t currentIndex() const;
 
 private:
@@ -43,10 +43,7 @@ private:
 
 private:
 
-    // Search settings
     size_t m_proximity = 10; // neighbourhood to search first
-
-    // Yield positions
     xt::xtensor<double,1> m_pos; // yielding positions
     size_t m_ntot; // len(m_pos)
     size_t m_idx; // current "index"
@@ -61,7 +58,7 @@ private:
 // --------------
 
 template <class T>
-Static::Static(double x, T&& yield)
+Static::Static(double x, const T& yield)
 {
     // Copy input
     m_pos = yield;
