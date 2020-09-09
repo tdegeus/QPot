@@ -18,8 +18,7 @@ SECTION("Redraw")
     auto uniform = [=](std::initializer_list<size_t> shape) {
         return xt::ones<double>(shape); };
 
-    QPot::RedrawList yield(x, uniform);
-    yield.setBuffer(30, 5, 2);
+    QPot::RedrawList yield(x, uniform, 30, 5, 2);
 
     for (size_t j = 0; j < 20; ++j) {
         x += 1.0;

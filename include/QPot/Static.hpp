@@ -41,16 +41,10 @@ private:
     // Initialise
     void init();
 
-    // Compute current "index"
-    void updateIndex();
-
 private:
 
     // Search settings
     size_t m_proximity = 10; // neighbourhood to search first
-
-    // Current position
-    double m_x;
 
     // Yield positions
     xt::xtensor<double,1> m_pos; // yielding positions
@@ -67,11 +61,25 @@ private:
 // --------------
 
 template <class T>
-Static::Static(double x, T&& yield) : m_x(x)
+Static::Static(double x, T&& yield)
 {
+    // Copy input
     m_pos = yield;
     m_ntot = m_pos.size();
-    this->init();
+
+    // set proximity search distance
+    m_proximity = std::min(m_proximity, m_ntot);
+
+    // register minimum and maximum positions for each particle
+    m_min = m_pos(0);
+    m_max = m_pos(m_pos.size() - 1);
+    QPOT_ASSERT(x > m_min);
+    QPOT_ASSERT(x < m_max);
+
+    // find current index and current yield positions
+    m_idx = std::lower_bound(m_pos.begin(), m_pos.end(), x) - m_pos.begin() - 1;
+    m_left = m_pos(m_idx);
+    m_right = m_pos(m_idx + 1);
 }
 
 void Static::setProximity(size_t proximity)
@@ -79,49 +87,27 @@ void Static::setProximity(size_t proximity)
     m_proximity = std::min(proximity, m_ntot);
 }
 
-void Static::init()
+void Static::setPosition(double x)
 {
-    // set proximity search distance
-    m_proximity = std::min(m_proximity, m_ntot);
+    QPOT_ASSERT(x > m_min);
+    QPOT_ASSERT(x < m_max);
 
-    // register minimum and maximum positions for each particle
-    m_min = m_pos(0);
-    m_max = m_pos(m_pos.size() - 1);
-    QPOT_ASSERT(m_x > m_min);
-    QPOT_ASSERT(m_x < m_max);
-
-    // initialise current index
-    m_idx = std::lower_bound(m_pos.begin(), m_pos.end(), m_x) - m_pos.begin() - 1;
-    this->updateIndex();
-}
-
-void Static::updateIndex()
-{
-    QPOT_ASSERT(m_x > m_min);
-    QPOT_ASSERT(m_x < m_max);
-
-    if (m_left < m_x && m_right >= m_x) {
+    if (m_left < x && m_right >= x) {
         return;
     }
 
     size_t l = m_idx > m_proximity ? m_idx - m_proximity : 0;
     size_t r = std::min(m_idx + m_proximity, m_ntot - 1);
 
-    if (m_pos(l) < m_x && m_pos(r) >= m_x) {
-        m_idx = std::lower_bound(&m_pos(l), &m_pos(l) + r - l, m_x) - &m_pos(l) - 1 + l;
+    if (m_pos(l) < x && m_pos(r) >= x) {
+        m_idx = std::lower_bound(&m_pos(l), &m_pos(l) + r - l, x) - &m_pos(l) - 1 + l;
     }
     else {
-        m_idx = std::lower_bound(m_pos.begin(), m_pos.end(), m_x) - m_pos.begin() - 1;
+        m_idx = std::lower_bound(m_pos.begin(), m_pos.end(), x) - m_pos.begin() - 1;
     }
 
     m_left = m_pos(m_idx);
     m_right = m_pos(m_idx + 1);
-}
-
-void Static::setPosition(double x)
-{
-    m_x = x;
-    this->updateIndex();
 }
 
 double Static::currentYieldLeft() const
