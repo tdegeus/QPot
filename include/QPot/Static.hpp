@@ -8,6 +8,7 @@
 #define QPOT_STATIC_HPP
 
 #include "config.h"
+#include <xtensor/xio.hpp>
 
 namespace QPot {
 
@@ -18,8 +19,10 @@ public:
     Static() = default;
 
     // Constructor
-    template <class T>
-    Static(double x, const T& yield);
+    Static(double x, const xt::xtensor<double,1>& yield);
+
+    // Parameters
+    xt::xtensor<double,1> yield() const;
 
     // Customise proximity search
     void setProximity(size_t proximity);
@@ -57,34 +60,32 @@ private:
 // Implementation
 // --------------
 
-template <class T>
-Static::Static(double x, const T& yield)
+inline Static::Static(double x, const xt::xtensor<double,1>& yield) : m_pos(yield)
 {
-    // Copy input
-    m_pos = yield;
     m_ntot = m_pos.size();
-
-    // set proximity search distance
     m_proximity = std::min(m_proximity, m_ntot);
 
-    // register minimum and maximum positions for each particle
     m_min = m_pos(0);
     m_max = m_pos(m_pos.size() - 1);
     QPOT_ASSERT(x > m_min);
     QPOT_ASSERT(x < m_max);
 
-    // find current index and current yield positions
     m_idx = std::lower_bound(m_pos.begin(), m_pos.end(), x) - m_pos.begin() - 1;
     m_left = m_pos(m_idx);
     m_right = m_pos(m_idx + 1);
 }
 
-void Static::setProximity(size_t proximity)
+inline xt::xtensor<double,1> Static::yield() const
+{
+    return m_pos;
+}
+
+inline void Static::setProximity(size_t proximity)
 {
     m_proximity = std::min(proximity, m_ntot);
 }
 
-void Static::setPosition(double x)
+inline void Static::setPosition(double x)
 {
     QPOT_ASSERT(x > m_min);
     QPOT_ASSERT(x < m_max);
@@ -107,17 +108,17 @@ void Static::setPosition(double x)
     m_right = m_pos(m_idx + 1);
 }
 
-double Static::currentYieldLeft() const
+inline double Static::currentYieldLeft() const
 {
     return m_left;
 }
 
-double Static::currentYieldRight() const
+inline double Static::currentYieldRight() const
 {
     return m_right;
 }
 
-size_t Static::currentIndex() const
+inline size_t Static::currentIndex() const
 {
     return m_idx;
 }
