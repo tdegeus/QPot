@@ -48,6 +48,13 @@ public:
     xt::xtensor<size_t,1> raw_idx() const;
     xt::xtensor<long,1> raw_idx_t() const;
 
+    // Restore raw data
+    void restore(
+        const xt::xtensor<double,2>& val,
+        const xt::xtensor<double,2>& pos,
+        const xt::xtensor<size_t,1>& idx,
+        const xt::xtensor<long,1>& idx_t);
+
 private:
 
     // Number of points
@@ -81,7 +88,7 @@ private:
 // --------------
 
 template <class E, class F>
-RedrawList::RedrawList(const E& x, F draw, size_t ntotal, size_t nbuffer, size_t noffset)
+inline RedrawList::RedrawList(const E& x, F draw, size_t ntotal, size_t nbuffer, size_t noffset)
     : m_N(x.size()), m_ntot(ntotal), m_nbuf(nbuffer), m_noff(noffset), m_draw(draw)
 {
     QPOT_ASSERT(x.dimension() == 1);
@@ -104,8 +111,8 @@ RedrawList::RedrawList(const E& x, F draw, size_t ntotal, size_t nbuffer, size_t
     }
 
     // register minimum and maximum positions for each particle
-    xt::noalias(m_min) = xt::view(m_pos, xt::all(), 0);
-    xt::noalias(m_max) = xt::view(m_pos, xt::all(), m_pos.shape(1) - 1);
+    m_min = xt::view(m_pos, xt::all(), 0);
+    m_max = xt::view(m_pos, xt::all(), m_pos.shape(1) - 1);
     QPOT_ASSERT(xt::all(x > m_min));
     QPOT_ASSERT(xt::all(x < m_max));
 
@@ -124,13 +131,13 @@ RedrawList::RedrawList(const E& x, F draw, size_t ntotal, size_t nbuffer, size_t
     }
 }
 
-void RedrawList::setProximity(size_t proximity)
+inline void RedrawList::setProximity(size_t proximity)
 {
     m_proximity = proximity;
 }
 
 template <class E>
-void RedrawList::setPosition(const E& x)
+inline void RedrawList::setPosition(const E& x)
 {
     QPOT_ASSERT(x.size() == m_N);
 
@@ -239,39 +246,59 @@ void RedrawList::setPosition(const E& x)
     }
 }
 
-xt::xtensor<double,1> RedrawList::currentYieldLeft() const
+inline xt::xtensor<double,1> RedrawList::currentYieldLeft() const
 {
     return m_left;
 }
 
-xt::xtensor<double,1> RedrawList::currentYieldRight() const
+inline xt::xtensor<double,1> RedrawList::currentYieldRight() const
 {
     return m_right;
 }
 
-xt::xtensor<long,1> RedrawList::currentIndex() const
+inline xt::xtensor<long,1> RedrawList::currentIndex() const
 {
     return m_idx_t + xt::cast<long>(m_idx);
 }
 
-xt::xtensor<double,2> RedrawList::raw_val() const
+inline xt::xtensor<double,2> RedrawList::raw_val() const
 {
     return m_val;
 }
 
-xt::xtensor<double,2> RedrawList::raw_pos() const
+inline xt::xtensor<double,2> RedrawList::raw_pos() const
 {
     return m_pos;
 }
 
-xt::xtensor<size_t,1> RedrawList::raw_idx() const
+inline xt::xtensor<size_t,1> RedrawList::raw_idx() const
 {
     return m_idx;
 }
 
-xt::xtensor<long,1> RedrawList::raw_idx_t() const
+inline xt::xtensor<long,1> RedrawList::raw_idx_t() const
 {
     return m_idx_t;
+}
+
+inline void RedrawList::restore(
+    const xt::xtensor<double,2>& val,
+    const xt::xtensor<double,2>& pos,
+    const xt::xtensor<size_t,1>& idx,
+    const xt::xtensor<long,1>& idx_t)
+{
+    m_val = val;
+    m_pos = pos;
+    m_idx = idx;
+    m_idx_t = idx_t;
+
+    m_min = xt::view(m_pos, xt::all(), 0);
+    m_max = xt::view(m_pos, xt::all(), m_pos.shape(1) - 1);
+
+    for (size_t p = 0; p < m_N; ++p) {
+        m_left(p) = m_pos(p, m_idx(p));
+        m_right(p) = m_pos(p, m_idx(p) + 1);
+    }
 }
 
 } // namespace QPot

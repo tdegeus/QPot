@@ -21,7 +21,7 @@ public:
     // Constructor
     Static(double x, const xt::xtensor<double,1>& yield);
 
-    // Parameters
+    // Return yield positions
     xt::xtensor<double,1> yield() const;
 
     // Customise proximity search
