@@ -1,7 +1,7 @@
 
 #include <catch2/catch.hpp>
 
-#define EQ(a, b) REQUIRE_THAT((a), Catch::WithinAbs((b), 1.e-12));
+#define ISCLOSE(a, b) REQUIRE_THAT((a), Catch::WithinAbs((b), 1.e-12));
 
 #include <QPot/Static.hpp>
 
@@ -15,14 +15,14 @@ SECTION("Index")
     QPot::Static yield(5.5, y);
 
     REQUIRE(yield.currentIndex() == 5);
-    EQ(yield.currentYieldLeft(), 5.0);
-    EQ(yield.currentYieldRight(), 6.0);
+    ISCLOSE(yield.currentYieldLeft(), 5.0);
+    ISCLOSE(yield.currentYieldRight(), 6.0);
 
     yield.setPosition(6.5);
 
     REQUIRE(yield.currentIndex() == 6);
-    EQ(yield.currentYieldLeft(), 6.0);
-    EQ(yield.currentYieldRight(), 7.0);
+    ISCLOSE(yield.currentYieldLeft(), 6.0);
+    ISCLOSE(yield.currentYieldRight(), 7.0);
 }
 
 }

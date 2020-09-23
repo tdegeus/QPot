@@ -30,8 +30,8 @@
 #endif
 
 #define QPOT_VERSION_MAJOR 0
-#define QPOT_VERSION_MINOR 0
-#define QPOT_VERSION_PATCH 2
+#define QPOT_VERSION_MINOR 1
+#define QPOT_VERSION_PATCH 0
 
 #define QPOT_VERSION_AT_LEAST(x, y, z) \
     (QPOT_VERSION_MAJOR > x || (QPOT_VERSION_MAJOR >= x && \

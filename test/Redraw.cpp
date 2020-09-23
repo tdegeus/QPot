@@ -15,8 +15,7 @@ SECTION("Redraw")
     xt::xtensor<double,1> r = l + 1.0;
     xt::xtensor<long,1> i = {13, 14, 15};
 
-    auto uniform = [=](std::vector<size_t> shape) {
-        return xt::ones<double>(shape); };
+    auto uniform = [=](std::vector<size_t> shape) { return xt::ones<double>(shape); };
 
     QPot::RedrawList yield(x, uniform, 30, 5, 2);
 
