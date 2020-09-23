@@ -24,8 +24,8 @@ public:
     // Return yield positions
     xt::xtensor<double,1> yield() const;
 
-    // Customise proximity search
-    void setProximity(size_t proximity);
+    // Customise proximity search region
+    void setProximity(size_t distance);
 
     // Update current position
     void setPosition(double x);
@@ -46,7 +46,7 @@ private:
 
 private:
 
-    size_t m_proximity = 10; // neighbourhood to search first
+    size_t m_proximity = 10; // size of neighbourhood to search first
     xt::xtensor<double,1> m_pos; // yielding positions
     size_t m_ntot; // len(m_pos)
     size_t m_idx; // current "index"

@@ -20,14 +20,15 @@ public:
     // Constructor
     template <class E, class F>
     RedrawList(
-        const E& x,
-        F function_to_draw_distances,
-        size_t ntotal = 1000,
-        size_t nbuffer = 300,
-        size_t noffset = 20);
+        const E& x, // current positions, number of particle derived from it
+        F function_to_draw_yield_distances,
+        size_t ntotal = 1000, // #yield-positions to keep in memory
+        size_t nbuffer = 300, // #yield-positions to buffer when shifting left/right
+        size_t noffset = 20); // #yield-positions at which to redraw maximally
+                              // (allows grouping of redraws for several particles)
 
-    // Customise proximity search
-    void setProximity(size_t proximity);
+    // Customise proximity search region
+    void setProximity(size_t distance);
 
     // Update current positions
     template <class E>
@@ -37,7 +38,7 @@ public:
     xt::xtensor<double,1> currentYieldLeft() const; // y[:, index]
     xt::xtensor<double,1> currentYieldRight() const; // y[:, index + 1]
 
-    // Get the index of the current yielding positions. Note:
+    // Get the index of the current minima. Note:
     // - "index" : yielding positions left
     // - "index + 1" : yielding positions right
     xt::xtensor<long,1> currentIndex() const;
@@ -66,18 +67,18 @@ private:
     size_t m_noff; // number of yield positions at which to shift maximally
 
     // Search settings
-    size_t m_proximity = 10; // neighbourhood to search first
+    size_t m_proximity = 10; // size of neighbourhood to search first
 
     // Yield positions
     xt::xtensor<double,2> m_val; // drawn random values
-    xt::xtensor<double,2> m_pos; // yielding ositions = cumsum(m_val, axis=1) + init
-                                 // ('init' is set during initialisation and redraw)
+    xt::xtensor<double,2> m_pos; // yielding positions = cumsum(m_val, axis=1) + init
+                                 // ('init' is computed during initialisation and redraw)
     xt::xtensor<size_t,1> m_idx; // current "index": since the last shift
-    xt::xtensor<long,1> m_idx_t; // current "index": total up to the last shift
-    xt::xtensor<double,1> m_max; // maximum yielding position
-    xt::xtensor<double,1> m_min; // minimum yielding position
-    xt::xtensor<double,1> m_left; // current yielding position to the left == m_pos[:, m_idx]
-    xt::xtensor<double,1> m_right; // current yielding position to the right == m_pos[:, m_idx + 1]
+    xt::xtensor<long,1> m_idx_t; // current "index": total up to the last shift (can be negative)
+    xt::xtensor<double,1> m_max; // maximum yielding positions
+    xt::xtensor<double,1> m_min; // minimum yielding positions
+    xt::xtensor<double,1> m_left; // current yielding positions to the left == m_pos[:, m_idx]
+    xt::xtensor<double,1> m_right; // current yielding positions to the right == m_pos[:, m_idx + 1]
 
     // Function to (re)draw yield positions
     std::function<xt::xtensor<double,2>(std::vector<size_t>)> m_draw;
@@ -95,13 +96,10 @@ inline RedrawList::RedrawList(const E& x, F draw, size_t ntotal, size_t nbuffer,
     QPOT_ASSERT(m_nbuf <= m_ntot);
     QPOT_ASSERT(m_noff <= m_nbuf);
 
-    // set proximity search distance
     m_proximity = std::min(m_proximity, m_ntot);
 
-    // draw yield distance (times two!)
+    // draw yield distance (times two!), and convert to yield positions
     m_val = m_draw({m_N, m_ntot});
-
-    // convert to yield positions
     m_pos = xt::cumsum(m_val, 1);
 
     // shift such that the mean of "x" is in the middle of the potential energy landscape
@@ -117,10 +115,10 @@ inline RedrawList::RedrawList(const E& x, F draw, size_t ntotal, size_t nbuffer,
     QPOT_ASSERT(xt::all(x < m_max));
 
     // allocate current index
-    m_idx = xt::empty<size_t>({m_N});
-    m_idx_t = xt::zeros<long>({m_N});
-    m_left = xt::empty<double>({m_N});
-    m_right = xt::empty<double>({m_N});
+    m_idx = xt::empty<decltype(m_idx)::value_type>({m_N});
+    m_idx_t = xt::zeros<decltype(m_idx_t)::value_type>({m_N});
+    m_left = xt::empty<decltype(m_left)::value_type>({m_N});
+    m_right = xt::empty<decltype(m_right)::value_type>({m_N});
 
     // compute current index (updates "m_idx" only, "m_idx_t" is only changed at redraw)
     for (size_t p = 0; p < m_N; ++p) {
@@ -162,10 +160,10 @@ inline void RedrawList::setPosition(const E& x)
         xt::view(y, xt::all(), xt::range(m_nbuf, m_ntot)) =
             m_draw({index.size(), m_ntot - m_nbuf});
 
-        // store distances
+        // store yield distances
         xt::view(m_val, xt::keep(index), xt::all()) = y;
 
-        // update positions
+        // update yield positions
         xt::view(y, xt::all(), 0) = xt::view(m_pos, xt::keep(index), m_ntot - m_nbuf);
         xt::view(m_pos, xt::keep(index), xt::all()) = xt::cumsum(y, 1);
 
@@ -173,7 +171,7 @@ inline void RedrawList::setPosition(const E& x)
         xt::view(m_idx_t, xt::keep(index)) += m_ntot - m_nbuf;
         xt::view(m_idx, xt::keep(index)) -= m_ntot - m_nbuf;
 
-        // register minimum and maximum positions for each particle
+        // register minimum and maximum yield positions for each particle
         xt::noalias(m_min) = xt::view(m_pos, xt::all(), 0);
         xt::noalias(m_max) = xt::view(m_pos, xt::all(), m_pos.shape(1) - 1);
     }
@@ -199,10 +197,10 @@ inline void RedrawList::setPosition(const E& x)
         xt::view(y, xt::all(), xt::range(0, m_ntot - m_nbuf)) =
             m_draw({index.size(), m_ntot - m_nbuf});
 
-        // store distances
+        // store yield distances
         xt::view(m_val, xt::keep(index), xt::all()) = y;
 
-        // update positions
+        // update yield positions
         xt::view(y, xt::all(), 0) = xt::view(m_pos, xt::keep(index), m_nbuf) - xt::sum(y, 1);
         xt::view(m_pos, xt::keep(index), xt::all()) = xt::cumsum(y, 1);
 
@@ -210,7 +208,7 @@ inline void RedrawList::setPosition(const E& x)
         xt::view(m_idx_t, xt::keep(index)) -= m_ntot - m_nbuf;
         xt::view(m_idx, xt::keep(index)) += m_ntot - m_nbuf;
 
-        // register minimum and maximum positions for each particle
+        // register minimum and maximum yield positions for each particle
         xt::noalias(m_min) = xt::view(m_pos, xt::all(), 0);
         xt::noalias(m_max) = xt::view(m_pos, xt::all(), m_pos.shape(1) - 1);
     }
@@ -221,17 +219,20 @@ inline void RedrawList::setPosition(const E& x)
     QPOT_ASSERT(xt::all(x > m_min));
     QPOT_ASSERT(xt::all(x < m_max));
 
+    using index_type = decltype(m_idx)::value_type;
+    using position_type = typename E::value_type;
+
     for (size_t p = 0; p < m_N; ++p)
     {
-        size_t i = m_idx(p);
-        double xp = x(p);
+        index_type i = m_idx(p);
+        position_type xp = x(p);
 
         if (m_left(p) < xp && m_right(p) >= xp) {
             continue;
         }
 
-        size_t l = i > m_proximity ? i - m_proximity : 0;
-        size_t r = std::min(i + m_proximity, m_ntot - 1);
+        index_type l = i > m_proximity ? i - m_proximity : 0;
+        index_type r = std::min(i + m_proximity, m_ntot - 1);
 
         if (m_pos(p, l) < xp && m_pos(p, r) >= xp) {
             i = std::lower_bound(&m_pos(p,l), &m_pos(p,l) + r - l, xp) - &m_pos(p,l) - 1 + l;

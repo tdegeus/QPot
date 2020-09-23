@@ -35,10 +35,9 @@ but a Python module is also provided (see [installation notes](#python-module)).
 The interfaces are identical except:
 
 +   All *xtensor* objects (`xt::xtensor<...>`) are *NumPy* arrays in Python. 
-    Overloading based on rank is also available in Python.
 +   All `::` in C++ are `.` in Python.
 
-## Stat.hpp
+## Static.hpp
 
 Static list of yield points.
 
@@ -96,6 +95,16 @@ int main()
     return 0;   
 }
 ```
+
+>   From Python one can use:
+>   
+>   ```python
+>   def uniform(shape):
+>       return np.ones(shape)
+>   
+>   x = np.random.rand([100])
+>   y = QPot.RedrawList(x, uniform);
+>   ```
 
 # Installation
 
@@ -182,11 +191,11 @@ The following targets are available:
     Includes *QPot* and the *xtensor* dependency.
 
 *   `QPot::assert`
-    Enables assertions by defining `GMATELASTOPLASTICQPOT_ENABLE_ASSERT`.
+    Enables assertions by defining `QPOT_ENABLE_ASSERT`.
 
 *   `QPot::debug`
     Enables all assertions by defining 
-    `GMATELASTOPLASTICQPOT_ENABLE_ASSERT` and `XTENSOR_ENABLE_ASSERT`.
+    `QPOT_ENABLE_ASSERT` and `XTENSOR_ENABLE_ASSERT`.
 
 *   `QPot::compiler_warings`
     Enables compiler warnings (generic).
