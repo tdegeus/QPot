@@ -39,7 +39,7 @@ public:
     // - "index + 1" : yielding position right
     size_t currentIndex() const;
 
-    // Check if the particle is "n" wells from the far-left/right
+    // Check that the particle is "n" wells from the far-left/right
     bool checkYieldBoundLeft(size_t n = 0) const;
     bool checkYieldBoundRight(size_t n = 0) const;
 
