@@ -1,8 +1,5 @@
 
 #include <catch2/catch.hpp>
-
-#define EQ(a, b) REQUIRE_THAT((a), Catch::WithinAbs((b), 1.e-12));
-
 #include <QPot/Redraw.hpp>
 
 TEST_CASE("QPot::RedrawList", "Redraw.hpp")
