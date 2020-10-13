@@ -42,6 +42,14 @@ py::class_<QPot::Static>(m, "Static")
     .def("currentYieldRight", &QPot::Static::currentYieldRight,
         "Get the yielding position right")
 
+    .def("checkYieldBoundLeft", &QPot::Static::checkYieldBoundLeft,
+        "Check if the particle is 'n' wells from the far-left",
+        py::arg("n") = 0)
+
+    .def("checkYieldBoundRight", &QPot::Static::checkYieldBoundRight,
+        "Check if the particle is 'n' wells from the far-right",
+        py::arg("n") = 0)
+
     .def("currentIndex", &QPot::Static::currentIndex,
         "Get the index of the current minimum. Note:"
         "- 'index' : yielding position left"
