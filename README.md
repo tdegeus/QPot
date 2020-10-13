@@ -246,3 +246,4 @@ enabling *xsimd*, ...
 ## v0.2.0
 
 *   Adding "checkYieldBoundLeft" and "checkYieldBoundRight" to "Static".
+*   Using Catch2 to test for floats.
