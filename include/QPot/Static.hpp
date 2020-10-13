@@ -39,6 +39,10 @@ public:
     // - "index + 1" : yielding position right
     size_t currentIndex() const;
 
+    // Check if the particle is "n" wells from the far-left/right
+    bool checkYieldBoundLeft(size_t n = 0) const;
+    bool checkYieldBoundRight(size_t n = 0) const;
+
 private:
 
     // Initialise
@@ -121,6 +125,18 @@ inline double Static::currentYieldRight() const
 inline size_t Static::currentIndex() const
 {
     return m_idx;
+}
+
+inline bool Static::checkYieldBoundLeft(size_t n) const
+{
+    QPOT_ASSERT(n < m_ntot);
+    return m_idx > n;
+}
+
+inline bool Static::checkYieldBoundRight(size_t n) const
+{
+    QPOT_ASSERT(n < m_ntot);
+    return m_idx < m_ntot - n;
 }
 
 } // namespace QPot

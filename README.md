@@ -240,3 +240,9 @@ c++ `pkg-config --cflags QPot` ...
 
 Note that you have to take care of the *xtensor* dependency, the C++ version, optimization, 
 enabling *xsimd*, ...
+
+# Change-log
+
+## v0.2.0
+
+*   Adding "checkYieldBoundLeft" and "checkYieldBoundRight" to "Static".
