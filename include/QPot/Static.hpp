@@ -19,10 +19,11 @@ public:
     Static() = default;
 
     // Constructor
-    Static(double x, const xt::xtensor<double,1>& yield);
+    Static(double x, const xt::xtensor<double, 1>& yield);
 
-    // Return yield positions
-    xt::xtensor<double,1> yield() const;
+    // Return yield positions:
+    xt::xtensor<double, 1> yield() const; // all
+    xt::xtensor<double, 1> yield(int left, int right) const; // around current position
 
     // Customise proximity search region
     void setProximity(size_t distance);
@@ -51,7 +52,7 @@ private:
 private:
 
     size_t m_proximity = 10; // size of neighbourhood to search first
-    xt::xtensor<double,1> m_pos; // yielding positions
+    xt::xtensor<double, 1> m_pos; // yielding positions
     size_t m_ntot; // len(m_pos)
     size_t m_idx; // current "index"
     double m_max; // maximum yielding position == m_pos[0]
@@ -64,7 +65,7 @@ private:
 // Implementation
 // --------------
 
-inline Static::Static(double x, const xt::xtensor<double,1>& yield) : m_pos(yield)
+inline Static::Static(double x, const xt::xtensor<double, 1>& yield) : m_pos(yield)
 {
     m_ntot = m_pos.size();
     m_proximity = std::min(m_proximity, m_ntot);
@@ -79,9 +80,18 @@ inline Static::Static(double x, const xt::xtensor<double,1>& yield) : m_pos(yiel
     m_right = m_pos(m_idx + 1);
 }
 
-inline xt::xtensor<double,1> Static::yield() const
+inline xt::xtensor<double, 1> Static::yield() const
 {
     return m_pos;
+}
+
+inline xt::xtensor<double, 1> Static::yield(int left, int right) const
+{
+    QPOT_ASSERT(left <= 0);
+    QPOT_ASSERT(right >= 0);
+    QPOT_ASSERT(static_cast<int>(m_idx) + left >= 0);
+    QPOT_ASSERT(static_cast<int>(m_idx) + right < static_cast<int>(m_ntot));
+    return xt::view(m_pos, xt::range(m_idx + left, m_idx + right));
 }
 
 inline void Static::setProximity(size_t proximity)
