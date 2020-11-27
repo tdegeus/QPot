@@ -27,6 +27,10 @@ public:
         size_t noffset = 20); // #yield-positions at which to redraw maximally
                               // (allows grouping of redraws for several particles)
 
+    // Return yield positions:
+    xt::xtensor<double, 2> yield() const; // current list
+    xt::xtensor<double, 2> yield(int left, int right) const; // around current position
+
     // Customise proximity search region
     void setProximity(size_t distance);
 
@@ -35,26 +39,26 @@ public:
     void setPosition(const E& x);
 
     // Get the yielding positions left/right, based on the current positions "x"
-    xt::xtensor<double,1> currentYieldLeft() const; // y[:, index]
-    xt::xtensor<double,1> currentYieldRight() const; // y[:, index + 1]
+    xt::xtensor<double, 1> currentYieldLeft() const; // y[:, index]
+    xt::xtensor<double, 1> currentYieldRight() const; // y[:, index + 1]
 
     // Get the index of the current minima. Note:
     // - "index" : yielding positions left
     // - "index + 1" : yielding positions right
-    xt::xtensor<long,1> currentIndex() const;
+    xt::xtensor<long, 1> currentIndex() const;
 
     // Output raw data
-    xt::xtensor<double,2> raw_val() const;
-    xt::xtensor<double,2> raw_pos() const;
-    xt::xtensor<size_t,1> raw_idx() const;
-    xt::xtensor<long,1> raw_idx_t() const;
+    xt::xtensor<double, 2> raw_val() const;
+    xt::xtensor<double, 2> raw_pos() const;
+    xt::xtensor<size_t, 1> raw_idx() const;
+    xt::xtensor<long, 1> raw_idx_t() const;
 
     // Restore raw data
     void restore(
-        const xt::xtensor<double,2>& val,
-        const xt::xtensor<double,2>& pos,
-        const xt::xtensor<size_t,1>& idx,
-        const xt::xtensor<long,1>& idx_t);
+        const xt::xtensor<double, 2>& val,
+        const xt::xtensor<double, 2>& pos,
+        const xt::xtensor<size_t, 1>& idx,
+        const xt::xtensor<long, 1>& idx_t);
 
 private:
 
@@ -70,18 +74,18 @@ private:
     size_t m_proximity = 10; // size of neighbourhood to search first
 
     // Yield positions
-    xt::xtensor<double,2> m_val; // drawn random values
-    xt::xtensor<double,2> m_pos; // yielding positions = cumsum(m_val, axis=1) + init
+    xt::xtensor<double, 2> m_val; // drawn random values
+    xt::xtensor<double, 2> m_pos; // yielding positions = cumsum(m_val, axis=1) + init
                                  // ('init' is computed during initialisation and redraw)
-    xt::xtensor<size_t,1> m_idx; // current "index": since the last shift
-    xt::xtensor<long,1> m_idx_t; // current "index": total up to the last shift (can be negative)
-    xt::xtensor<double,1> m_max; // maximum yielding positions
-    xt::xtensor<double,1> m_min; // minimum yielding positions
-    xt::xtensor<double,1> m_left; // current yielding positions to the left == m_pos[:, m_idx]
-    xt::xtensor<double,1> m_right; // current yielding positions to the right == m_pos[:, m_idx + 1]
+    xt::xtensor<size_t, 1> m_idx; // current "index": since the last shift
+    xt::xtensor<long, 1> m_idx_t; // current "index": total up to the last shift (can be negative)
+    xt::xtensor<double, 1> m_max; // maximum yielding positions
+    xt::xtensor<double, 1> m_min; // minimum yielding positions
+    xt::xtensor<double, 1> m_left; // current yielding positions to the left == m_pos[:, m_idx]
+    xt::xtensor<double, 1> m_right; // current yielding positions to the right == m_pos[:, m_idx + 1]
 
     // Function to (re)draw yield positions
-    std::function<xt::xtensor<double,2>(std::vector<size_t>)> m_draw;
+    std::function<xt::xtensor<double, 2>(std::vector<size_t>)> m_draw;
 };
 
 // --------------
@@ -129,6 +133,24 @@ inline RedrawList::RedrawList(const E& x, F draw, size_t ntotal, size_t nbuffer,
     }
 }
 
+inline xt::xtensor<double, 2> RedrawList::yield() const
+{
+    return m_pos;
+}
+
+inline xt::xtensor<double, 2> RedrawList::yield(int left, int right) const
+{
+    QPOT_ASSERT(left <= 0);
+    QPOT_ASSERT(right >= 0);
+    xt::xtensor<double, 2> ret = xt::empty<double>({m_N, static_cast<size_t>(right - left)});
+    for (size_t p = 0; p < m_N; ++p) {
+        QPOT_ASSERT(static_cast<int>(m_idx(p)) + left >= 0);
+        QPOT_ASSERT(static_cast<int>(m_idx(p)) + right < static_cast<int>(m_ntot));
+        xt::view(ret, p, xt::all()) = xt::view(m_pos, p, xt::range(m_idx(p) + left, m_idx(p) + right));
+    }
+    return ret;
+}
+
 inline void RedrawList::setProximity(size_t proximity)
 {
     m_proximity = proximity;
@@ -146,11 +168,11 @@ inline void RedrawList::setPosition(const E& x)
     {
         // get rows for which a redraw is needed
         // use the opportunity to redraw multiple rows
-        xt::xtensor<size_t,1> index = xt::flatten_indices(xt::argwhere(
+        xt::xtensor<size_t, 1> index = xt::flatten_indices(xt::argwhere(
             x >= xt::view(m_pos, xt::all(), m_ntot - m_noff)));
 
         // allocate new yield distances (times two!)
-        xt::xtensor<double,2> y = xt::empty<double>({index.size(), m_ntot});
+        xt::xtensor<double, 2> y = xt::empty<double>({index.size(), m_ntot});
 
         // apply buffer: insert previously drawn values
         xt::view(y, xt::all(), xt::range(0, m_nbuf)) =
@@ -183,11 +205,11 @@ inline void RedrawList::setPosition(const E& x)
     {
         // get rows for which a redraw is needed
         // use the opportunity to redraw multiple rows
-        xt::xtensor<size_t,1> index = xt::flatten_indices(xt::argwhere(
+        xt::xtensor<size_t, 1> index = xt::flatten_indices(xt::argwhere(
             x <= xt::view(m_pos, xt::all(), m_noff)));
 
         // allocate new yield distances (times two!)
-        xt::xtensor<double,2> y = xt::empty<double>({index.size(), m_ntot});
+        xt::xtensor<double, 2> y = xt::empty<double>({index.size(), m_ntot});
 
         // apply buffer: insert previously drawn values
         xt::view(y, xt::all(), xt::range(m_ntot - m_nbuf, m_ntot)) =
@@ -247,46 +269,46 @@ inline void RedrawList::setPosition(const E& x)
     }
 }
 
-inline xt::xtensor<double,1> RedrawList::currentYieldLeft() const
+inline xt::xtensor<double, 1> RedrawList::currentYieldLeft() const
 {
     return m_left;
 }
 
-inline xt::xtensor<double,1> RedrawList::currentYieldRight() const
+inline xt::xtensor<double, 1> RedrawList::currentYieldRight() const
 {
     return m_right;
 }
 
-inline xt::xtensor<long,1> RedrawList::currentIndex() const
+inline xt::xtensor<long, 1> RedrawList::currentIndex() const
 {
     return m_idx_t + xt::cast<long>(m_idx);
 }
 
-inline xt::xtensor<double,2> RedrawList::raw_val() const
+inline xt::xtensor<double, 2> RedrawList::raw_val() const
 {
     return m_val;
 }
 
-inline xt::xtensor<double,2> RedrawList::raw_pos() const
+inline xt::xtensor<double, 2> RedrawList::raw_pos() const
 {
     return m_pos;
 }
 
-inline xt::xtensor<size_t,1> RedrawList::raw_idx() const
+inline xt::xtensor<size_t, 1> RedrawList::raw_idx() const
 {
     return m_idx;
 }
 
-inline xt::xtensor<long,1> RedrawList::raw_idx_t() const
+inline xt::xtensor<long, 1> RedrawList::raw_idx_t() const
 {
     return m_idx_t;
 }
 
 inline void RedrawList::restore(
-    const xt::xtensor<double,2>& val,
-    const xt::xtensor<double,2>& pos,
-    const xt::xtensor<size_t,1>& idx,
-    const xt::xtensor<long,1>& idx_t)
+    const xt::xtensor<double, 2>& val,
+    const xt::xtensor<double, 2>& pos,
+    const xt::xtensor<size_t, 1>& idx,
+    const xt::xtensor<long, 1>& idx_t)
 {
     m_val = val;
     m_pos = pos;
