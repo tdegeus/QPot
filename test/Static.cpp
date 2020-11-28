@@ -29,7 +29,7 @@ TEST_CASE("QPot::Static", "Static.hpp")
     {
         xt::xtensor<double, 1> y = xt::linspace<double>(0, 10, 11);
         QPot::Static yield(5.5, y);
-        xt::xtensor<double, 1> ret = {4, 5, 6, 7};
-        REQUIRE(xt::allclose(yield.yield(-2, 2), ret));
+        xt::xtensor<double, 1> ret = {3, 4, 5, 6, 7};
+        REQUIRE(xt::allclose(yield.yield(-2, 3), ret));
     }
 }

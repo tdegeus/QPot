@@ -44,9 +44,9 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
         xt::xtensor<double, 1> x = {4.5, 5.5, 6.5};
         QPot::RedrawList yield(x, uniform, 30, 5, 2);
         xt::xtensor<double, 2> ret = {
-            {3, 4, 5, 6},
-            {4, 5, 6, 7},
-            {5, 6, 7, 8}};
-        REQUIRE(xt::allclose(yield.yield(-2, 2), ret));
+            {2, 3, 4, 5, 6},
+            {3, 4, 5, 6, 7},
+            {4, 5, 6, 7, 8}};
+        REQUIRE(xt::allclose(yield.yield(-2, 3), ret));
     }
 }

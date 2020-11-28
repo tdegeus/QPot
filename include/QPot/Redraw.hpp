@@ -29,7 +29,7 @@ public:
 
     // Return yield positions:
     xt::xtensor<double, 2> yield() const; // current list
-    xt::xtensor<double, 2> yield(int left, int right) const; // around current position
+    xt::xtensor<double, 2> yield(int left, int right) const; // around position: i + left: i + right
 
     // Customise proximity search region
     void setProximity(size_t distance);
