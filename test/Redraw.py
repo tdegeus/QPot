@@ -1,34 +1,41 @@
-
+import unittest
 import numpy as np
 import QPot
 
-x = np.array([-1.0, 0.0, 1.0])
-l = np.array([-1.5, -0.5, 0.5])
-r = l + 1.0
-i = np.array([13, 14, 15])
+class Test_main(unittest.TestCase):
 
-def uniform(shape):
-    return np.ones(shape)
+    def test_Basic(self):
 
-y = QPot.RedrawList(x, uniform, 30, 5, 2);
+        x = np.array([-1.0, 0.0, 1.0])
+        l = np.array([-1.5, -0.5, 0.5])
+        r = l + 1.0
+        i = np.array([13, 14, 15])
 
-for j in range(20):
-    x += 1.0
-    l += 1.0
-    r += 1.0
-    i += 1
-    y.setPosition(x)
-    print(y.currentIndex())
-    assert np.all(np.equal(y.currentYieldLeft(), l))
-    assert np.all(np.equal(y.currentYieldRight(), r))
-    assert np.all(np.equal(y.currentIndex(), i))
+        def uniform(shape):
+            return np.ones(shape)
 
-for j in range(40):
-    x -= 1.0
-    l -= 1.0
-    r -= 1.0
-    i -= 1
-    y.setPosition(x)
-    assert np.all(np.equal(y.currentYieldLeft(), l))
-    assert np.all(np.equal(y.currentYieldRight(), r))
-    assert np.all(np.equal(y.currentIndex(), i))
+        y = QPot.RedrawList(x, uniform, 30, 5, 2);
+
+        for j in range(20):
+            x += 1.0
+            l += 1.0
+            r += 1.0
+            i += 1
+            y.setPosition(x)
+            self.assertTrue(np.all(np.equal(y.currentYieldLeft(), l)))
+            self.assertTrue(np.all(np.equal(y.currentYieldRight(), r)))
+            self.assertTrue(np.all(np.equal(y.currentIndex(), i)))
+
+        for j in range(40):
+            x -= 1.0
+            l -= 1.0
+            r -= 1.0
+            i -= 1
+            y.setPosition(x)
+            self.assertTrue(np.all(np.equal(y.currentYieldLeft(), l)))
+            self.assertTrue(np.all(np.equal(y.currentYieldRight(), r)))
+            self.assertTrue(np.all(np.equal(y.currentIndex(), i)))
+
+if __name__ == '__main__':
+
+    unittest.main()
