@@ -165,7 +165,7 @@ inline xt::xtensor<double, 1> RedrawList::currentYieldLeft(size_t offset) const
 
 inline xt::xtensor<double, 1> RedrawList::currentYieldRight(size_t offset) const
 {
-    QPOT_ASSERT(xt::amax(m_idx)() + offset < m_ntot);
+    QPOT_ASSERT(xt::amax(m_idx)() + 1 + offset < m_ntot);
     xt::xtensor<double, 1> ret = xt::empty<double>({m_N});
     for (size_t p = 0; p < m_N; ++p) {
         ret(p) = m_pos(p, m_idx(p) + 1 + offset);

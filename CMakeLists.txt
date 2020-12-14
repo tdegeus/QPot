@@ -14,7 +14,7 @@ option(BUILD_TESTS "${PROJECT_NAME} Build tests" OFF)
 file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/include/QPot/config.h" _QPOT_ver
      REGEX "#define QPOT_VERSION_(MAJOR|MINOR|PATCH)")
 
-foreach(ver ${_QPOT_vers})
+foreach(ver ${_QPOT_ver})
     if(ver MATCHES "#define QPOT_VERSION_(MAJOR|MINOR|PATCH) +([^ ]+)$")
         set(_QPOT_VERSION_${CMAKE_MATCH_1} "${CMAKE_MATCH_2}"  CACHE INTERNAL "")
     endif()
