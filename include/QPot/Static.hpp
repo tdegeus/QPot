@@ -8,7 +8,6 @@
 #define QPOT_STATIC_HPP
 
 #include "config.h"
-#include <xtensor/xio.hpp>
 
 namespace QPot {
 
@@ -118,7 +117,7 @@ inline double Static::currentYieldLeft(size_t offset) const
 
 inline double Static::currentYieldRight(size_t offset) const
 {
-    QPOT_ASSERT(m_idx + offset < m_ntot);
+    QPOT_ASSERT(m_idx + 1 + offset < m_ntot);
     return m_pos(m_idx + 1 + offset);
 }
 

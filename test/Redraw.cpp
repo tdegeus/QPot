@@ -38,10 +38,10 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
                 REQUIRE(xt::allclose(yield.currentYieldLeft(2), l - 2.0));
             }
 
-            if (xt::amax(yield.raw_idx())() < 30 - 1) {
+            if (xt::amax(yield.raw_idx())() < 30 - 2) {
                 REQUIRE(xt::allclose(yield.currentYieldRight(1), r + 1.0));
             }
-            if (xt::amax(yield.raw_idx())() < 30 - 2) {
+            if (xt::amax(yield.raw_idx())() < 30 - 3) {
                 REQUIRE(xt::allclose(yield.currentYieldRight(2), r + 2.0));
             }
         }
@@ -67,10 +67,10 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
                 REQUIRE(xt::allclose(yield.currentYieldLeft(2), l - 2.0));
             }
 
-            if (xt::amax(yield.raw_idx())() < 30 - 1) {
+            if (xt::amax(yield.raw_idx())() < 30 - 2) {
                 REQUIRE(xt::allclose(yield.currentYieldRight(1), r + 1.0));
             }
-            if (xt::amax(yield.raw_idx())() < 30 - 2) {
+            if (xt::amax(yield.raw_idx())() < 30 - 3) {
                 REQUIRE(xt::allclose(yield.currentYieldRight(2), r + 2.0));
             }
         }
