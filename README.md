@@ -245,6 +245,7 @@ enabling *xsimd*, ...
 
 ## v0.3.0
 
+*   Switching to GitHub CI.
 *   Adding `yield` to return the entire landscape or a cross-section.
 *   Adding offset overloads to `currentYieldLeft` and `currentYieldRight`.
 *   Adding `currentYield` to get the landscape around the current position.

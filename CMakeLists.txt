@@ -11,15 +11,12 @@ option(BUILD_TESTS "${PROJECT_NAME} Build tests" OFF)
 # Version
 # =======
 
-file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/include/QPot/config.h"
-             _QPOT_version_defines
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/include/QPot/config.h" _QPOT_ver
      REGEX "#define QPOT_VERSION_(MAJOR|MINOR|PATCH)")
 
-foreach(ver ${_QPOT_version_defines})
+foreach(ver ${_QPOT_vers})
     if(ver MATCHES "#define QPOT_VERSION_(MAJOR|MINOR|PATCH) +([^ ]+)$")
-        set(_QPOT_VERSION_${CMAKE_MATCH_1}
-            "${CMAKE_MATCH_2}"
-            CACHE INTERNAL "")
+        set(_QPOT_VERSION_${CMAKE_MATCH_1} "${CMAKE_MATCH_2}"  CACHE INTERNAL "")
     endif()
 endforeach()
 
@@ -80,6 +77,10 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/QPot.pc"
 
 include("QPotConfig.cmake")
 
+set(CTEST_TEST_TARGET_ALIAS RUN_ALL_TESTS)
+include(CTest)
+
 if(BUILD_TESTS)
+    enable_testing()
     add_subdirectory(test)
 endif()
