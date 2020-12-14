@@ -243,6 +243,12 @@ enabling *xsimd*, ...
 
 # Change-log
 
+## v0.3.0
+
+*   Adding `yield` to return the entire landscape or a cross-section.
+*   Adding offset overloads to `currentYieldLeft` and `currentYieldRight`.
+*   Adding `currentYield` to get the landscape around the current position.
+
 ## v0.2.0
 
 *   Adding "checkYieldBoundLeft" and "checkYieldBoundRight" to "Static".

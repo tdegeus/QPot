@@ -28,8 +28,9 @@ public:
                               // (allows grouping of redraws for several particles)
 
     // Return yield positions:
-    xt::xtensor<double, 2> yield() const; // current list
-    xt::xtensor<double, 2> yield(int left, int right) const; // around position: i + left: i + right
+    xt::xtensor<double, 2> yield() const; // y
+    xt::xtensor<double, 2> yield(size_t start, size_t stop) const; // y[:, left: right]
+    xt::xtensor<double, 1> yield(size_t i) const; // y[i]
 
     // Customise proximity search region
     void setProximity(size_t distance);
@@ -39,8 +40,11 @@ public:
     void setPosition(const E& x);
 
     // Get the yielding positions left/right, based on the current positions "x"
-    xt::xtensor<double, 1> currentYieldLeft() const; // y[:, index]
-    xt::xtensor<double, 1> currentYieldRight() const; // y[:, index + 1]
+    xt::xtensor<double, 1> currentYieldLeft() const; // y[:, current_index]
+    xt::xtensor<double, 1> currentYieldRight() const; // y[:, current_index + 1]
+    xt::xtensor<double, 1> currentYieldLeft(size_t offset) const; // y[:, current_index - offset]
+    xt::xtensor<double, 1> currentYieldRight(size_t offset) const; // y[:, current_index + 1 - offset]
+    xt::xtensor<double, 2> currentYield(int left, int right) const; // y[:, current_index + left: current_index + right]
 
     // Get the index of the current minima. Note:
     // - "index" : yielding positions left
@@ -138,7 +142,38 @@ inline xt::xtensor<double, 2> RedrawList::yield() const
     return m_pos;
 }
 
-inline xt::xtensor<double, 2> RedrawList::yield(int left, int right) const
+inline xt::xtensor<double, 2> RedrawList::yield(size_t start, size_t stop) const
+{
+    return xt::view(m_pos, xt::all(), xt::range(start, stop));
+}
+
+inline xt::xtensor<double, 1> RedrawList::yield(size_t i) const
+{
+    QPOT_ASSERT(i < m_ntot);
+    return xt::view(m_pos, xt::all(), i);
+}
+
+inline xt::xtensor<double, 1> RedrawList::currentYieldLeft(size_t offset) const
+{
+    QPOT_ASSERT(offset <= xt::amin(m_idx)());
+    xt::xtensor<double, 1> ret = xt::empty<double>({m_N});
+    for (size_t p = 0; p < m_N; ++p) {
+        ret(p) = m_pos(p, m_idx(p) - offset);
+    }
+    return ret;
+}
+
+inline xt::xtensor<double, 1> RedrawList::currentYieldRight(size_t offset) const
+{
+    QPOT_ASSERT(xt::amax(m_idx)() + offset < m_ntot);
+    xt::xtensor<double, 1> ret = xt::empty<double>({m_N});
+    for (size_t p = 0; p < m_N; ++p) {
+        ret(p) = m_pos(p, m_idx(p) + 1 + offset);
+    }
+    return ret;
+}
+
+inline xt::xtensor<double, 2> RedrawList::currentYield(int left, int right) const
 {
     QPOT_ASSERT(left <= 0);
     QPOT_ASSERT(right >= 0);

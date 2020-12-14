@@ -23,7 +23,8 @@ public:
 
     // Return yield positions:
     xt::xtensor<double, 1> yield() const; // all
-    xt::xtensor<double, 1> yield(int left, int right) const; // around position: i + left: i + right
+    xt::xtensor<double, 1> yield(size_t start, size_t stop) const; // y[left: right]
+    double yield(size_t i) const; // y[index]
 
     // Customise proximity search region
     void setProximity(size_t distance);
@@ -32,12 +33,15 @@ public:
     void setPosition(double x);
 
     // Get the yielding position left/right, based on the current position "x"
-    double currentYieldLeft() const; // y[index]
-    double currentYieldRight() const; // y[index + 1]
+    double currentYieldLeft() const; // y[current_index]
+    double currentYieldRight() const; // y[current_index + 1]
+    double currentYieldLeft(size_t offset) const; // y[current_index - offset]
+    double currentYieldRight(size_t offset) const; // y[current_index + 1 - offset]
+    xt::xtensor<double, 1> currentYield(int left, int right) const; // y[current_index + left: current_index + right]
 
     // Get the index of the current minimum. Note:
-    // - "index" : yielding position left
-    // - "index + 1" : yielding position right
+    // - "current_index" : yielding position left
+    // - "current_index + 1" : yielding position right
     size_t currentIndex() const;
 
     // Check that the particle is "n" wells from the far-left/right
@@ -85,13 +89,37 @@ inline xt::xtensor<double, 1> Static::yield() const
     return m_pos;
 }
 
-inline xt::xtensor<double, 1> Static::yield(int left, int right) const
+inline xt::xtensor<double, 1> Static::yield(size_t start, size_t stop) const
+{
+    QPOT_ASSERT(stop <= m_ntot);
+    return xt::view(m_pos, xt::range(start, stop));
+}
+
+inline double Static::yield(size_t i) const
+{
+    QPOT_ASSERT(i < m_ntot);
+    return m_pos(i);
+}
+
+inline xt::xtensor<double, 1> Static::currentYield(int left, int right) const
 {
     QPOT_ASSERT(left <= 0);
     QPOT_ASSERT(right >= 0);
     QPOT_ASSERT(static_cast<int>(m_idx) + left >= 0);
     QPOT_ASSERT(static_cast<int>(m_idx) + right < static_cast<int>(m_ntot));
     return xt::view(m_pos, xt::range(m_idx + left, m_idx + right));
+}
+
+inline double Static::currentYieldLeft(size_t offset) const
+{
+    QPOT_ASSERT(offset <= m_idx);
+    return m_pos(m_idx - offset);
+}
+
+inline double Static::currentYieldRight(size_t offset) const
+{
+    QPOT_ASSERT(m_idx + offset < m_ntot);
+    return m_pos(m_idx + 1 + offset);
 }
 
 inline void Static::setProximity(size_t proximity)

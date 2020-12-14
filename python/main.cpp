@@ -25,8 +25,29 @@ m.doc() = "Library to keep track of a sequential potential energy landscape.";
 
 py::class_<QPot::Static>(m, "Static")
 
-    .def(py::init<double, xt::xtensor<double,1>>(),
-        "Static yield sequence.", py::arg("x"), py::arg("yield"))
+    .def(
+        py::init<double, xt::xtensor<double,1>>(),
+        "Static yield sequence.",
+        py::arg("x"),
+        py::arg("yield"))
+
+    .def(
+        "yield",
+        py::overload_cast<>(&QPot::Static::yield, py::const_),
+        "Yield positions")
+
+    .def(
+        "yield",
+        py::overload_cast<size_t>(&QPot::Static::yield, py::const_),
+        "Specific yield position",
+        py::arg("i"))
+
+    .def(
+        "yield",
+        py::overload_cast<size_t, size_t>(&QPot::Static::yield, py::const_),
+        "Range of yield position",
+        py::arg("start"),
+        py::arg("stop"))
 
     .def("setProximity", &QPot::Static::setProximity,
         "Customise proximity search",
@@ -36,11 +57,27 @@ py::class_<QPot::Static>(m, "Static")
         "Update current position",
         py::arg("x"))
 
-    .def("currentYieldLeft", &QPot::Static::currentYieldLeft,
+    .def(
+        "currentYieldLeft",
+        py::overload_cast<>(&QPot::Static::currentYieldLeft, py::const_),
         "Get the yielding position left")
 
-    .def("currentYieldRight", &QPot::Static::currentYieldRight,
+    .def(
+        "currentYieldRight",
+        py::overload_cast<>(&QPot::Static::currentYieldRight, py::const_),
         "Get the yielding position right")
+
+    .def(
+        "currentYieldLeft",
+        py::overload_cast<size_t>(&QPot::Static::currentYieldLeft, py::const_),
+        "Get the yielding position left",
+        py::arg("offset"))
+
+    .def(
+        "currentYieldRight",
+        py::overload_cast<size_t>(&QPot::Static::currentYieldRight, py::const_),
+        "Get the yielding position right",
+        py::arg("offset"))
 
     .def("checkYieldBoundLeft", &QPot::Static::checkYieldBoundLeft,
         "Check if the particle is 'n' wells from the far-left",
@@ -49,6 +86,13 @@ py::class_<QPot::Static>(m, "Static")
     .def("checkYieldBoundRight", &QPot::Static::checkYieldBoundRight,
         "Check if the particle is 'n' wells from the far-right",
         py::arg("n") = 0)
+
+    .def(
+        "currentYield",
+        &QPot::Static::currentYield,
+        "Range of yielding positions relative to the current yielding position.",
+        py::arg("left"),
+        py::arg("right"))
 
     .def("currentIndex", &QPot::Static::currentIndex,
         "Get the index of the current minimum. Note:"
@@ -61,12 +105,37 @@ py::class_<QPot::Static>(m, "Static")
 
 py::class_<QPot::RedrawList>(m, "RedrawList")
 
-    .def(py::init<xt::xtensor<double,1>,
-                  std::function<xt::xtensor<double,2>(std::vector<size_t>)>,
-                  size_t,
-                  size_t,
-                  size_t>(),
-        "RedrawList", py::arg("x"), py::arg("redraw_function"), py::arg("ntotal") = 1000, py::arg("nbuffer") = 300, py::arg("noffset") = 20)
+    .def(
+        py::init<
+            xt::xtensor<double,1>,
+            std::function<xt::xtensor<double,2>(std::vector<size_t>)>,
+            size_t,
+            size_t,
+            size_t>(),
+        "RedrawList",
+        py::arg("x"),
+        py::arg("redraw_function"),
+        py::arg("ntotal") = 1000,
+        py::arg("nbuffer") = 300,
+        py::arg("noffset") = 20)
+
+    .def(
+        "yield",
+        py::overload_cast<>(&QPot::RedrawList::yield, py::const_),
+        "Yield positions")
+
+    .def(
+        "yield",
+        py::overload_cast<size_t>(&QPot::RedrawList::yield, py::const_),
+        "Specific yield position",
+        py::arg("i"))
+
+    .def(
+        "yield",
+        py::overload_cast<size_t, size_t>(&QPot::RedrawList::yield, py::const_),
+        "Range of yield position",
+        py::arg("start"),
+        py::arg("stop"))
 
     .def("setProximity", &QPot::RedrawList::setProximity,
         "Customise proximity search",
@@ -76,11 +145,34 @@ py::class_<QPot::RedrawList>(m, "RedrawList")
         "Update current position",
         py::arg("x"))
 
-    .def("currentYieldLeft", &QPot::RedrawList::currentYieldLeft,
+    .def(
+        "currentYieldLeft",
+        py::overload_cast<>(&QPot::RedrawList::currentYieldLeft, py::const_),
         "Get the yielding position left")
 
-    .def("currentYieldRight", &QPot::RedrawList::currentYieldRight,
+    .def(
+        "currentYieldRight",
+        py::overload_cast<>(&QPot::RedrawList::currentYieldRight, py::const_),
         "Get the yielding position right")
+
+    .def(
+        "currentYieldLeft",
+        py::overload_cast<size_t>(&QPot::RedrawList::currentYieldLeft, py::const_),
+        "Get the yielding position left",
+        py::arg("offset"))
+
+    .def(
+        "currentYieldRight",
+        py::overload_cast<size_t>(&QPot::RedrawList::currentYieldRight, py::const_),
+        "Get the yielding position right",
+        py::arg("offset"))
+
+    .def(
+        "currentYield",
+        &QPot::RedrawList::currentYield,
+        "Range of yielding positions relative to the current yielding position.",
+        py::arg("left"),
+        py::arg("right"))
 
     .def("currentIndex", &QPot::RedrawList::currentIndex,
         "Get the index of the current minimum.")
