@@ -44,7 +44,7 @@ jobs:
     - name: Configure using CMake
       run: cmake . -DBUILD_TESTS=1
 
-    - name: Build C++ tests & examples
+    - name: Build C++ tests
       run: cmake --build .
 
     - name: Run C++ tests

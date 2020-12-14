@@ -1,7 +1,6 @@
 # QPot
 
-[![Travis](https://travis-ci.com/tdegeus/QPot.svg?branch=master)](https://travis-ci.com/tdegeus/QPot)
-[![Build status](https://ci.appveyor.com/api/projects/status/mk27sy0gqpasxh2g?svg=true)](https://ci.appveyor.com/project/tdegeus/qpot)
+[![CI](https://github.com/tdegeus/QPot/workflows/CI/badge.svg)](https://github.com/tdegeus/QPot/actions)
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/qpot.svg)](https://anaconda.org/conda-forge/qpot)
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/python-qpot.svg)](https://anaconda.org/conda-forge/python-qpot)
 
