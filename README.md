@@ -274,6 +274,10 @@ enabling *xsimd*, ...
 
 # Change-log
 
+## v0.4.0
+
+*   Adding `nextYield`.
+
 ## v0.3.0
 
 *   Switching to GitHub CI.
