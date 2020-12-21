@@ -31,18 +31,25 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
             REQUIRE(xt::allclose(yield.currentYieldLeft(0), l));
             REQUIRE(xt::allclose(yield.currentYieldRight(0), r));
 
+            REQUIRE(xt::allclose(yield.nextYield(-1), l));
+            REQUIRE(xt::allclose(yield.nextYield(+1), r));
+
             if (xt::amin(yield.raw_idx())() > 0) {
                 REQUIRE(xt::allclose(yield.currentYieldLeft(1), l - 1.0));
+                REQUIRE(xt::allclose(yield.nextYield(-2), l - 1.0));
             }
             if (xt::amin(yield.raw_idx())() > 1) {
                 REQUIRE(xt::allclose(yield.currentYieldLeft(2), l - 2.0));
+                REQUIRE(xt::allclose(yield.nextYield(-3), l - 2.0));
             }
 
             if (xt::amax(yield.raw_idx())() < 30 - 2) {
                 REQUIRE(xt::allclose(yield.currentYieldRight(1), r + 1.0));
+                REQUIRE(xt::allclose(yield.nextYield(+2), r + 1.0));
             }
             if (xt::amax(yield.raw_idx())() < 30 - 3) {
                 REQUIRE(xt::allclose(yield.currentYieldRight(2), r + 2.0));
+                REQUIRE(xt::allclose(yield.nextYield(+3), r + 2.0));
             }
         }
 
@@ -60,18 +67,25 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
             REQUIRE(xt::allclose(yield.currentYieldLeft(0), l));
             REQUIRE(xt::allclose(yield.currentYieldRight(0), r));
 
+            REQUIRE(xt::allclose(yield.nextYield(-1), l));
+            REQUIRE(xt::allclose(yield.nextYield(+1), r));
+
             if (xt::amin(yield.raw_idx())() > 0) {
                 REQUIRE(xt::allclose(yield.currentYieldLeft(1), l - 1.0));
+                REQUIRE(xt::allclose(yield.nextYield(-2), l - 1.0));
             }
             if (xt::amin(yield.raw_idx())() > 1) {
                 REQUIRE(xt::allclose(yield.currentYieldLeft(2), l - 2.0));
+                REQUIRE(xt::allclose(yield.nextYield(-3), l - 2.0));
             }
 
             if (xt::amax(yield.raw_idx())() < 30 - 2) {
                 REQUIRE(xt::allclose(yield.currentYieldRight(1), r + 1.0));
+                REQUIRE(xt::allclose(yield.nextYield(+2), r + 1.0));
             }
             if (xt::amax(yield.raw_idx())() < 30 - 3) {
                 REQUIRE(xt::allclose(yield.currentYieldRight(2), r + 2.0));
+                REQUIRE(xt::allclose(yield.nextYield(+3), r + 2.0));
             }
         }
     }

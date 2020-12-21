@@ -26,6 +26,18 @@ TEST_CASE("QPot::Static", "Static.hpp")
         REQUIRE(xt::allclose(yield.currentYieldRight(1), 7.0));
         REQUIRE(xt::allclose(yield.currentYieldRight(2), 8.0));
 
+        REQUIRE(xt::allclose(yield.currentYieldRight(0), yield.currentYieldRight()));
+        REQUIRE(xt::allclose(yield.currentYieldRight(1), 7.0));
+        REQUIRE(xt::allclose(yield.currentYieldRight(2), 8.0));
+
+        REQUIRE(xt::allclose(yield.nextYield(-1), yield.currentYieldLeft()));
+        REQUIRE(xt::allclose(yield.nextYield(-2), 4.0));
+        REQUIRE(xt::allclose(yield.nextYield(-3), 3.0));
+
+        REQUIRE(xt::allclose(yield.nextYield(+1), yield.currentYieldRight()));
+        REQUIRE(xt::allclose(yield.nextYield(+2), 7.0));
+        REQUIRE(xt::allclose(yield.nextYield(+3), 8.0));
+
         yield.setPosition(6.5);
 
         REQUIRE(yield.currentIndex() == 6);
@@ -43,6 +55,14 @@ TEST_CASE("QPot::Static", "Static.hpp")
         REQUIRE(xt::allclose(yield.currentYieldRight(0), yield.currentYieldRight()));
         REQUIRE(xt::allclose(yield.currentYieldRight(1), 8.0));
         REQUIRE(xt::allclose(yield.currentYieldRight(2), 9.0));
+
+        REQUIRE(xt::allclose(yield.nextYield(-1), yield.currentYieldLeft()));
+        REQUIRE(xt::allclose(yield.nextYield(-2), 5.0));
+        REQUIRE(xt::allclose(yield.nextYield(-3), 4.0));
+
+        REQUIRE(xt::allclose(yield.nextYield(+1), yield.currentYieldRight()));
+        REQUIRE(xt::allclose(yield.nextYield(+2), 8.0));
+        REQUIRE(xt::allclose(yield.nextYield(+3), 9.0));
     }
 
     SECTION("Static::currentYield")
