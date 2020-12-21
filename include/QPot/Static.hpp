@@ -32,10 +32,11 @@ public:
     void setPosition(double x);
 
     // Get the yielding position left/right, based on the current position "x"
+    double nextYield(int offset) const; // offset > 0: y[current_index + offset], offset < 0: y[current_index + offset + 1]
     double currentYieldLeft() const; // y[current_index]
     double currentYieldRight() const; // y[current_index + 1]
     double currentYieldLeft(size_t offset) const; // y[current_index - offset]
-    double currentYieldRight(size_t offset) const; // y[current_index + 1 - offset]
+    double currentYieldRight(size_t offset) const; // y[current_index + 1 + offset]
     xt::xtensor<double, 1> currentYield(int left, int right) const; // y[current_index + left: current_index + right]
 
     // Get the index of the current minimum. Note:
@@ -119,6 +120,21 @@ inline double Static::currentYieldRight(size_t offset) const
 {
     QPOT_ASSERT(m_idx + 1 + offset < m_ntot);
     return m_pos(m_idx + 1 + offset);
+}
+
+inline double Static::nextYield(int offset) const
+{
+    QPOT_ASSERT(offset != 0);
+
+    if (offset < 0) {
+        size_t shift = static_cast<size_t>(- offset);
+        QPOT_ASSERT(shift - 1 <= m_idx);
+        return m_pos(m_idx - shift + 1);
+    }
+
+    size_t shift = static_cast<size_t>(offset);
+    QPOT_ASSERT(m_idx + shift < m_ntot);
+    return m_pos(m_idx + shift);
 }
 
 inline void Static::setProximity(size_t proximity)

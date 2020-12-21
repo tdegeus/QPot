@@ -40,10 +40,11 @@ public:
     void setPosition(const E& x);
 
     // Get the yielding positions left/right, based on the current positions "x"
+    xt::xtensor<double, 1> nextYield(int offset) const; // offset > 0: y[current_index + offset], offset < 0: y[current_index + offset + 1]
     xt::xtensor<double, 1> currentYieldLeft() const; // y[:, current_index]
     xt::xtensor<double, 1> currentYieldRight() const; // y[:, current_index + 1]
     xt::xtensor<double, 1> currentYieldLeft(size_t offset) const; // y[:, current_index - offset]
-    xt::xtensor<double, 1> currentYieldRight(size_t offset) const; // y[:, current_index + 1 - offset]
+    xt::xtensor<double, 1> currentYieldRight(size_t offset) const; // y[:, current_index + 1 + offset]
     xt::xtensor<double, 2> currentYield(int left, int right) const; // y[:, current_index + left: current_index + right]
 
     // Get the index of the current minima. Note:
@@ -169,6 +170,29 @@ inline xt::xtensor<double, 1> RedrawList::currentYieldRight(size_t offset) const
     xt::xtensor<double, 1> ret = xt::empty<double>({m_N});
     for (size_t p = 0; p < m_N; ++p) {
         ret(p) = m_pos(p, m_idx(p) + 1 + offset);
+    }
+    return ret;
+}
+
+inline xt::xtensor<double, 1> RedrawList::nextYield(int offset) const
+{
+    QPOT_ASSERT(offset != 0);
+
+    if (offset < 0) {
+        size_t shift = static_cast<size_t>(- offset);
+        QPOT_ASSERT(shift - 1 <= xt::amin(m_idx)());
+        xt::xtensor<double, 1> ret = xt::empty<double>({m_N});
+        for (size_t p = 0; p < m_N; ++p) {
+            ret(p) = m_pos(p, m_idx(p) - shift + 1);
+        }
+        return ret;
+    }
+
+    size_t shift = static_cast<size_t>(offset);
+    QPOT_ASSERT(xt::amax(m_idx)() + shift < m_ntot);
+    xt::xtensor<double, 1> ret = xt::empty<double>({m_N});
+    for (size_t p = 0; p < m_N; ++p) {
+        ret(p) = m_pos(p, m_idx(p) + shift);
     }
     return ret;
 }
