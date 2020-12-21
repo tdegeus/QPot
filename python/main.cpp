@@ -58,6 +58,12 @@ py::class_<QPot::Static>(m, "Static")
         py::arg("x"))
 
     .def(
+        "nextYield",
+        &QPot::Static::nextYield,
+        "Get the next yield position in either direction.",
+        py::arg("offset"))
+
+    .def(
         "currentYieldLeft",
         py::overload_cast<>(&QPot::Static::currentYieldLeft, py::const_),
         "Get the yielding position left")
@@ -144,6 +150,12 @@ py::class_<QPot::RedrawList>(m, "RedrawList")
     .def("setPosition", &QPot::RedrawList::setPosition<xt::xtensor<double,1>>,
         "Update current position",
         py::arg("x"))
+
+    .def(
+        "nextYield",
+        &QPot::RedrawList::nextYield,
+        "Get the next yield position in either direction.",
+        py::arg("offset"))
 
     .def(
         "currentYieldLeft",

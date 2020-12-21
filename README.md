@@ -63,6 +63,22 @@ int main()
 }
 ```
 
+To get more information about the yield positions:
+
+*   `currentYieldRight(offset)`:
+    -   `currentYieldRight(0) == currentYieldRight()`.
+    -   `currentYieldRight(1)` gives the following yield positions to the right, etc.
+*   `currentYieldLeft(offset)`:
+    -   `currentYieldLeft(0) == currentYieldLeft()`.
+    -   `currentYieldLeft(1)` gives the following yield positions to the left, etc.
+*   `nextYield(offset)`:
+    -   `nextYield(1) == currentYieldRight() == currentYieldRight(0)`  
+    -   `nextYield(2) == currentYieldRight(1)`
+    -   etc.  
+    -   `nextYield(-1) == currentYieldLeft() == currentYieldLeft(0)`  
+    -   `nextYield(-2) == currentYieldLeft(1)`
+    -   etc.
+
 ## Redraw.hpp
 
 Dynamically redraw yield points.
@@ -104,6 +120,22 @@ int main()
 >   x = np.random.rand([100])
 >   y = QPot.RedrawList(x, uniform);
 >   ```
+
+To get more information about the yield positions:
+
+*   `currentYieldRight(offset)`:
+    -   `currentYieldRight(0) == currentYieldRight()`.
+    -   `currentYieldRight(1)` gives the following yield positions to the right, etc.
+*   `currentYieldLeft(offset)`:
+    -   `currentYieldLeft(0) == currentYieldLeft()`.
+    -   `currentYieldLeft(1)` gives the following yield positions to the left, etc.
+*   `nextYield(offset)`:
+    -   `nextYield(1) == currentYieldRight() == currentYieldRight(0)`  
+    -   `nextYield(2) == currentYieldRight(1)`
+    -   etc.  
+    -   `nextYield(-1) == currentYieldLeft() == currentYieldLeft(0)`  
+    -   `nextYield(-2) == currentYieldLeft(1)`
+    -   etc.
 
 # Installation
 
