@@ -1,7 +1,9 @@
-/*
+/**
+Use a static list of yielding positions.
 
-(c - MIT) T.W.J. de Geus (Tom) | www.geus.me | github.com/tdegeus/QPot
-
+\file Redraw.hpp
+\copyright Copyright 2017. Tom de Geus. All rights reserved.
+\license This project is released under the MIT License.
 */
 
 #ifndef QPOT_STATIC_HPP
@@ -16,6 +18,9 @@
 
 namespace QPot {
 
+/**
+Yielding positions for one particle.
+*/
 class Static
 {
 public:
@@ -30,49 +35,147 @@ public:
     */
     Static(double x, const xt::xtensor<double, 1>& yield);
 
-    // Return yield positions:
-    xt::xtensor<double, 1> yield() const; // all
-    xt::xtensor<double, 1> yield(size_t start, size_t stop) const; // y[left: right]
-    double yield(size_t i) const; // y[index]
+    /**
+    Yield positions.
 
-    // Customise proximity search region
+    \return All yield positions [ntotal].
+    */
+    xt::xtensor<double, 1> yield() const;
+
+    /**
+    Slice yield()[start: stop].
+
+    \param start Lower column bound.
+    \param stop Upper column bound.
+    \return Yield positions [stop - start].
+    */
+    xt::xtensor<double, 1> yield(size_t start, size_t stop) const;
+
+    /**
+    Slice yield()[i].
+
+    \param i Column to select.
+    \return Yield position.
+    */
+    double yield(size_t i) const;
+
+    /**
+    Customise proximity search region.
+    See Static::m_proximity for default.
+
+    \param distance Width of the region to consider as proximity.
+    */
     void setProximity(size_t distance);
 
-    // Update current position
+    /**
+    Update current position.
+
+    \param x Current position.
+    */
     void setPosition(double x);
 
-    // Get the yielding position left/right, based on the current position "x"
-    double nextYield(int offset) const; // offset > 0: y[current_index + offset], offset < 0: y[current_index + offset + 1]
-    double currentYieldLeft() const; // y[current_index]
-    double currentYieldRight() const; // y[current_index + 1]
-    double currentYieldLeft(size_t offset) const; // y[current_index - offset]
-    double currentYieldRight(size_t offset) const; // y[current_index + 1 + offset]
-    xt::xtensor<double, 1> currentYield(int left, int right) const; // y[current_index + left: current_index + right]
+    /**
+    Yielding position at an offset left/right of the current position:
+    -   offset > 0: ``yield()[current_index + offset]``
+    -   offset < 0: ``yield()[current_index + offset + 1]``
 
-    // Get the index of the current minimum. Note:
-    // - "current_index" : yielding position left
-    // - "current_index + 1" : yielding position right
+    \param offset The offset.
+    \return Yield position.
+    */
+    double nextYield(int offset) const;
+
+    /**
+    Yielding position left of the current position
+
+        yield()[current_index]
+
+    \return Yield position.
+    */
+    double currentYieldLeft() const;
+
+    /**
+    Yielding position right of the current position
+
+        yield()[current_index + 1]
+
+    \return Yield position.
+    */
+    double currentYieldRight() const;
+
+    /**
+    Yielding position at an offset left of the current position
+
+        yield()[current_index - offset]
+
+    \param offset The offset (same for all particles).
+    \return Yield position.
+    */
+    double currentYieldLeft(size_t offset) const;
+
+    /**
+    Yielding position at an offset right of the current position
+
+        yield()[current_index + 1 + offset]
+
+    \param offset The offset (same for all particles).
+    \return Yield position.
+    */
+    double currentYieldRight(size_t offset) const;
+
+    /**
+    Slice of yielding positions at an offset left/right of the current position
+
+        yield()[current_index + left: current_index + right]
+
+    \param left Offset left (same for all particles).
+    \param right Offset right (same for all particles).
+    \return Yield positions [right - left].
+    */
+    xt::xtensor<double, 1> currentYield(int left, int right) const;
+
+    /**
+    Index of the current minimum
+
+        yield()[:, index] -> yielding position left
+        yield()[:, index + 1] -> yielding position right
+
+    \return Index.
+    */
     size_t currentIndex() const;
 
-    // Check that the particle is "n" wells from the far-left/right
+    /**
+    Check that the particle is at least ``n`` wells from the far-left.
+
+    \param n Offset.
+    \return boolean.
+    */
     bool checkYieldBoundLeft(size_t n = 0) const;
+
+    /**
+    Check that the particle is at least ``n`` wells from the far-right.
+
+    \param n Offset.
+    \return boolean.
+    */
     bool checkYieldBoundRight(size_t n = 0) const;
 
 private:
 
-    // Initialise
+    /**
+    Initialisation.
+    */
     void init();
 
 private:
 
-    size_t m_proximity = 10; // size of neighbourhood to search first
-    xt::xtensor<double, 1> m_pos; // yielding positions
-    size_t m_ntot; // len(m_pos)
-    size_t m_idx; // current "index"
-    double m_max; // maximum yielding position == m_pos[0]
-    double m_min; // minimum yielding position == m_pos[-1]
-    double m_left; // current yielding position to the left == m_pos[m_idx]
-    double m_right; // current yielding position to the right == m_pos[m_idx + 1]
+    size_t m_proximity = 10; ///< Size of neighbourhood to search first.
+    xt::xtensor<double, 1> m_pos; ///< Yielding positions.
+    size_t m_ntot; ///< Len(m_pos).
+    size_t m_idx; ///< Current "index".
+    double m_max; ///< Maximum yielding position ``== m_pos[0]``.
+    double m_min; ///< Minimum yielding position ``== m_pos[-1]``.
+    double m_left; ///< Current yielding position to the left ``== m_pos[m_idx]``.
+    double m_right; ///< Current yielding position to the right ``== m_pos[m_idx + 1]``.
 };
 
 // --------------

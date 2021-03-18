@@ -50,7 +50,7 @@ jobs:
       run: echo "SETUPTOOLS_SCM_PRETEND_VERSION=ci" >> $GITHUB_ENV
 
     - name: Configure using CMake
-      run: cmake -Bbuild -DBUILD_TESTS=1
+      run: cmake -Bbuild -DBUILD_TESTS=1 -DBUILD_DOCS=1
 
     - name: Build C++
       working-directory: build
@@ -69,3 +69,8 @@ jobs:
       run: |
         python test/Static.py
         python test/Redraw.py
+
+    - name: Check doxygen-docs (error on warning)
+      if: runner.os == 'Linux'
+      working-directory: build
+      run: make docs
