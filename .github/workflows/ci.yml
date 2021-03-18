@@ -9,7 +9,7 @@ on:
 
 jobs:
 
-  default-shell:
+  standard:
 
     strategy:
       fail-fast: false
@@ -28,7 +28,15 @@ jobs:
     - name: Basic GitHub action setup
       uses: actions/checkout@v2
 
-    - name: Set conda environment "test"
+    - name: Set conda environment
+      if: runner.os != 'Windows'
+      uses: mamba-org/provision-with-micromamba@main
+      with:
+        environment-file: environment.yaml
+        environment-name: myenv
+
+    - name: Set conda environment
+      if: runner.os == 'Windows'
       uses: conda-incubator/setup-miniconda@v2
       with:
         mamba-version: "*"
@@ -38,17 +46,19 @@ jobs:
         activate-environment: test
         auto-activate-base: false
 
-    - name: Extending conda environment for testing
-      run: conda env update --file environment_test.yaml
+    - name: Dummy version
+      run: echo "SETUPTOOLS_SCM_PRETEND_VERSION=ci" >> $GITHUB_ENV
 
     - name: Configure using CMake
-      run: cmake . -DBUILD_TESTS=1
+      run: cmake -Bbuild -DBUILD_TESTS=1
 
-    - name: Build C++ tests
+    - name: Build C++
+      working-directory: build
       run: cmake --build .
 
     - name: Run C++ tests
-      run: cmake --build . --target "RUN_ALL_TESTS"
+      working-directory: build
+      run: ctest --output-on-failure
 
     - name: Build and install Python module
       run: |
@@ -57,5 +67,5 @@ jobs:
 
     - name: Run Python tests
       run: |
-        python ./test/Static.py
-        python ./test/Redraw.py
+        python test/Static.py
+        python test/Redraw.py

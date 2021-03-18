@@ -7,7 +7,12 @@
 #ifndef QPOT_REDRAW_HPP
 #define QPOT_REDRAW_HPP
 
+#include <xtensor/xtensor.hpp>
+#include <xtensor/xview.hpp>
+#include <xtensor/xnoalias.hpp>
+
 #include "config.h"
+#include "version.hpp"
 
 namespace QPot {
 

@@ -15,6 +15,7 @@
 
 #include <QPot/Static.hpp>
 #include <QPot/Redraw.hpp>
+#include <QPot/version.hpp>
 
 namespace py = pybind11;
 
@@ -22,6 +23,9 @@ PYBIND11_MODULE(QPot, m)
 {
 
 m.doc() = "Library to keep track of a sequential potential energy landscape.";
+
+m.def("version", &QPot::version, "version");
+m.def("version_dependencies", &QPot::version_dependencies, "version_dependencies");
 
 py::class_<QPot::Static>(m, "Static")
 
