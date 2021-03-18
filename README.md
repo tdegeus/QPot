@@ -1,6 +1,7 @@
 # QPot
 
 [![CI](https://github.com/tdegeus/QPot/workflows/CI/badge.svg)](https://github.com/tdegeus/QPot/actions)
+[![Doxygen -> gh-pages](https://github.com/tdegeus/QPot/workflows/gh-pages/badge.svg)](https://tdegeus.github.io/QPot)
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/qpot.svg)](https://anaconda.org/conda-forge/qpot)
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/python-qpot.svg)](https://anaconda.org/conda-forge/python-qpot)
 
@@ -273,6 +274,13 @@ Note that you have to take care of the *xtensor* dependency, the C++ version, op
 enabling *xsimd*, ...
 
 # Change-log
+
+## v0.5.0
+
+*   Allow reconstruction of random RedrawList (see test-case).
+*   Adding documentation using doxygen.
+*   Switching to setuptools_scm for versioning.
+*   Minor style updates.
 
 ## v0.4.0
 
