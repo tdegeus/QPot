@@ -1,46 +1,58 @@
-/*
+/**
+Defines used in the library.
 
-(c - MIT) T.W.J. de Geus (Tom) | www.geus.me | github.com/tdegeus/QPot
-
+\file config.h
+\copyright Copyright 2020. Tom de Geus. All rights reserved.
+\license This project is released under the MIT License.
 */
 
 #ifndef QPOT_CONFIG_H
 #define QPOT_CONFIG_H
 
-#include <xtensor/xtensor.hpp>
-#include <xtensor/xview.hpp>
-#include <xtensor/xnoalias.hpp>
+/**
+\cond
+*/
+#define Q(x) #x
+#define QUOTE(x) Q(x)
 
+#define QPOT_ASSERT_IMPL(expr, file, line) \
+    if (!(expr)) { \
+        throw std::runtime_error( \
+            std::string(file) + ':' + std::to_string(line) + \
+            ": assertion failed (" #expr ") \n\t"); \
+    }
+/**
+\endcond
+*/
+
+/**
+All assertions are implementation as::
+
+    QPOT_ASSERT(...)
+
+They can be enabled by::
+
+    #define QPOT_ENABLE_ASSERT
+
+(before including QPot).
+The advantage is that:
+
+-   File and line-number are displayed if the assertion fails.
+-   QPot's assertions can be enabled/disabled independently from those of other libraries.
+
+\throw std::runtime_error
+*/
 #ifdef QPOT_ENABLE_ASSERT
-
-    #define QPOT_ASSERT(expr) \
-        QPOT_ASSERT_IMPL(expr, __FILE__, __LINE__)
-
-    #define QPOT_ASSERT_IMPL(expr, file, line) \
-        if (!(expr)) { \
-            throw std::runtime_error( \
-                std::string(file) + ':' + std::to_string(line) + \
-                ": assertion failed (" #expr ") \n\t"); \
-        }
-
+#define QPOT_ASSERT(expr) QPOT_ASSERT_IMPL(expr, __FILE__, __LINE__)
 #else
-
-    #define QPOT_ASSERT(expr)
-
+#define QPOT_ASSERT(expr)
 #endif
 
-#define QPOT_VERSION_MAJOR 0
-#define QPOT_VERSION_MINOR 4
-#define QPOT_VERSION_PATCH 0
+/**
+Assertions that cannot be disable.
 
-#define QPOT_VERSION_AT_LEAST(x, y, z) \
-    (QPOT_VERSION_MAJOR > x || (QPOT_VERSION_MAJOR >= x && \
-    (QPOT_VERSION_MINOR > y || (QPOT_VERSION_MINOR >= y && \
-                                QPOT_VERSION_PATCH >= z))))
-
-#define QPOT_VERSION(x, y, z) \
-    (QPOT_VERSION_MAJOR == x && \
-     QPOT_VERSION_MINOR == y && \
-     QPOT_VERSION_PATCH == z)
+\throw std::runtime_error
+*/
+#define QPOT_REQUIRE(expr) QPOT_REQUIRE_IMPL(expr, __FILE__, __LINE__)
 
 #endif

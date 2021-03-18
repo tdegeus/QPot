@@ -7,7 +7,12 @@
 #ifndef QPOT_STATIC_HPP
 #define QPOT_STATIC_HPP
 
+#include <xtensor/xtensor.hpp>
+#include <xtensor/xview.hpp>
+#include <xtensor/xnoalias.hpp>
+
 #include "config.h"
+#include "version.hpp"
 
 namespace QPot {
 
