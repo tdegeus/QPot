@@ -2,6 +2,7 @@
 #include <catch2/catch.hpp>
 #include <QPot/Redraw.hpp>
 #include <xtensor/xio.hpp>
+#include <xtensor/xrandom.hpp>
 
 TEST_CASE("QPot::RedrawList", "Redraw.hpp")
 {
@@ -109,5 +110,33 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
         QPot::RedrawList yield(x, uniform, 30, 5, 2);
         xt::xtensor<double, 1> ret = (0.0 - (14.5 - 5.5)) * xt::ones<double>({3});
         REQUIRE(xt::allclose(yield.yield(0), ret));
+    }
+
+    SECTION("RedrawList - reproduce sequence")
+    {
+        auto seed = time(NULL);
+        auto rand = [=](std::vector<size_t> shape) { return xt::random::rand<double>(shape); };
+
+        xt::xtensor<double, 1> x = {4.5, 5.5, 6.5};
+
+        xt::random::seed(seed);
+        QPot::RedrawList yield(x, rand, 30, 5, 2);
+        std::vector<bool> redraw;
+
+        for (size_t i = 0; i < 50; ++i) {
+            redraw.push_back(yield.setPosition(xt::eval((double)i * x)));
+        }
+
+        auto pos = yield.raw_pos();
+
+        xt::random::seed(seed);
+        QPot::RedrawList other(x, rand, 30, 5, 2);
+        for (size_t i = 0; i < redraw.size(); ++i) {
+            if (redraw[i]) {
+                other.setPosition(xt::eval((double)i * x));
+            }
+        }
+
+        REQUIRE(xt::allclose(pos, other.raw_pos()));
     }
 }

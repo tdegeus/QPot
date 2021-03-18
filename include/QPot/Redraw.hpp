@@ -85,9 +85,10 @@ public:
     Update current positions.
 
     \param x Current positions [N].
+    \return ``true`` is the was a redraw.
     */
     template <class E>
-    void setPosition(const E& x);
+    bool setPosition(const E& x);
 
     /**
     Yielding positions at an offset left/right of the current position:
@@ -354,9 +355,10 @@ inline void RedrawList::setProximity(size_t proximity)
 }
 
 template <class E>
-inline void RedrawList::setPosition(const E& x)
+inline bool RedrawList::setPosition(const E& x)
 {
     QPOT_ASSERT(x.size() == m_N);
+    bool redraw = false;
 
     // extend right
     // ------------
@@ -374,6 +376,9 @@ inline void RedrawList::setPosition(const E& x)
         // apply buffer: insert previously drawn values
         xt::view(y, xt::all(), xt::range(0, m_nbuf)) =
             xt::view(m_val, xt::keep(index), xt::range(m_ntot - m_nbuf, m_ntot));
+
+        // store redraw
+        redraw = true;
 
         // draw yield distances (times two!)
         xt::view(y, xt::all(), xt::range(m_nbuf, m_ntot)) =
@@ -411,6 +416,9 @@ inline void RedrawList::setPosition(const E& x)
         // apply buffer: insert previously drawn values
         xt::view(y, xt::all(), xt::range(m_ntot - m_nbuf, m_ntot)) =
             xt::view(m_val, xt::keep(index), xt::range(0, m_nbuf));
+
+        // store redraw
+        redraw = true;
 
         // draw yield distances (times two!)
         xt::view(y, xt::all(), xt::range(0, m_ntot - m_nbuf)) =
@@ -464,6 +472,8 @@ inline void RedrawList::setPosition(const E& x)
         m_left(p) = m_pos(p, i);
         m_right(p) = m_pos(p, i + 1);
     }
+
+    return redraw;
 }
 
 inline xt::xtensor<double, 1> RedrawList::currentYieldLeft() const
