@@ -1,7 +1,9 @@
-/*
+/**
+Dynamically redraw yielding positions.
 
-(c - MIT) T.W.J. de Geus (Tom) | www.geus.me | github.com/tdegeus/QPot
-
+\file Redraw.hpp
+\copyright Copyright 2017. Tom de Geus. All rights reserved.
+\license This project is released under the MIT License.
 */
 
 #ifndef QPOT_REDRAW_HPP
@@ -16,54 +18,182 @@
 
 namespace QPot {
 
+/**
+Yielding positions (that are dynamically redrawn) for a list of particles.
+*/
 class RedrawList
 {
 public:
 
     RedrawList() = default;
 
-    // Constructor
+    /**
+    Constructor.
+
+    \param x
+        Current positions, number of particles derived from it.
+
+    \param func
+        Function to draw yield distances.
+
+    \param ntotal
+        Number of yield-positions to keep in memory.
+
+    \param nbuffer
+        Number of yield-positions to buffer when shifting left/right.
+
+    \param noffset
+        Number of yield-positions at which to redraw maximally.
+        (allows grouping of redraws for several particles)
+    */
     template <class E, class F>
-    RedrawList(
-        const E& x, // current positions, number of particle derived from it
-        F function_to_draw_yield_distances,
-        size_t ntotal = 1000, // #yield-positions to keep in memory
-        size_t nbuffer = 300, // #yield-positions to buffer when shifting left/right
-        size_t noffset = 20); // #yield-positions at which to redraw maximally
-                              // (allows grouping of redraws for several particles)
+    RedrawList(const E& x, F func, size_t ntotal = 1000, size_t nbuffer = 300, size_t noffset = 20);
 
-    // Return yield positions:
+    /**
+    Yield positions.
+
+    \return All yield positions [N, ntotal].
+    */
     xt::xtensor<double, 2> yield() const; // y
-    xt::xtensor<double, 2> yield(size_t start, size_t stop) const; // y[:, left: right]
-    xt::xtensor<double, 1> yield(size_t i) const; // y[i]
 
-    // Customise proximity search region
+    /**
+    Slice yield()[:, start: stop].
+
+    \param start Lower column bound.
+    \param stop Upper column bound.
+    \return Yield positions [N, stop - start].
+    */
+    xt::xtensor<double, 2> yield(size_t start, size_t stop) const;
+
+    /**
+    Slice yield()[:, i].
+
+    \param i Column to select.
+    \return Yield positions [N].
+    */
+    xt::xtensor<double, 1> yield(size_t i) const;
+
+    /**
+    Customise proximity search region.
+    See RedrawList::m_proximity for default.
+
+    \param distance Width of the region to consider as proximity.
+    */
     void setProximity(size_t distance);
 
-    // Update current positions
+    /**
+    Update current positions.
+
+    \param x Current positions [N].
+    */
     template <class E>
     void setPosition(const E& x);
 
-    // Get the yielding positions left/right, based on the current positions "x"
-    xt::xtensor<double, 1> nextYield(int offset) const; // offset > 0: y[current_index + offset], offset < 0: y[current_index + offset + 1]
-    xt::xtensor<double, 1> currentYieldLeft() const; // y[:, current_index]
-    xt::xtensor<double, 1> currentYieldRight() const; // y[:, current_index + 1]
-    xt::xtensor<double, 1> currentYieldLeft(size_t offset) const; // y[:, current_index - offset]
-    xt::xtensor<double, 1> currentYieldRight(size_t offset) const; // y[:, current_index + 1 + offset]
-    xt::xtensor<double, 2> currentYield(int left, int right) const; // y[:, current_index + left: current_index + right]
+    /**
+    Yielding positions at an offset left/right of the current position:
+    -   offset > 0: ``yield()[:, current_index + offset]``
+    -   offset < 0: ``yield()[:, current_index + offset + 1]``
 
-    // Get the index of the current minima. Note:
-    // - "index" : yielding positions left
-    // - "index + 1" : yielding positions right
+    \param offset The offset (same for all particles).
+    \return Yield positions [N].
+    */
+    xt::xtensor<double, 1> nextYield(int offset) const;
+
+    /**
+    Yielding positions left of the current position
+
+        yield()[:, current_index]
+
+    \return Yield positions [N].
+    */
+    xt::xtensor<double, 1> currentYieldLeft() const;
+
+    /**
+    Yielding positions right of the current position
+
+        yield()[:, current_index + 1]
+
+    \return Yield positions [N].
+    */
+    xt::xtensor<double, 1> currentYieldRight() const;
+
+    /**
+    Yielding positions at an offset left of the current position
+
+        yield()[:, current_index - offset]
+
+    \param offset The offset (same for all particles).
+    \return Yield positions [N].
+    */
+    xt::xtensor<double, 1> currentYieldLeft(size_t offset) const;
+
+    /**
+    Yielding positions at an offset right of the current position
+
+        yield()[:, current_index + 1 + offset]
+
+    \param offset The offset (same for all particles).
+    \return Yield positions [N].
+    */
+    xt::xtensor<double, 1> currentYieldRight(size_t offset) const;
+
+    /**
+    Slice of yielding positions at an offset left/right of the current position
+
+        yield()[:, current_index + left: current_index + right]
+
+    \param left Offset left (same for all particles).
+    \param right Offset right (same for all particles).
+    \return Yield positions [N, right - left].
+    */
+    xt::xtensor<double, 2> currentYield(int left, int right) const;
+
+    /**
+    Index of the current minima
+
+        yield()[:, index] -> yielding positions left
+        yield()[:, index + 1] -> yielding positions right
+
+    \return Indices [N].
+    */
     xt::xtensor<long, 1> currentIndex() const;
 
-    // Output raw data
+    /**
+    Output the current matrix of random values.
+
+    \return [N, ntotal].
+    */
     xt::xtensor<double, 2> raw_val() const;
+
+    /**
+    Output the current matrix of yielding positions.
+
+    \return [N, ntotal].
+    */
     xt::xtensor<double, 2> raw_pos() const;
+
+    /**
+    Output the current matrix of indices.
+
+    \return [N].
+    */
     xt::xtensor<size_t, 1> raw_idx() const;
+
+    /**
+    Output the current matrix of historic indices.
+
+    \return [N].
+    */
     xt::xtensor<long, 1> raw_idx_t() const;
 
-    // Restore raw data
+    /**
+    Restore raw data.
+
+    \param val See raw_val().
+    \param pos See raw_pos().
+    \param idx See raw_idx().
+    \param idx_t See raw_idx_t().
+    */
     void restore(
         const xt::xtensor<double, 2>& val,
         const xt::xtensor<double, 2>& pos,
@@ -72,29 +202,32 @@ public:
 
 private:
 
-    // Number of points
-    size_t m_N;
+    size_t m_N; ///< Number of points
+    size_t m_ntot; ///< Number of yield positions to keep in memory at all times.
+    size_t m_nbuf; ///< Number of yield positions to buffer.
+    size_t m_noff; ///< Number of yield positions at which to shift maximally.
+    size_t m_proximity = 10; ///< Size of neighbourhood to search first.
 
-    // Buffer settings
-    size_t m_ntot; // number of yield positions to keep in memory at all times
-    size_t m_nbuf; // number of yield positions to buffer
-    size_t m_noff; // number of yield positions at which to shift maximally
+    /**
+    Yielding positions
 
-    // Search settings
-    size_t m_proximity = 10; // size of neighbourhood to search first
+        = cumsum(m_val, axis=1) + init
 
-    // Yield positions
-    xt::xtensor<double, 2> m_val; // drawn random values
-    xt::xtensor<double, 2> m_pos; // yielding positions = cumsum(m_val, axis=1) + init
-                                 // ('init' is computed during initialisation and redraw)
-    xt::xtensor<size_t, 1> m_idx; // current "index": since the last shift
-    xt::xtensor<long, 1> m_idx_t; // current "index": total up to the last shift (can be negative)
-    xt::xtensor<double, 1> m_max; // maximum yielding positions
-    xt::xtensor<double, 1> m_min; // minimum yielding positions
-    xt::xtensor<double, 1> m_left; // current yielding positions to the left == m_pos[:, m_idx]
-    xt::xtensor<double, 1> m_right; // current yielding positions to the right == m_pos[:, m_idx + 1]
+    (``init`` is computed during initialisation and redraw).
+    */
+    xt::xtensor<double, 2> m_pos;
 
-    // Function to (re)draw yield positions
+    xt::xtensor<double, 2> m_val; ///< Drawn random values.
+    xt::xtensor<size_t, 1> m_idx; ///< Current "index": since the last shift.
+    xt::xtensor<long, 1> m_idx_t; ///< Current "index": total up to the last shift (can be negative).
+    xt::xtensor<double, 1> m_max; ///< Maximum yielding positions.
+    xt::xtensor<double, 1> m_min; ///< Minimum yielding positions.
+    xt::xtensor<double, 1> m_left; ///< Current yielding positions to the left ``== m_pos[:, m_idx]``.
+    xt::xtensor<double, 1> m_right; ///< Current yielding positions to the right ``== m_pos[:, m_idx + 1]``.
+
+    /**
+    Function to (re)draw yield positions.
+    */
     std::function<xt::xtensor<double, 2>(std::vector<size_t>)> m_draw;
 };
 
