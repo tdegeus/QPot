@@ -26,7 +26,7 @@ m.doc() = "Library to keep track of a sequential potential energy landscape.";
 py::class_<QPot::Static>(m, "Static")
 
     .def(
-        py::init<double, xt::xtensor<double,1>>(),
+        py::init<double, xt::xtensor<double, 1>>(),
         "Static yield sequence.",
         py::arg("x"),
         py::arg("yield"))
@@ -147,7 +147,7 @@ py::class_<QPot::RedrawList>(m, "RedrawList")
         "Customise proximity search",
         py::arg("proximity"))
 
-    .def("setPosition", &QPot::RedrawList::setPosition<xt::xtensor<double,1>>,
+    .def("setPosition", &QPot::RedrawList::setPosition<xt::xtensor<double, 1>>,
         "Update current position",
         py::arg("x"))
 

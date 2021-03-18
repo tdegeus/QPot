@@ -17,7 +17,12 @@ public:
 
     Static() = default;
 
-    // Constructor
+    /**
+    Constructor.
+
+    \param x Current position.
+    \param yield Sequence of yield positions.
+    */
     Static(double x, const xt::xtensor<double, 1>& yield);
 
     // Return yield positions:
