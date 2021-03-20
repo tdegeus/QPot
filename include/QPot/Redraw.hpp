@@ -229,7 +229,7 @@ private:
     /**
     Function to (re)draw yield positions.
     */
-    std::function<xt::xtensor<double, 2>(std::vector<size_t>)> m_draw;
+    std::function<xt::xtensor<double, 2>(std::array<size_t, 2>)> m_draw;
 };
 
 // --------------
