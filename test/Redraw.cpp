@@ -1,6 +1,7 @@
 
 #include <catch2/catch.hpp>
 #include <QPot/Redraw.hpp>
+#include <QPot/random.hpp>
 #include <xtensor/xio.hpp>
 #include <xtensor/xrandom.hpp>
 
@@ -13,7 +14,7 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
         xt::xtensor<double, 1> r = l + 1.0;
         xt::xtensor<long, 1> i = {13, 14, 15};
 
-        auto uniform = [=](std::vector<size_t> shape) { return xt::ones<double>(shape); };
+        auto uniform = QPot::random::UniformList();
 
         QPot::RedrawList yield(x, uniform, 30, 5, 2);
 
@@ -93,7 +94,7 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
 
     SECTION("RedrawList::currentYield")
     {
-        auto uniform = [=](std::vector<size_t> shape) { return xt::ones<double>(shape); };
+        auto uniform = QPot::random::UniformList();
         xt::xtensor<double, 1> x = {4.5, 5.5, 6.5};
         QPot::RedrawList yield(x, uniform, 30, 5, 2);
         xt::xtensor<double, 2> ret = {
@@ -105,7 +106,7 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
 
     SECTION("RedrawList::yield - index")
     {
-        auto uniform = [=](std::vector<size_t> shape) { return xt::ones<double>(shape); };
+        auto uniform = QPot::random::UniformList();
         xt::xtensor<double, 1> x = {4.5, 5.5, 6.5};
         QPot::RedrawList yield(x, uniform, 30, 5, 2);
         xt::xtensor<double, 1> ret = (0.0 - (14.5 - 5.5)) * xt::ones<double>({3});
@@ -115,11 +116,11 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
     SECTION("RedrawList - reproduce sequence")
     {
         auto seed = time(NULL);
-        auto rand = [=](std::vector<size_t> shape) { return xt::random::rand<double>(shape); };
+        auto rand = QPot::random::RandList();
 
         xt::xtensor<double, 1> x = {4.5, 5.5, 6.5};
 
-        xt::random::seed(seed);
+        QPot::random::seed(seed);
         QPot::RedrawList yield(x, rand, 30, 5, 2);
         std::vector<bool> redraw;
 
@@ -129,7 +130,7 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
 
         auto pos = yield.raw_pos();
 
-        xt::random::seed(seed);
+        QPot::random::seed(seed);
         QPot::RedrawList other(x, rand, 30, 5, 2);
         for (size_t i = 0; i < redraw.size(); ++i) {
             if (redraw[i]) {
