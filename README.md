@@ -7,6 +7,12 @@
 
 Library to keep track of a sequential potential energy landscape.
 
+Documentation:
+
+*   This readme
+*   [Doxygen documentation](https://tdegeus.github.io/QPot)
+*   [The tests (in C++ and Python)](test/)
+
 # Disclaimer
 
 This library is free to use under the
@@ -89,7 +95,7 @@ Dynamically redraw yield points.
 
 int main()
 {
-    auto uniform = [=](std::vector<size_t> shape) {
+    auto uniform = [=](std::array<size_t, 2> shape) {
         return xt::ones<double>(shape); };
 
     size_t N = 10;
@@ -274,6 +280,11 @@ Note that you have to take care of the *xtensor* dependency, the C++ version, op
 enabling *xsimd*, ...
 
 # Change-log
+
+## v0.6.0
+
+*   Adding QPot::random interface to simplify RedrawList and to make reconstruction in Python possible (see test).
+*   [docs] Dark background.
 
 ## v0.5.0
 
