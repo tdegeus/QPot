@@ -369,6 +369,7 @@ template <class E, class T>
 inline void RedrawList::fullSearch(const E& x, const T& index)
 {
     for (auto& p : index) {
+        QPOT_ASSERT(x(p) >= m_min(p) && x(p) <= m_max(p));
         size_t i = std::lower_bound(&m_pos(p,0), &m_pos(p,0) + m_ntot, x(p)) - &m_pos(p,0) - 1;
         m_idx(p) = i;
         m_left(p) = m_pos(p, i);
@@ -415,13 +416,13 @@ inline bool RedrawList::setPosition(const E& x)
         xt::view(y, xt::all(), 0) = xt::view(m_pos, xt::keep(index), m_ntot - m_nbuf);
         xt::view(m_pos, xt::keep(index), xt::all()) = xt::cumsum(y, 1);
 
-        // update historic/current index
-        xt::view(m_idx_t, xt::keep(index)) += m_ntot - m_nbuf;
-        this->fullSearch(x, index);
-
         // register minimum and maximum yield positions for each particle
         xt::noalias(m_min) = xt::view(m_pos, xt::all(), 0);
         xt::noalias(m_max) = xt::view(m_pos, xt::all(), m_pos.shape(1) - 1);
+
+        // update historic/current index
+        xt::view(m_idx_t, xt::keep(index)) += m_ntot - m_nbuf;
+        this->fullSearch(x, index);
     }
 
     // extend left
@@ -457,13 +458,13 @@ inline bool RedrawList::setPosition(const E& x)
         xt::view(y, xt::all(), 0) = xt::view(m_pos, xt::keep(index), m_nbuf) - xt::sum(y, 1);
         xt::view(m_pos, xt::keep(index), xt::all()) = xt::cumsum(y, 1);
 
-        // update historic/current index
-        xt::view(m_idx_t, xt::keep(index)) -= m_ntot - m_nbuf;
-        this->fullSearch(x, index);
-
         // register minimum and maximum yield positions for each particle
         xt::noalias(m_min) = xt::view(m_pos, xt::all(), 0);
         xt::noalias(m_max) = xt::view(m_pos, xt::all(), m_pos.shape(1) - 1);
+
+        // update historic/current index
+        xt::view(m_idx_t, xt::keep(index)) -= m_ntot - m_nbuf;
+        this->fullSearch(x, index);
     }
 
     // update index
