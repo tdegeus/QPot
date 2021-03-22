@@ -281,6 +281,10 @@ enabling *xsimd*, ...
 
 # Change-log
 
+## v0.6.1
+
+*   Bugfix: making sure that "m_idx" is computed correctly after a redraw
+
 ## v0.6.0
 
 *   Adding QPot::random interface to simplify RedrawList and to make reconstruction in Python possible (see test).
