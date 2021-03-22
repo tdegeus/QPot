@@ -281,6 +281,11 @@ enabling *xsimd*, ...
 
 # Change-log
 
+## v0.6.2
+
+*   Python API: relaxing dependencies.
+*   RedrawList: Adding extra assertion on position.
+
 ## v0.6.1
 
 *   Bugfix: making sure that "m_idx" is computed correctly after a redraw
