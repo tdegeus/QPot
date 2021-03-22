@@ -140,4 +140,23 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
 
         REQUIRE(xt::allclose(pos, other.raw_pos()));
     }
+
+    SECTION("RedrawList - large step size")
+    {
+        xt::xtensor<double, 1> x = {0.0, 0.0, 0.0};
+        xt::xtensor<double, 1> l = {-0.5, -0.5, -0.5};
+        xt::xtensor<double, 1> r = l + 1.0;
+        xt::xtensor<double, 1> dx = {20.0, 2.0, 1.0};
+
+        auto uniform = QPot::random::UniformList();
+        QPot::RedrawList yield(x, uniform, 30, 5, 2);
+
+        REQUIRE(xt::allclose(yield.currentYieldLeft(), l));
+        REQUIRE(xt::allclose(yield.currentYieldRight(), r));
+
+        yield.setPosition(x + dx);
+
+        REQUIRE(xt::allclose(yield.currentYieldLeft(), l + dx));
+        REQUIRE(xt::allclose(yield.currentYieldRight(), r + dx));
+    }
 }

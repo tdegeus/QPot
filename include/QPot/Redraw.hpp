@@ -43,8 +43,8 @@ public:
         Number of yield-positions to buffer when shifting left/right.
 
     \param noffset
-        Number of yield-positions at which to redraw maximally.
-        (allows grouping of redraws for several particles)
+        Number of yield-positions from the end to consider for redrawing
+        (allows grouping of redraws for several particles).
     */
     template <class E, class F>
     RedrawList(const E& x, F func, size_t ntotal = 1000, size_t nbuffer = 300, size_t noffset = 20);
@@ -203,6 +203,17 @@ public:
 
 private:
 
+    /**
+    Perform a full search for #m_idx for a list of particles.
+
+    \param x Particle positions.
+    \param index List of particles.
+    */
+    template <class E, class T>
+    void fullSearch(const E& x, const T& index);
+
+private:
+
     size_t m_N; ///< Number of points
     size_t m_ntot; ///< Number of yield positions to keep in memory at all times.
     size_t m_nbuf; ///< Number of yield positions to buffer.
@@ -354,6 +365,17 @@ inline void RedrawList::setProximity(size_t proximity)
     m_proximity = proximity;
 }
 
+template <class E, class T>
+inline void RedrawList::fullSearch(const E& x, const T& index)
+{
+    for (auto& p : index) {
+        size_t i = std::lower_bound(&m_pos(p,0), &m_pos(p,0) + m_ntot, x(p)) - &m_pos(p,0) - 1;
+        m_idx(p) = i;
+        m_left(p) = m_pos(p, i);
+        m_right(p) = m_pos(p, i + 1);
+    }
+}
+
 template <class E>
 inline bool RedrawList::setPosition(const E& x)
 {
@@ -384,6 +406,8 @@ inline bool RedrawList::setPosition(const E& x)
         xt::view(y, xt::all(), xt::range(m_nbuf, m_ntot)) =
             m_draw({index.size(), m_ntot - m_nbuf});
 
+        QPOT_ASSERT(xt::all(y > 0));
+
         // store yield distances
         xt::view(m_val, xt::keep(index), xt::all()) = y;
 
@@ -391,9 +415,9 @@ inline bool RedrawList::setPosition(const E& x)
         xt::view(y, xt::all(), 0) = xt::view(m_pos, xt::keep(index), m_ntot - m_nbuf);
         xt::view(m_pos, xt::keep(index), xt::all()) = xt::cumsum(y, 1);
 
-        // update current index
+        // update historic/current index
         xt::view(m_idx_t, xt::keep(index)) += m_ntot - m_nbuf;
-        xt::view(m_idx, xt::keep(index)) -= m_ntot - m_nbuf;
+        this->fullSearch(x, index);
 
         // register minimum and maximum yield positions for each particle
         xt::noalias(m_min) = xt::view(m_pos, xt::all(), 0);
@@ -424,6 +448,8 @@ inline bool RedrawList::setPosition(const E& x)
         xt::view(y, xt::all(), xt::range(0, m_ntot - m_nbuf)) =
             m_draw({index.size(), m_ntot - m_nbuf});
 
+        QPOT_ASSERT(xt::all(y > 0));
+
         // store yield distances
         xt::view(m_val, xt::keep(index), xt::all()) = y;
 
@@ -431,9 +457,9 @@ inline bool RedrawList::setPosition(const E& x)
         xt::view(y, xt::all(), 0) = xt::view(m_pos, xt::keep(index), m_nbuf) - xt::sum(y, 1);
         xt::view(m_pos, xt::keep(index), xt::all()) = xt::cumsum(y, 1);
 
-        // update current index
+        // update historic/current index
         xt::view(m_idx_t, xt::keep(index)) -= m_ntot - m_nbuf;
-        xt::view(m_idx, xt::keep(index)) += m_ntot - m_nbuf;
+        this->fullSearch(x, index);
 
         // register minimum and maximum yield positions for each particle
         xt::noalias(m_min) = xt::view(m_pos, xt::all(), 0);
@@ -465,7 +491,7 @@ inline bool RedrawList::setPosition(const E& x)
             i = std::lower_bound(&m_pos(p,l), &m_pos(p,l) + r - l, xp) - &m_pos(p,l) - 1 + l;
         }
         else {
-            i = std::lower_bound(&m_pos(p,0), &m_pos(p,0) + m_pos.shape(1), xp) - &m_pos(p,0) - 1;
+            i = std::lower_bound(&m_pos(p,0), &m_pos(p,0) + m_ntot, xp) - &m_pos(p,0) - 1;
         }
 
         m_idx(p) = i;
