@@ -173,6 +173,24 @@ PYBIND11_MODULE(QPot, m)
         .def("currentIndex", &QPot::RedrawList::currentIndex,
              "Get the index of the current minimum.")
 
+        .def("was_redrawn", &QPot::RedrawList::was_redrawn,
+             "Check if there was a redraw the last time setPosition() was called.")
+
+        .def("last_redraw", &QPot::RedrawList::last_redraw,
+             "Get the direction of redrawing the late time setPosition() was called.")
+
+        .def("redraw", &QPot::RedrawList::redraw,
+             "Force redraw (can be used to restore a sequence).",
+             py::arg("iredraw"))
+
+        .def("redrawRight", &QPot::RedrawList::redrawRight,
+             "Force redraw (can be used to restore a sequence).",
+             py::arg("index"))
+
+        .def("redrawLeft", &QPot::RedrawList::redrawLeft,
+             "Force redraw (can be used to restore a sequence).",
+             py::arg("index"))
+
         .def("raw_val", &QPot::RedrawList::raw_val,
              "Current matrix of random values.")
 

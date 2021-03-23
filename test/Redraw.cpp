@@ -188,7 +188,7 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
 
         for (size_t i = 0; i < 50; ++i) {
             yield.setPosition(xt::eval((double)i * x));
-            iredraw.push_back(yield.iredraw());
+            iredraw.push_back(yield.last_redraw());
         }
 
         auto pos = yield.raw_pos();
@@ -225,7 +225,7 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
 
         for (size_t i = 0; i < 50; ++i) {
             if (yield.setPosition(xt::eval((double)i * x))) {
-                iredraw.push_back(yield.iredraw());
+                iredraw.push_back(yield.last_redraw());
             }
         }
 
@@ -266,7 +266,7 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
 
         for (size_t i = 0; i < 50; ++i) {
             if (yield.setPosition(xt::eval((double)i * x))) {
-                auto iredraw = yield.iredraw();
+                auto iredraw = yield.last_redraw();
                 xt::xtensor<size_t, 1> r = xt::flatten_indices(xt::argwhere(iredraw > 0));
                 index.push_back(r);
                 direction.push_back(+1);

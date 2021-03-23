@@ -164,14 +164,14 @@ public:
 
     \return bool
     */
-    bool redraw() const;
+    bool was_redrawn() const;
 
     /**
     Get the direction of redrawing the late time setPosition() was called.
 
     \return Direction (+1: redraw right, -1 redraw left) [N].
     */
-    xt::xtensor<long, 1> iredraw() const;
+    xt::xtensor<long, 1> last_redraw() const;
 
     /**
     Force redraw (can be used to restore a sequence).
@@ -577,13 +577,13 @@ inline void RedrawList::computeIndex(const E& x)
     m_lock = false;
 }
 
-inline bool RedrawList::redraw() const
+inline bool RedrawList::was_redrawn() const
 {
     QPOT_ASSERT(!m_lock);
     return m_redraw;
 }
 
-inline xt::xtensor<long, 1> RedrawList::iredraw() const
+inline xt::xtensor<long, 1> RedrawList::last_redraw() const
 {
     QPOT_ASSERT(!m_lock);
     return m_iredraw;
