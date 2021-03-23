@@ -179,15 +179,15 @@ PYBIND11_MODULE(QPot, m)
         .def("last_redraw", &QPot::RedrawList::last_redraw,
              "Get the direction of redrawing the late time setPosition() was called.")
 
-        .def("redraw", &QPot::RedrawList::redraw,
+        .def("redraw", &QPot::RedrawList::redraw<xt::xtensor<int, 1>>,
              "Force redraw (can be used to restore a sequence).",
              py::arg("iredraw"))
 
-        .def("redrawRight", &QPot::RedrawList::redrawRight,
+        .def("redrawRight", &QPot::RedrawList::redrawRight<xt::xtensor<size_t, 1>>,
              "Force redraw (can be used to restore a sequence).",
              py::arg("index"))
 
-        .def("redrawLeft", &QPot::RedrawList::redrawLeft,
+        .def("redrawLeft", &QPot::RedrawList::redrawLeft<xt::xtensor<size_t, 1>>,
              "Force redraw (can be used to restore a sequence).",
              py::arg("index"))
 
