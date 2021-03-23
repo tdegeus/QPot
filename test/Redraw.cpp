@@ -148,11 +148,14 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
         QPot::random::seed(seed);
         QPot::RedrawList yield(x, rand, 30, 5, 2);
 
-        // ``true`` is redraw was triggered
-        std::vector<bool> redraw;
+        size_t n = 50;
 
-        for (size_t i = 0; i < 50; ++i) {
-            redraw.push_back(yield.setPosition(xt::eval((double)i * x)));
+        // ``true`` is redraw was triggered
+        std::vector<bool> redraw(n);
+
+        for (size_t i = 0; i < n; ++i) {
+            bool r = yield.setPosition(xt::eval((double)i * x));
+            redraw[i] = r;
         }
 
         auto pos = yield.raw_pos();
@@ -169,7 +172,7 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
             }
         }
 
-        other.setPosition(xt::eval(49.0 * x));
+        other.setPosition(xt::eval(double(n - 1) * x));
 
         REQUIRE(xt::allclose(pos, other.raw_pos()));
         REQUIRE(xt::allclose(yl, other.currentYieldLeft()));
@@ -306,7 +309,7 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
 
     SECTION("Check platform independence")
     {
-        H5Easy::File data("test/Redraw_reconstruct-data.h5", H5Easy::File::ReadOnly);
+        H5Easy::File data("Redraw_reconstruct-data.h5", H5Easy::File::ReadOnly);
 
         auto rand = QPot::random::RandList();
         QPot::random::seed(H5Easy::load<size_t>(data, "/seed"));

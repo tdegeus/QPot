@@ -149,7 +149,7 @@ class Test_main(unittest.TestCase):
 
     def test_Reconstruct_platform_independence(self):
 
-        with h5py.File("test/Redraw_reconstruct-data.h5", "r") as data:
+        with h5py.File("Redraw_reconstruct-data.h5", "r") as data:
 
             rand = QPot.random.RandList()
             QPot.random.seed(data["/seed"][...])
