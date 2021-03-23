@@ -4,7 +4,9 @@
 #include <QPot/random.hpp>
 #include <xtensor/xio.hpp>
 #include <xtensor/xrandom.hpp>
+#ifdef USE_HDF5
 #include <highfive/H5Easy.hpp>
+#endif
 
 TEST_CASE("QPot::RedrawList", "Redraw.hpp")
 {
@@ -310,6 +312,7 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
         REQUIRE(xt::allclose(yi, other.currentIndex()));
     }
 
+#ifdef USE_HDF5
     SECTION("Check platform independence")
     {
         H5Easy::File data("Redraw_reconstruct-data.h5", H5Easy::File::ReadOnly);
@@ -338,4 +341,5 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
         REQUIRE(xt::allclose(self.currentYieldRight(), H5Easy::load<xt::xtensor<double, 1>>(data, "/currentYieldRight")));
         REQUIRE(xt::allclose(self.currentIndex(), H5Easy::load<xt::xtensor<long, 1>>(data, "/currentIndex")));
     }
+#endif
 }
