@@ -30,6 +30,12 @@ public:
     /**
     Constructor.
 
+    \tparam E
+        E.g. ``xt::xtensor<double, 1>``.
+
+    \tparam F
+        E.g. ``std::function<xt::xtensor<double, 2>(std::array<size_t, 2>)>``.
+
     \param x
         Current positions, number of particles derived from it.
 
@@ -50,9 +56,16 @@ public:
     RedrawList(const E& x, F func, size_t ntotal = 1000, size_t nbuffer = 300, size_t noffset = 20);
 
     /**
+    Number of particles.
+
+    \return unsigned int
+    */
+    size_t N() const;
+
+    /**
     Yield positions.
 
-    \return All yield positions [N, ntotal].
+    \return All yield positions [#N, ntotal].
     */
     xt::xtensor<double, 2> yield() const; // y
 
@@ -61,7 +74,7 @@ public:
 
     \param start Lower column bound.
     \param stop Upper column bound.
-    \return Yield positions [N, stop - start].
+    \return Yield positions [#N, stop - start].
     */
     xt::xtensor<double, 2> yield(size_t start, size_t stop) const;
 
@@ -69,13 +82,12 @@ public:
     Slice yield()[:, i].
 
     \param i Column to select.
-    \return Yield positions [N].
+    \return Yield positions [#N].
     */
     xt::xtensor<double, 1> yield(size_t i) const;
 
     /**
-    Customise proximity search region.
-    See RedrawList::m_proximity for default.
+    Customise proximity search region (default: ``10``).
 
     \param distance Width of the region to consider as proximity.
     */
@@ -84,8 +96,9 @@ public:
     /**
     Update current positions.
 
-    \param x Current positions [N].
-    \return ``true`` is the was a redraw.
+    \tparam E E.g. ``xt::xtensor<double, 1>``.
+    \param x Current positions [#N].
+    \return ``true`` is the was a redraw. See currentRedraw() for details on the redraw.
     */
     template <class E>
     bool setPosition(const E& x);
@@ -96,7 +109,7 @@ public:
     -   offset < 0: ``yield()[:, current_index + offset + 1]``
 
     \param offset The offset (same for all particles).
-    \return Yield positions [N].
+    \return Yield positions [#N].
     */
     xt::xtensor<double, 1> nextYield(int offset) const;
 
@@ -105,7 +118,7 @@ public:
 
         yield()[:, current_index]
 
-    \return Yield positions [N].
+    \return Yield positions [#N].
     */
     xt::xtensor<double, 1> currentYieldLeft() const;
 
@@ -114,7 +127,7 @@ public:
 
         yield()[:, current_index + 1]
 
-    \return Yield positions [N].
+    \return Yield positions [#N].
     */
     xt::xtensor<double, 1> currentYieldRight() const;
 
@@ -124,7 +137,7 @@ public:
         yield()[:, current_index - offset]
 
     \param offset The offset (same for all particles).
-    \return Yield positions [N].
+    \return Yield positions [#N].
     */
     xt::xtensor<double, 1> currentYieldLeft(size_t offset) const;
 
@@ -134,7 +147,7 @@ public:
         yield()[:, current_index + 1 + offset]
 
     \param offset The offset (same for all particles).
-    \return Yield positions [N].
+    \return Yield positions [#N].
     */
     xt::xtensor<double, 1> currentYieldRight(size_t offset) const;
 
@@ -145,7 +158,7 @@ public:
 
     \param left Offset left (same for all particles).
     \param right Offset right (same for all particles).
-    \return Yield positions [N, right - left].
+    \return Yield positions [#N, right - left].
     */
     xt::xtensor<double, 2> currentYield(int left, int right) const;
 
@@ -155,27 +168,29 @@ public:
         yield()[:, index] -> yielding positions left
         yield()[:, index + 1] -> yielding positions right
 
-    \return Indices [N].
+    \return Indices [#N].
     */
     xt::xtensor<long, 1> currentIndex() const;
 
     /**
     Check if there was a redraw the last time setPosition() was called.
+    See currentRedraw() for details on the redraw.
 
     \return bool
     */
     bool currentAnyRedraw() const;
 
     /**
-    Get the direction of redrawing the late time setPosition() was called.
+    Get the direction of redrawing the last time setPosition() was called.
 
-    \return Direction (+1: redraw right, -1 redraw left) [N].
+    \return Direction (+1: redraw right, -1 redraw left, 0 no redraw) [#N].
     */
     xt::xtensor<int, 1> currentRedraw() const;
 
     /**
     Force redraw (can be used to restore a sequence).
 
+    \tparam T E.g. ``xt::xtensor<int, 1>``.
     \param iredraw See iredraw().
     */
     template <class T>
@@ -184,6 +199,7 @@ public:
     /**
     Force redraw (can be used to restore a sequence).
 
+    \tparam T E.g. ``xt::xtensor<size_t, 1>``.
     \param index List of particles for which to redraw to the right.
     */
     template <class T>
@@ -192,6 +208,7 @@ public:
     /**
     Force redraw (can be used to restore a sequence).
 
+    \tparam T E.g. ``xt::xtensor<size_t, 1>``.
     \param index List of particles for which to redraw to the left.
     */
     template <class T>
@@ -200,28 +217,28 @@ public:
     /**
     Output the current matrix of random values.
 
-    \return [N, ntotal].
+    \return [#N, ntotal].
     */
     xt::xtensor<double, 2> raw_val() const;
 
     /**
     Output the current matrix of yielding positions.
 
-    \return [N, ntotal].
+    \return [#N, ntotal].
     */
     xt::xtensor<double, 2> raw_pos() const;
 
     /**
     Output the current matrix of indices.
 
-    \return [N].
+    \return [#N].
     */
     xt::xtensor<size_t, 1> raw_idx() const;
 
     /**
     Output the current matrix of historic indices.
 
-    \return [N].
+    \return [#N].
     */
     xt::xtensor<long, 1> raw_idx_t() const;
 
@@ -338,6 +355,11 @@ inline RedrawList::RedrawList(const E& x, F draw, size_t ntotal, size_t nbuffer,
         m_left(p) = m_pos(p, i);
         m_right(p) = m_pos(p, i + 1);
     }
+}
+
+inline size_t RedrawList::N() const
+{
+    return m_N;
 }
 
 inline void RedrawList::setProximity(size_t proximity)
