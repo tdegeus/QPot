@@ -583,7 +583,7 @@ inline bool RedrawList::currentAnyRedraw() const
     return m_redraw;
 }
 
-inline xt::xtensor<long, 1> RedrawList::currentRedraw() const
+inline xt::xtensor<int, 1> RedrawList::currentRedraw() const
 {
     QPOT_ASSERT(!m_lock);
     return m_iredraw;
