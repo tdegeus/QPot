@@ -160,6 +160,44 @@ public:
     xt::xtensor<long, 1> currentIndex() const;
 
     /**
+    Check if there was a redraw the last time setPosition() was called.
+
+    \return bool
+    */
+    bool redraw() const;
+
+    /**
+    Get the direction of redrawing the late time setPosition() was called.
+
+    \return Direction (+1: redraw right, -1 redraw left) [N].
+    */
+    xt::xtensor<long, 1> iredraw() const;
+
+    /**
+    Force redraw (can be used to restore a sequence).
+
+    \param iredraw See iredraw().
+    */
+    template <class T>
+    void redraw(const T& iredraw);
+
+    /**
+    Force redraw (can be used to restore a sequence).
+
+    \param index List of particles for which to redraw to the right.
+    */
+    template <class T>
+    void redrawRight(const T& index);
+
+    /**
+    Force redraw (can be used to restore a sequence).
+
+    \param index List of particles for which to redraw to the left.
+    */
+    template <class T>
+    void redrawLeft(const T& index);
+
+    /**
     Output the current matrix of random values.
 
     \return [N, ntotal].
@@ -204,13 +242,16 @@ public:
 private:
 
     /**
-    Perform a full search for #m_idx for a list of particles.
+    Compute the current #m_idx for all particles.
+    Internally the following rules are used:
 
-    \param x Particle positions.
-    \param index List of particles.
+    1.  If a particle's yield positions were redrawn: global search.
+    2.  See if the index is unchanged.
+    3.  Search the near surroundings.
+    4.  Global search.
     */
-    template <class E, class T>
-    void fullSearch(const E& x, const T& index);
+    template <class E>
+    void computeIndex(const E& x);
 
 private:
 
@@ -219,6 +260,15 @@ private:
     size_t m_nbuf; ///< Number of yield positions to buffer.
     size_t m_noff; ///< Number of yield positions at which to shift maximally.
     size_t m_proximity = 10; ///< Size of neighbourhood to search first.
+    xt::xtensor<long, 1> m_iredraw; ///< See RedrawList::iredraw
+    bool m_redraw = false; ///< `See RedrawList::redraw
+
+    /**
+    Lock outputting state:
+    If redraw(), redrawRight(), redrawLeft() are externally called,
+    the current position is unknown.
+    */
+    bool m_lock = false;
 
     /**
     Yielding positions
@@ -254,6 +304,7 @@ inline RedrawList::RedrawList(const E& x, F draw, size_t ntotal, size_t nbuffer,
     QPOT_ASSERT(x.dimension() == 1);
     QPOT_ASSERT(m_nbuf <= m_ntot);
     QPOT_ASSERT(m_noff <= m_nbuf);
+    QPOT_ASSERT(2 * m_noff < m_ntot); // either redraw left or right, never both for the same "x"
 
     m_proximity = std::min(m_proximity, m_ntot);
 
@@ -276,6 +327,7 @@ inline RedrawList::RedrawList(const E& x, F draw, size_t ntotal, size_t nbuffer,
     // allocate current index
     m_idx = xt::empty<decltype(m_idx)::value_type>({m_N});
     m_idx_t = xt::zeros<decltype(m_idx_t)::value_type>({m_N});
+    m_iredraw = xt::zeros<decltype(m_iredraw)::value_type>({m_N});
     m_left = xt::empty<decltype(m_left)::value_type>({m_N});
     m_right = xt::empty<decltype(m_right)::value_type>({m_N});
 
@@ -286,6 +338,11 @@ inline RedrawList::RedrawList(const E& x, F draw, size_t ntotal, size_t nbuffer,
         m_left(p) = m_pos(p, i);
         m_right(p) = m_pos(p, i + 1);
     }
+}
+
+inline void RedrawList::setProximity(size_t proximity)
+{
+    m_proximity = proximity;
 }
 
 inline xt::xtensor<double, 2> RedrawList::yield() const
@@ -306,6 +363,7 @@ inline xt::xtensor<double, 1> RedrawList::yield(size_t i) const
 
 inline xt::xtensor<double, 1> RedrawList::currentYieldLeft(size_t offset) const
 {
+    QPOT_ASSERT(!m_lock);
     QPOT_ASSERT(offset <= xt::amin(m_idx)());
     xt::xtensor<double, 1> ret = xt::empty<double>({m_N});
     for (size_t p = 0; p < m_N; ++p) {
@@ -316,6 +374,7 @@ inline xt::xtensor<double, 1> RedrawList::currentYieldLeft(size_t offset) const
 
 inline xt::xtensor<double, 1> RedrawList::currentYieldRight(size_t offset) const
 {
+    QPOT_ASSERT(!m_lock);
     QPOT_ASSERT(xt::amax(m_idx)() + 1 + offset < m_ntot);
     xt::xtensor<double, 1> ret = xt::empty<double>({m_N});
     for (size_t p = 0; p < m_N; ++p) {
@@ -326,6 +385,7 @@ inline xt::xtensor<double, 1> RedrawList::currentYieldRight(size_t offset) const
 
 inline xt::xtensor<double, 1> RedrawList::nextYield(int offset) const
 {
+    QPOT_ASSERT(!m_lock);
     QPOT_ASSERT(offset != 0);
 
     if (offset < 0) {
@@ -349,6 +409,7 @@ inline xt::xtensor<double, 1> RedrawList::nextYield(int offset) const
 
 inline xt::xtensor<double, 2> RedrawList::currentYield(int left, int right) const
 {
+    QPOT_ASSERT(!m_lock);
     QPOT_ASSERT(left <= 0);
     QPOT_ASSERT(right >= 0);
     xt::xtensor<double, 2> ret = xt::empty<double>({m_N, static_cast<size_t>(right - left)});
@@ -360,74 +421,201 @@ inline xt::xtensor<double, 2> RedrawList::currentYield(int left, int right) cons
     return ret;
 }
 
-inline void RedrawList::setProximity(size_t proximity)
+inline xt::xtensor<double, 1> RedrawList::currentYieldLeft() const
 {
-    m_proximity = proximity;
+    QPOT_ASSERT(!m_lock);
+    return m_left;
 }
 
-template <class E, class T>
-inline void RedrawList::fullSearch(const E& x, const T& index)
+inline xt::xtensor<double, 1> RedrawList::currentYieldRight() const
 {
-    for (auto& p : index) {
-        QPOT_ASSERT(x(p) >= m_min(p) && x(p) <= m_max(p));
-        size_t i = std::lower_bound(&m_pos(p,0), &m_pos(p,0) + m_ntot, x(p)) - &m_pos(p,0) - 1;
-        m_idx(p) = i;
-        m_left(p) = m_pos(p, i);
-        m_right(p) = m_pos(p, i + 1);
+    QPOT_ASSERT(!m_lock);
+    return m_right;
+}
+
+inline xt::xtensor<long, 1> RedrawList::currentIndex() const
+{
+    QPOT_ASSERT(!m_lock);
+    return m_idx_t + xt::cast<long>(m_idx);
+}
+
+template <class T>
+inline void RedrawList::redraw(const T& iredraw)
+{
+    QPOT_ASSERT(iredraw.size() == m_N);
+    QPOT_ASSERT(iredraw.dimension() == 1);
+    this->redrawRight(xt::flatten_indices(xt::argwhere(iredraw > 0)));
+    this->redrawLeft(xt::flatten_indices(xt::argwhere(iredraw < 0)));
+}
+
+template <class T>
+inline void RedrawList::redrawRight(const T& index)
+{
+    // store redraw
+    m_lock = true;
+    m_redraw = true;
+    xt::view(m_iredraw, xt::keep(index)) = +1;
+
+    // allocate new yield distances (times two!)
+    xt::xtensor<double, 2> y = xt::empty<double>({index.size(), m_ntot});
+
+    // apply buffer: insert previously drawn values
+    xt::view(y, xt::all(), xt::range(0, m_nbuf)) =
+        xt::view(m_val, xt::keep(index), xt::range(m_ntot - m_nbuf, m_ntot));
+
+    // draw yield distances (times two!)
+    xt::view(y, xt::all(), xt::range(m_nbuf, m_ntot)) = m_draw({index.size(), m_ntot - m_nbuf});
+    QPOT_ASSERT(xt::all(y > 0));
+
+    // store yield distances
+    xt::view(m_val, xt::keep(index), xt::all()) = y;
+
+    // update yield positions
+    xt::view(y, xt::all(), 0) = xt::view(m_pos, xt::keep(index), m_ntot - m_nbuf);
+    xt::view(m_pos, xt::keep(index), xt::all()) = xt::cumsum(y, 1);
+
+    // register minimum and maximum yield positions for each particle
+    xt::noalias(m_min) = xt::view(m_pos, xt::all(), 0);
+    xt::noalias(m_max) = xt::view(m_pos, xt::all(), m_pos.shape(1) - 1);
+
+    // update historic/current index
+    xt::view(m_idx_t, xt::keep(index)) += m_ntot - m_nbuf;
+}
+
+template <class T>
+inline void RedrawList::redrawLeft(const T& index)
+{
+    // store redraw
+    m_lock = true;
+    m_redraw = true;
+    xt::view(m_iredraw, xt::keep(index)) = -1;
+
+    // allocate new yield distances (times two!)
+    xt::xtensor<double, 2> y = xt::empty<double>({index.size(), m_ntot});
+
+    // apply buffer: insert previously drawn values
+    xt::view(y, xt::all(), xt::range(m_ntot - m_nbuf, m_ntot)) =
+        xt::view(m_val, xt::keep(index), xt::range(0, m_nbuf));
+
+    // draw yield distances (times two!)
+    xt::view(y, xt::all(), xt::range(0, m_ntot - m_nbuf)) = m_draw({index.size(), m_ntot - m_nbuf});
+    QPOT_ASSERT(xt::all(y > 0));
+
+    // store yield distances
+    xt::view(m_val, xt::keep(index), xt::all()) = y;
+
+    // update yield positions
+    xt::view(y, xt::all(), 0) = xt::view(m_pos, xt::keep(index), m_nbuf) - xt::sum(y, 1);
+    xt::view(m_pos, xt::keep(index), xt::all()) = xt::cumsum(y, 1);
+
+    // register minimum and maximum yield positions for each particle
+    xt::noalias(m_min) = xt::view(m_pos, xt::all(), 0);
+    xt::noalias(m_max) = xt::view(m_pos, xt::all(), m_pos.shape(1) - 1);
+
+    // update historic/current index
+    xt::view(m_idx_t, xt::keep(index)) -= m_ntot - m_nbuf;
+}
+
+template <class E>
+inline void RedrawList::computeIndex(const E& x)
+{
+    using index_type = decltype(m_idx)::value_type;
+    using position_type = typename E::value_type;
+
+    if (!m_redraw) {
+        for (size_t p = 0; p < m_N; ++p)
+        {
+            index_type i = m_idx(p);
+            position_type xp = x(p);
+
+            if (m_left(p) < xp && m_right(p) >= xp) {
+                continue;
+            }
+
+            index_type l = i > m_proximity ? i - m_proximity : 0;
+            index_type r = std::min(i + m_proximity, m_ntot - 1);
+
+            if (m_pos(p, l) < xp && m_pos(p, r) >= xp) {
+                i = std::lower_bound(&m_pos(p,l), &m_pos(p,l) + r - l, xp) - &m_pos(p,l) - 1 + l;
+            }
+            else {
+                i = std::lower_bound(&m_pos(p,0), &m_pos(p,0) + m_ntot, xp) - &m_pos(p,0) - 1;
+            }
+
+            m_idx(p) = i;
+            m_left(p) = m_pos(p, i);
+            m_right(p) = m_pos(p, i + 1);
+        }
     }
+    else {
+        for (size_t p = 0; p < m_N; ++p)
+        {
+            index_type i = m_idx(p);
+            position_type xp = x(p);
+            bool redraw = m_iredraw(p) != 0;
+
+            if (m_left(p) < xp && m_right(p) >= xp && !redraw) {
+                continue;
+            }
+
+            index_type l = i > m_proximity ? i - m_proximity : 0;
+            index_type r = std::min(i + m_proximity, m_ntot - 1);
+
+            if (m_pos(p, l) < xp && m_pos(p, r) >= xp && !redraw) {
+                i = std::lower_bound(&m_pos(p,l), &m_pos(p,l) + r - l, xp) - &m_pos(p,l) - 1 + l;
+            }
+            else {
+                i = std::lower_bound(&m_pos(p,0), &m_pos(p,0) + m_ntot, xp) - &m_pos(p,0) - 1;
+            }
+
+            m_idx(p) = i;
+            m_left(p) = m_pos(p, i);
+            m_right(p) = m_pos(p, i + 1);
+        }
+    }
+
+    m_lock = false;
+}
+
+inline bool RedrawList::redraw() const
+{
+    QPOT_ASSERT(!m_lock);
+    return m_redraw;
+}
+
+inline xt::xtensor<long, 1> RedrawList::iredraw() const
+{
+    QPOT_ASSERT(!m_lock);
+    return m_iredraw;
 }
 
 template <class E>
 inline bool RedrawList::setPosition(const E& x)
 {
     QPOT_ASSERT(x.size() == m_N);
-    bool redraw = false;
 
-    // extend right
-    // ------------
+    // if redraw was force-triggered (from redrawRight or redrawLeft and not from here):
+    // make sure that all indices are updated (forces update for 'redrawn particles')
+    if (m_lock) {
+        this->computeIndex(x);
+    }
 
+    // erase history
+    if (m_redraw) {
+        m_iredraw.fill(0);
+        m_redraw = false;
+    }
+
+    // extend right (use the opportunity to redraw multiple rows)
     if (xt::any(x >= m_max))
     {
-        // get rows for which a redraw is needed
-        // use the opportunity to redraw multiple rows
         xt::xtensor<size_t, 1> index = xt::flatten_indices(xt::argwhere(
             x >= xt::view(m_pos, xt::all(), m_ntot - m_noff)));
 
-        // allocate new yield distances (times two!)
-        xt::xtensor<double, 2> y = xt::empty<double>({index.size(), m_ntot});
-
-        // apply buffer: insert previously drawn values
-        xt::view(y, xt::all(), xt::range(0, m_nbuf)) =
-            xt::view(m_val, xt::keep(index), xt::range(m_ntot - m_nbuf, m_ntot));
-
-        // store redraw
-        redraw = true;
-
-        // draw yield distances (times two!)
-        xt::view(y, xt::all(), xt::range(m_nbuf, m_ntot)) =
-            m_draw({index.size(), m_ntot - m_nbuf});
-
-        QPOT_ASSERT(xt::all(y > 0));
-
-        // store yield distances
-        xt::view(m_val, xt::keep(index), xt::all()) = y;
-
-        // update yield positions
-        xt::view(y, xt::all(), 0) = xt::view(m_pos, xt::keep(index), m_ntot - m_nbuf);
-        xt::view(m_pos, xt::keep(index), xt::all()) = xt::cumsum(y, 1);
-
-        // register minimum and maximum yield positions for each particle
-        xt::noalias(m_min) = xt::view(m_pos, xt::all(), 0);
-        xt::noalias(m_max) = xt::view(m_pos, xt::all(), m_pos.shape(1) - 1);
-
-        // update historic/current index
-        xt::view(m_idx_t, xt::keep(index)) += m_ntot - m_nbuf;
-        this->fullSearch(x, index);
+        this->redrawRight(index);
     }
 
-    // extend left
-    // -----------
-
+    // extend left (use the opportunity to redraw multiple rows)
     if (xt::any(x <= m_min))
     {
         // get rows for which a redraw is needed
@@ -435,87 +623,13 @@ inline bool RedrawList::setPosition(const E& x)
         xt::xtensor<size_t, 1> index = xt::flatten_indices(xt::argwhere(
             x <= xt::view(m_pos, xt::all(), m_noff)));
 
-        // allocate new yield distances (times two!)
-        xt::xtensor<double, 2> y = xt::empty<double>({index.size(), m_ntot});
-
-        // apply buffer: insert previously drawn values
-        xt::view(y, xt::all(), xt::range(m_ntot - m_nbuf, m_ntot)) =
-            xt::view(m_val, xt::keep(index), xt::range(0, m_nbuf));
-
-        // store redraw
-        redraw = true;
-
-        // draw yield distances (times two!)
-        xt::view(y, xt::all(), xt::range(0, m_ntot - m_nbuf)) =
-            m_draw({index.size(), m_ntot - m_nbuf});
-
-        QPOT_ASSERT(xt::all(y > 0));
-
-        // store yield distances
-        xt::view(m_val, xt::keep(index), xt::all()) = y;
-
-        // update yield positions
-        xt::view(y, xt::all(), 0) = xt::view(m_pos, xt::keep(index), m_nbuf) - xt::sum(y, 1);
-        xt::view(m_pos, xt::keep(index), xt::all()) = xt::cumsum(y, 1);
-
-        // register minimum and maximum yield positions for each particle
-        xt::noalias(m_min) = xt::view(m_pos, xt::all(), 0);
-        xt::noalias(m_max) = xt::view(m_pos, xt::all(), m_pos.shape(1) - 1);
-
-        // update historic/current index
-        xt::view(m_idx_t, xt::keep(index)) -= m_ntot - m_nbuf;
-        this->fullSearch(x, index);
+        this->redrawLeft(index);
     }
 
-    // update index
-    // ------------
+    // update index (force update 'redrawn particles')
+    this->computeIndex(x);
 
-    QPOT_ASSERT(xt::all(x > m_min));
-    QPOT_ASSERT(xt::all(x < m_max));
-
-    using index_type = decltype(m_idx)::value_type;
-    using position_type = typename E::value_type;
-
-    for (size_t p = 0; p < m_N; ++p)
-    {
-        index_type i = m_idx(p);
-        position_type xp = x(p);
-
-        if (m_left(p) < xp && m_right(p) >= xp) {
-            continue;
-        }
-
-        index_type l = i > m_proximity ? i - m_proximity : 0;
-        index_type r = std::min(i + m_proximity, m_ntot - 1);
-
-        if (m_pos(p, l) < xp && m_pos(p, r) >= xp) {
-            i = std::lower_bound(&m_pos(p,l), &m_pos(p,l) + r - l, xp) - &m_pos(p,l) - 1 + l;
-        }
-        else {
-            i = std::lower_bound(&m_pos(p,0), &m_pos(p,0) + m_ntot, xp) - &m_pos(p,0) - 1;
-        }
-
-        m_idx(p) = i;
-        m_left(p) = m_pos(p, i);
-        m_right(p) = m_pos(p, i + 1);
-    }
-
-    return redraw;
-}
-
-inline xt::xtensor<double, 1> RedrawList::currentYieldLeft() const
-{
-    return m_left;
-}
-
-inline xt::xtensor<double, 1> RedrawList::currentYieldRight() const
-{
-    return m_right;
-}
-
-inline xt::xtensor<long, 1> RedrawList::currentIndex() const
-{
-    return m_idx_t + xt::cast<long>(m_idx);
+    return m_redraw;
 }
 
 inline xt::xtensor<double, 2> RedrawList::raw_val() const

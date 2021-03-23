@@ -7,7 +7,7 @@
 
 TEST_CASE("QPot::RedrawList", "Redraw.hpp")
 {
-    SECTION("Basic behaviour")
+    SECTION("Basic behaviour (includes tests for convenience functions)")
     {
         xt::xtensor<double, 1> x = {-1.0, 0.0, 1.0};
         xt::xtensor<double, 1> l = {-1.5, -0.5, 0.5};
@@ -19,10 +19,12 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
         QPot::RedrawList yield(x, uniform, 30, 5, 2);
 
         for (size_t j = 0; j < 20; ++j) {
+
             x += 1.0;
             l += 1.0;
             r += 1.0;
             i += 1;
+
             yield.setPosition(x);
 
             REQUIRE(xt::all(xt::equal(yield.currentIndex(), i)));
@@ -56,11 +58,14 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
         }
 
         for (size_t j = 0; j < 40; ++j) {
+
             x -= 1.0;
             l -= 1.0;
             r -= 1.0;
             i -= 1;
+
             yield.setPosition(x);
+
             REQUIRE(xt::all(xt::equal(yield.currentIndex(), i)));
 
             REQUIRE(xt::allclose(yield.currentYieldLeft(), l));
@@ -92,7 +97,7 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
         }
     }
 
-    SECTION("RedrawList::currentYield")
+    SECTION("Slice around currentYield")
     {
         auto uniform = QPot::random::UniformList();
         xt::xtensor<double, 1> x = {4.5, 5.5, 6.5};
@@ -104,7 +109,7 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
         REQUIRE(xt::allclose(yield.currentYield(-2, 3), ret));
     }
 
-    SECTION("RedrawList::yield - index")
+    SECTION("Slice of yield")
     {
         auto uniform = QPot::random::UniformList();
         xt::xtensor<double, 1> x = {4.5, 5.5, 6.5};
@@ -113,35 +118,7 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
         REQUIRE(xt::allclose(yield.yield(0), ret));
     }
 
-    SECTION("RedrawList - reproduce sequence")
-    {
-        auto seed = time(NULL);
-        auto rand = QPot::random::RandList();
-
-        xt::xtensor<double, 1> x = {4.5, 5.5, 6.5};
-
-        QPot::random::seed(seed);
-        QPot::RedrawList yield(x, rand, 30, 5, 2);
-        std::vector<bool> redraw;
-
-        for (size_t i = 0; i < 50; ++i) {
-            redraw.push_back(yield.setPosition(xt::eval((double)i * x)));
-        }
-
-        auto pos = yield.raw_pos();
-
-        QPot::random::seed(seed);
-        QPot::RedrawList other(x, rand, 30, 5, 2);
-        for (size_t i = 0; i < redraw.size(); ++i) {
-            if (redraw[i]) {
-                other.setPosition(xt::eval((double)i * x));
-            }
-        }
-
-        REQUIRE(xt::allclose(pos, other.raw_pos()));
-    }
-
-    SECTION("RedrawList - large step size")
+    SECTION("Large step size")
     {
         xt::xtensor<double, 1> x = {0.0, 0.0, 0.0};
         xt::xtensor<double, 1> l = {-0.5, -0.5, -0.5};
@@ -158,5 +135,169 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
 
         REQUIRE(xt::allclose(yield.currentYieldLeft(), l + dx));
         REQUIRE(xt::allclose(yield.currentYieldRight(), r + dx));
+    }
+
+    SECTION("Reproduce redrawn sequence: restore positions that triggered a redraw")
+    {
+        auto seed = time(NULL);
+        auto rand = QPot::random::RandList();
+
+        xt::xtensor<double, 1> x = {4.5, 5.5, 6.5};
+
+        QPot::random::seed(seed);
+        QPot::RedrawList yield(x, rand, 30, 5, 2);
+
+        // ``true`` is redraw was triggered
+        std::vector<bool> redraw;
+
+        for (size_t i = 0; i < 50; ++i) {
+            redraw.push_back(yield.setPosition(xt::eval((double)i * x)));
+        }
+
+        auto pos = yield.raw_pos();
+        auto yl = yield.currentYieldLeft();
+        auto yr = yield.currentYieldRight();
+        auto yi = yield.currentIndex();
+
+        QPot::random::seed(seed);
+        QPot::RedrawList other(x, rand, 30, 5, 2);
+
+        for (size_t i = 0; i < redraw.size(); ++i) {
+            if (redraw[i]) {
+                other.setPosition(xt::eval((double)i * x));
+            }
+        }
+
+        REQUIRE(xt::allclose(pos, other.raw_pos()));
+        REQUIRE(xt::allclose(yl, other.currentYieldLeft()));
+        REQUIRE(xt::allclose(yr, other.currentYieldRight()));
+        REQUIRE(xt::allclose(yi, other.currentIndex()));
+    }
+
+    SECTION("Reproduce redrawn sequence: restore 'iredraw' of each step")
+    {
+        auto seed = time(NULL);
+        auto rand = QPot::random::RandList();
+
+        xt::xtensor<double, 1> x = {4.5, 5.5, 6.5};
+
+        QPot::random::seed(seed);
+        QPot::RedrawList yield(x, rand, 30, 5, 2);
+
+        std::vector<xt::xtensor<long, 1>> iredraw;
+
+        for (size_t i = 0; i < 50; ++i) {
+            yield.setPosition(xt::eval((double)i * x));
+            iredraw.push_back(yield.iredraw());
+        }
+
+        auto pos = yield.raw_pos();
+        auto yl = yield.currentYieldLeft();
+        auto yr = yield.currentYieldRight();
+        auto yi = yield.currentIndex();
+
+        QPot::random::seed(seed);
+        QPot::RedrawList other(x, rand, 30, 5, 2);
+
+        for (auto& i : iredraw) {
+            other.redraw(i);
+        }
+
+        other.setPosition(xt::eval(49.0 * x));
+
+        REQUIRE(xt::allclose(pos, other.raw_pos()));
+        REQUIRE(xt::allclose(yl, other.currentYieldLeft()));
+        REQUIRE(xt::allclose(yr, other.currentYieldRight()));
+        REQUIRE(xt::allclose(yi, other.currentIndex()));
+    }
+
+    SECTION("Reproduce redrawn sequence: restore 'iredraw' only when there was a redraw")
+    {
+        auto seed = time(NULL);
+        auto rand = QPot::random::RandList();
+
+        xt::xtensor<double, 1> x = {4.5, 5.5, 6.5};
+
+        QPot::random::seed(seed);
+        QPot::RedrawList yield(x, rand, 30, 5, 2);
+
+        std::vector<xt::xtensor<long, 1>> iredraw;
+
+        for (size_t i = 0; i < 50; ++i) {
+            if (yield.setPosition(xt::eval((double)i * x))) {
+                iredraw.push_back(yield.iredraw());
+            }
+        }
+
+        auto pos = yield.raw_pos();
+        auto yl = yield.currentYieldLeft();
+        auto yr = yield.currentYieldRight();
+        auto yi = yield.currentIndex();
+
+        QPot::random::seed(seed);
+        QPot::RedrawList other(x, rand, 30, 5, 2);
+
+        for (auto& i : iredraw) {
+            other.redraw(i);
+        }
+
+        other.setPosition(xt::eval(49.0 * x));
+
+        REQUIRE(xt::allclose(pos, other.raw_pos()));
+        REQUIRE(xt::allclose(yl, other.currentYieldLeft()));
+        REQUIRE(xt::allclose(yr, other.currentYieldRight()));
+        REQUIRE(xt::allclose(yi, other.currentIndex()));
+    }
+
+    SECTION("Reproduce redrawn sequence: minimal data storage (only lists of redrawn particles)")
+    {
+        // WARNING: one has to call "redrawRight" before "redrawLeft" to restore the sequence
+
+        auto seed = time(NULL);
+        auto rand = QPot::random::RandList();
+
+        xt::xtensor<double, 1> x = {4.5, 5.5, 6.5};
+
+        QPot::random::seed(seed);
+        QPot::RedrawList yield(x, rand, 30, 5, 2);
+
+        std::vector<int> direction;
+        std::vector<xt::xtensor<size_t, 1>> index;
+
+        for (size_t i = 0; i < 50; ++i) {
+            if (yield.setPosition(xt::eval((double)i * x))) {
+                auto iredraw = yield.iredraw();
+                xt::xtensor<size_t, 1> r = xt::flatten_indices(xt::argwhere(iredraw > 0));
+                index.push_back(r);
+                direction.push_back(+1);
+                xt::xtensor<size_t, 1> l = xt::flatten_indices(xt::argwhere(iredraw < 0));
+                index.push_back(l);
+                direction.push_back(-1);
+            }
+        }
+
+        auto pos = yield.raw_pos();
+        auto yl = yield.currentYieldLeft();
+        auto yr = yield.currentYieldRight();
+        auto yi = yield.currentIndex();
+
+        QPot::random::seed(seed);
+        QPot::RedrawList other(x, rand, 30, 5, 2);
+
+        for (size_t i = 0; i < direction.size(); ++i) {
+            if (direction[i] > 0) {
+                other.redrawRight(index[i]);
+            }
+            else {
+                other.redrawLeft(index[i]);
+            }
+        }
+
+        other.setPosition(xt::eval(49.0 * x));
+
+        REQUIRE(xt::allclose(pos, other.raw_pos()));
+        REQUIRE(xt::allclose(yl, other.currentYieldLeft()));
+        REQUIRE(xt::allclose(yr, other.currentYieldRight()));
+        REQUIRE(xt::allclose(yi, other.currentIndex()));
     }
 }
