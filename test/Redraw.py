@@ -1,5 +1,6 @@
 import unittest
 import numpy as np
+import h5py
 import time
 import QPot
 
@@ -63,7 +64,7 @@ class Test_main(unittest.TestCase):
             if redraw[i]:
                 other.setPosition(i * x)
 
-        other.setPosition(float(redraw.shape[1] - 1) * x)
+        other.setPosition(float(redraw.size - 1) * x)
 
         self.assertTrue(np.allclose(pos, other.raw_pos()))
         self.assertTrue(np.allclose(yl, other.currentYieldLeft()))
@@ -145,6 +146,29 @@ class Test_main(unittest.TestCase):
         self.assertTrue(np.allclose(yl, other.currentYieldLeft()))
         self.assertTrue(np.allclose(yr, other.currentYieldRight()))
         self.assertTrue(np.all(np.equal(yi, other.currentIndex())))
+
+    def test_Reconstruct_platform_independence(self):
+
+        with h5py.File("test/Redraw_reconstruct-data.h5", "r") as data:
+
+            rand = QPot.random.RandList()
+            QPot.random.seed(data["/seed"][...])
+
+            n = data["/n"][...]
+            redraw = data["/redraw"][...]
+            x = data["/x"][...]
+
+            this = QPot.RedrawList(x, rand, data["/ntotal"][...], data["/nbuffer"][...], data["/noffset"][...])
+
+            for i in range(n):
+                this.redraw(redraw[:, i])
+
+            this.setPosition(float(n - 1) * x)
+
+            self.assertTrue(np.allclose(this.raw_pos(), data["/raw_pos"][...]))
+            self.assertTrue(np.allclose(this.currentYieldLeft(), data["/currentYieldLeft"][...]))
+            self.assertTrue(np.allclose(this.currentYieldRight(), data["/currentYieldRight"][...]))
+            self.assertTrue(np.all(np.equal(this.currentIndex(), data["/currentIndex"][...])))
 
 if __name__ == '__main__':
 
