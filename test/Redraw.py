@@ -47,9 +47,10 @@ class Test_main(unittest.TestCase):
 
         QPot.random.seed(seed)
         this = QPot.RedrawList(x, rand, 30, 5, 2)
-        redraw = np.zeros((50), dtype=np.int64)
+        n = 50
+        redraw = np.zeros((n), dtype=np.int64)
 
-        for i in range(redraw.size):
+        for i in range(n):
             redraw[i] = this.setPosition(i * x)
 
         pos = this.raw_pos()
@@ -60,11 +61,11 @@ class Test_main(unittest.TestCase):
         QPot.random.seed(seed)
         other = QPot.RedrawList(x, rand, 30, 5, 2)
 
-        for i in range(redraw.size):
+        for i in range(n):
             if redraw[i]:
                 other.setPosition(i * x)
 
-        other.setPosition(float(redraw.size - 1) * x)
+        other.setPosition(float(n - 1) * x)
 
         self.assertTrue(np.allclose(pos, other.raw_pos()))
         self.assertTrue(np.allclose(yl, other.currentYieldLeft()))
@@ -80,9 +81,10 @@ class Test_main(unittest.TestCase):
 
         QPot.random.seed(seed)
         this = QPot.RedrawList(x, rand, 30, 5, 2)
-        redraw = np.zeros((x.size, 50), dtype=np.int64)
+        n = 50
+        redraw = np.zeros((x.size, n), dtype=np.int64)
 
-        for i in range(redraw.shape[1]):
+        for i in range(n):
             this.setPosition(i * x)
             redraw[:, i] = this.last_redraw()
 
@@ -94,10 +96,10 @@ class Test_main(unittest.TestCase):
         QPot.random.seed(seed)
         other = QPot.RedrawList(x, rand, 30, 5, 2)
 
-        for i in range(redraw.shape[1]):
+        for i in range(n):
             other.redraw(redraw[:, i])
 
-        other.setPosition(float(redraw.shape[1] - 1) * x)
+        other.setPosition(float(n - 1) * x)
 
         self.assertTrue(np.allclose(pos, other.raw_pos()))
         self.assertTrue(np.allclose(yl, other.currentYieldLeft()))
@@ -113,10 +115,11 @@ class Test_main(unittest.TestCase):
 
         QPot.random.seed(seed)
         this = QPot.RedrawList(x, rand, 30, 5, 2)
+        n = 50
         index = []
         direction = []
 
-        for i in range(50):
+        for i in range(n):
             this.setPosition(i * x)
             iredraw = this.last_redraw()
             if np.any(iredraw > 0):
@@ -140,7 +143,7 @@ class Test_main(unittest.TestCase):
             else:
                 other.redrawLeft(i)
 
-        other.setPosition(float(50 - 1) * x)
+        other.setPosition(float(n - 1) * x)
 
         self.assertTrue(np.allclose(pos, other.raw_pos()))
         self.assertTrue(np.allclose(yl, other.currentYieldLeft()))

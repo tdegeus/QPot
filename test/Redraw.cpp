@@ -146,22 +146,21 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
         xt::xtensor<double, 1> x = {4.5, 5.5, 6.5};
 
         QPot::random::seed(seed);
-        QPot::RedrawList yield(x, rand, 30, 5, 2);
-
+        QPot::RedrawList self(x, rand, 30, 5, 2);
         size_t n = 50;
 
         // ``true`` is redraw was triggered
         std::vector<bool> redraw(n);
 
         for (size_t i = 0; i < n; ++i) {
-            bool r = yield.setPosition(xt::eval((double)i * x));
+            bool r = self.setPosition(xt::eval((double)i * x));
             redraw[i] = r;
         }
 
-        auto pos = yield.raw_pos();
-        auto yl = yield.currentYieldLeft();
-        auto yr = yield.currentYieldRight();
-        auto yi = yield.currentIndex();
+        auto pos = self.raw_pos();
+        auto yl = self.currentYieldLeft();
+        auto yr = self.currentYieldRight();
+        auto yi = self.currentIndex();
 
         QPot::random::seed(seed);
         QPot::RedrawList other(x, rand, 30, 5, 2);
@@ -188,19 +187,20 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
         xt::xtensor<double, 1> x = {4.5, 5.5, 6.5};
 
         QPot::random::seed(seed);
-        QPot::RedrawList yield(x, rand, 30, 5, 2);
+        QPot::RedrawList self(x, rand, 30, 5, 2);
+        size_t n = 50;
 
-        std::vector<xt::xtensor<long, 1>> iredraw;
+        std::vector<xt::xtensor<int, 1>> iredraw(n);
 
-        for (size_t i = 0; i < 50; ++i) {
-            yield.setPosition(xt::eval((double)i * x));
-            iredraw.push_back(yield.last_redraw());
+        for (size_t i = 0; i < n; ++i) {
+            self.setPosition(xt::eval((double)i * x));
+            iredraw[i] = self.last_redraw();
         }
 
-        auto pos = yield.raw_pos();
-        auto yl = yield.currentYieldLeft();
-        auto yr = yield.currentYieldRight();
-        auto yi = yield.currentIndex();
+        auto pos = self.raw_pos();
+        auto yl = self.currentYieldLeft();
+        auto yr = self.currentYieldRight();
+        auto yi = self.currentIndex();
 
         QPot::random::seed(seed);
         QPot::RedrawList other(x, rand, 30, 5, 2);
@@ -209,7 +209,7 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
             other.redraw(i);
         }
 
-        other.setPosition(xt::eval(49.0 * x));
+        other.setPosition(xt::eval(double(n - 1) * x));
 
         REQUIRE(xt::allclose(pos, other.raw_pos()));
         REQUIRE(xt::allclose(yl, other.currentYieldLeft()));
@@ -225,20 +225,22 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
         xt::xtensor<double, 1> x = {4.5, 5.5, 6.5};
 
         QPot::random::seed(seed);
-        QPot::RedrawList yield(x, rand, 30, 5, 2);
+        QPot::RedrawList self(x, rand, 30, 5, 2);
+        size_t n = 50;
 
-        std::vector<xt::xtensor<long, 1>> iredraw;
+        std::vector<xt::xtensor<int, 1>> iredraw;
 
-        for (size_t i = 0; i < 50; ++i) {
-            if (yield.setPosition(xt::eval((double)i * x))) {
-                iredraw.push_back(yield.last_redraw());
+        for (size_t i = 0; i < n; ++i) {
+            bool r = self.setPosition(xt::eval((double)i * x));
+            if (r) {
+                iredraw.push_back(self.last_redraw());
             }
         }
 
-        auto pos = yield.raw_pos();
-        auto yl = yield.currentYieldLeft();
-        auto yr = yield.currentYieldRight();
-        auto yi = yield.currentIndex();
+        auto pos = self.raw_pos();
+        auto yl = self.currentYieldLeft();
+        auto yr = self.currentYieldRight();
+        auto yi = self.currentIndex();
 
         QPot::random::seed(seed);
         QPot::RedrawList other(x, rand, 30, 5, 2);
@@ -247,7 +249,7 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
             other.redraw(i);
         }
 
-        other.setPosition(xt::eval(49.0 * x));
+        other.setPosition(xt::eval(double(n - 1) * x));
 
         REQUIRE(xt::allclose(pos, other.raw_pos()));
         REQUIRE(xt::allclose(yl, other.currentYieldLeft()));
@@ -265,14 +267,15 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
         xt::xtensor<double, 1> x = {4.5, 5.5, 6.5};
 
         QPot::random::seed(seed);
-        QPot::RedrawList yield(x, rand, 30, 5, 2);
+        QPot::RedrawList self(x, rand, 30, 5, 2);
+        size_t n = 50;
 
         std::vector<int> direction;
         std::vector<xt::xtensor<size_t, 1>> index;
 
-        for (size_t i = 0; i < 50; ++i) {
-            if (yield.setPosition(xt::eval((double)i * x))) {
-                auto iredraw = yield.last_redraw();
+        for (size_t i = 0; i < n; ++i) {
+            if (self.setPosition(xt::eval((double)i * x))) {
+                auto iredraw = self.last_redraw();
                 xt::xtensor<size_t, 1> r = xt::flatten_indices(xt::argwhere(iredraw > 0));
                 index.push_back(r);
                 direction.push_back(+1);
@@ -282,10 +285,10 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
             }
         }
 
-        auto pos = yield.raw_pos();
-        auto yl = yield.currentYieldLeft();
-        auto yr = yield.currentYieldRight();
-        auto yi = yield.currentIndex();
+        auto pos = self.raw_pos();
+        auto yl = self.currentYieldLeft();
+        auto yr = self.currentYieldRight();
+        auto yi = self.currentIndex();
 
         QPot::random::seed(seed);
         QPot::RedrawList other(x, rand, 30, 5, 2);
@@ -299,7 +302,7 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
             }
         }
 
-        other.setPosition(xt::eval(49.0 * x));
+        other.setPosition(xt::eval(double(n - 1) * x));
 
         REQUIRE(xt::allclose(pos, other.raw_pos()));
         REQUIRE(xt::allclose(yl, other.currentYieldLeft()));
