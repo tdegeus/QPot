@@ -281,6 +281,13 @@ enabling *xsimd*, ...
 
 # Change-log
 
+## v0.7.0
+
+*   Various documentation updates.
+*   Adding (optional) HDF5 test to test platform independence of sequence restore).
+*   Allowing restoring a sequence with less data. 
+*   Allow prompt if a redraw was triggered on the last position update.
+
 ## v0.6.2
 
 *   Python API: relaxing dependencies.
