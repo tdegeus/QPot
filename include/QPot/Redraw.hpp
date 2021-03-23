@@ -164,14 +164,14 @@ public:
 
     \return bool
     */
-    bool was_redrawn() const;
+    bool currentAnyRedraw() const;
 
     /**
     Get the direction of redrawing the late time setPosition() was called.
 
     \return Direction (+1: redraw right, -1 redraw left) [N].
     */
-    xt::xtensor<long, 1> last_redraw() const;
+    xt::xtensor<int, 1> currentRedraw() const;
 
     /**
     Force redraw (can be used to restore a sequence).
@@ -260,7 +260,7 @@ private:
     size_t m_nbuf; ///< Number of yield positions to buffer.
     size_t m_noff; ///< Number of yield positions at which to shift maximally.
     size_t m_proximity = 10; ///< Size of neighbourhood to search first.
-    xt::xtensor<long, 1> m_iredraw; ///< See RedrawList::iredraw
+    xt::xtensor<int, 1> m_iredraw; ///< See RedrawList::iredraw
     bool m_redraw = false; ///< `See RedrawList::redraw
 
     /**
@@ -577,13 +577,13 @@ inline void RedrawList::computeIndex(const E& x)
     m_lock = false;
 }
 
-inline bool RedrawList::was_redrawn() const
+inline bool RedrawList::currentAnyRedraw() const
 {
     QPOT_ASSERT(!m_lock);
     return m_redraw;
 }
 
-inline xt::xtensor<long, 1> RedrawList::last_redraw() const
+inline xt::xtensor<long, 1> RedrawList::currentRedraw() const
 {
     QPOT_ASSERT(!m_lock);
     return m_iredraw;
