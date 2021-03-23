@@ -168,6 +168,8 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
             }
         }
 
+        other.setPosition(xt::eval(49.0 * x));
+
         REQUIRE(xt::allclose(pos, other.raw_pos()));
         REQUIRE(xt::allclose(yl, other.currentYieldLeft()));
         REQUIRE(xt::allclose(yr, other.currentYieldRight()));
