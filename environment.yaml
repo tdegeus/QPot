@@ -17,7 +17,9 @@ dependencies:
 
   # run tests
   - catch2
+  - highfive
   - numpy
+  - h5py
 
   # build docs
   - doxygen

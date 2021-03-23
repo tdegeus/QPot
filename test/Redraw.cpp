@@ -4,6 +4,7 @@
 #include <QPot/random.hpp>
 #include <xtensor/xio.hpp>
 #include <xtensor/xrandom.hpp>
+#include <highfive/H5Easy.hpp>
 
 TEST_CASE("QPot::RedrawList", "Redraw.hpp")
 {
@@ -301,5 +302,34 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
         REQUIRE(xt::allclose(yl, other.currentYieldLeft()));
         REQUIRE(xt::allclose(yr, other.currentYieldRight()));
         REQUIRE(xt::allclose(yi, other.currentIndex()));
+    }
+
+    SECTION("Check platform independence")
+    {
+        H5Easy::File data("test/Redraw_reconstruct-data.h5", H5Easy::File::ReadOnly);
+
+        auto rand = QPot::random::RandList();
+        QPot::random::seed(H5Easy::load<size_t>(data, "/seed"));
+
+        auto n = H5Easy::load<size_t>(data, "/n");
+        auto redraw = H5Easy::load<xt::xtensor<int, 2>>(data, "/redraw");
+        auto x = H5Easy::load<xt::xtensor<double, 1>>(data, "/x");
+
+        QPot::RedrawList self(x, rand,
+            H5Easy::load<size_t>(data, "/ntotal"),
+            H5Easy::load<size_t>(data, "/nbuffer"),
+            H5Easy::load<size_t>(data, "/noffset"));
+
+        for (size_t i = 0; i < n; ++i) {
+            xt::xtensor<int, 1> r = xt::view(redraw, xt::all(), i);
+            self.redraw(r);
+        }
+
+        self.setPosition((double)(n - 1) * x);
+
+        REQUIRE(xt::allclose(self.raw_pos(), H5Easy::load<xt::xtensor<double, 2>>(data, "/raw_pos")));
+        REQUIRE(xt::allclose(self.currentYieldLeft(), H5Easy::load<xt::xtensor<double, 1>>(data, "/currentYieldLeft")));
+        REQUIRE(xt::allclose(self.currentYieldRight(), H5Easy::load<xt::xtensor<double, 1>>(data, "/currentYieldRight")));
+        REQUIRE(xt::allclose(self.currentIndex(), H5Easy::load<xt::xtensor<long, 1>>(data, "/currentIndex")));
     }
 }

@@ -63,6 +63,8 @@ class Test_main(unittest.TestCase):
             if redraw[i]:
                 other.setPosition(i * x)
 
+        other.setPosition(float(redraw.shape[1] - 1) * x)
+
         self.assertTrue(np.allclose(pos, other.raw_pos()))
         self.assertTrue(np.allclose(yl, other.currentYieldLeft()))
         self.assertTrue(np.allclose(yr, other.currentYieldRight()))
