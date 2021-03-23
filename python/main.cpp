@@ -173,10 +173,10 @@ PYBIND11_MODULE(QPot, m)
         .def("currentIndex", &QPot::RedrawList::currentIndex,
              "Get the index of the current minimum.")
 
-        .def("was_redrawn", &QPot::RedrawList::was_redrawn,
+        .def("currentAnyRedraw", &QPot::RedrawList::currentAnyRedraw,
              "Check if there was a redraw the last time setPosition() was called.")
 
-        .def("last_redraw", &QPot::RedrawList::last_redraw,
+        .def("currentRedraw", &QPot::RedrawList::currentRedraw,
              "Get the direction of redrawing the late time setPosition() was called.")
 
         .def("redraw", &QPot::RedrawList::redraw<xt::xtensor<int, 1>>,

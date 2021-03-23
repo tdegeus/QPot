@@ -20,9 +20,12 @@ find_package(HighFive REQUIRED)
 
 add_executable(${test_name} main.cpp Redraw.cpp Static.cpp)
 
-target_link_libraries(${test_name} PRIVATE Catch2::Catch2 QPot HighFive)
-target_link_libraries(${test_name} PRIVATE QPot::compiler_warnings)
-target_link_libraries(${test_name} PRIVATE QPot::assert)
+target_link_libraries(${test_name} PRIVATE
+    Catch2::Catch2
+    HighFive
+    QPot
+    QPot::compiler_warnings
+    QPot::assert)
 
 if(XSIMD)
     target_link_libraries(${test_name} PRIVATE xtensor::optimize xtensor::use_xsimd)

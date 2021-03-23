@@ -72,7 +72,7 @@ class Test_main(unittest.TestCase):
         self.assertTrue(np.allclose(yr, other.currentYieldRight()))
         self.assertTrue(np.all(np.equal(yi, other.currentIndex())))
 
-    def test_Reconstruct_last_redraw(self):
+    def test_Reconstruct_currentRedraw(self):
 
         seed = int(time.time())
         rand = QPot.random.RandList()
@@ -86,7 +86,7 @@ class Test_main(unittest.TestCase):
 
         for i in range(n):
             this.setPosition(i * x)
-            redraw[:, i] = this.last_redraw()
+            redraw[:, i] = this.currentRedraw()
 
         pos = this.raw_pos()
         yl = this.currentYieldLeft()
@@ -121,7 +121,7 @@ class Test_main(unittest.TestCase):
 
         for i in range(n):
             this.setPosition(i * x)
-            iredraw = this.last_redraw()
+            iredraw = this.currentRedraw()
             if np.any(iredraw > 0):
                 index += [np.argwhere(iredraw > 0).ravel()]
                 direction += [+1]

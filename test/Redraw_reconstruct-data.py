@@ -28,7 +28,7 @@ with h5py.File("Redraw_reconstruct-data.h5", "w") as data:
 
     for i in range(n):
         this.setPosition(float(i) * x)
-        redraw[:, i] = this.last_redraw()
+        redraw[:, i] = this.currentRedraw()
 
     data["/redraw"] = redraw
     data["/raw_pos"] = this.raw_pos()
