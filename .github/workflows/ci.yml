@@ -70,12 +70,6 @@ jobs:
       working-directory: build
       run: cmake --build .
 
-    - name: List files
-      working-directory: build
-      run: |
-        ls
-        ls test
-
     - name: Run C++ tests
       working-directory: build
       run: ctest --output-on-failure
@@ -86,9 +80,10 @@ jobs:
         python setup.py install
 
     - name: Run Python tests
+      working-directory: test
       run: |
-        python test/Static.py
-        python test/Redraw.py
+        python Static.py
+        python Redraw.py
 
     - name: Check doxygen-docs (error on warning)
       if: runner.os == 'Linux'

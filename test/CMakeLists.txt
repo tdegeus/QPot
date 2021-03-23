@@ -30,4 +30,8 @@ endif()
 
 add_test(NAME ${test_name} COMMAND ${test_name})
 
+# allows running with ctest
+set_tests_properties(${test_name} PROPERTIES WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+
+# allows running from the same directory as the binary
 configure_file("Redraw_reconstruct-data.h5" "Redraw_reconstruct-data.h5" COPYONLY)
