@@ -628,13 +628,13 @@ inline xt::xtensor<int, 1> RedrawList::currentRedraw() const
 inline xt::xtensor<size_t, 1> RedrawList::currentRedrawRight() const
 {
     QPOT_ASSERT(!m_lock);
-    return xt::flatten_indices(xt::argwhere(iredraw > 0));
+    return xt::flatten_indices(xt::argwhere(m_iredraw > 0));
 }
 
 inline xt::xtensor<size_t, 1> RedrawList::currentRedrawLeft() const
 {
     QPOT_ASSERT(!m_lock);
-    return xt::flatten_indices(xt::argwhere(iredraw < 0));
+    return xt::flatten_indices(xt::argwhere(m_iredraw < 0));
 }
 
 template <class E>
