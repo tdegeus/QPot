@@ -177,7 +177,13 @@ PYBIND11_MODULE(QPot, m)
              "Check if there was a redraw the last time setPosition() was called.")
 
         .def("currentRedraw", &QPot::RedrawList::currentRedraw,
-             "Get the direction of redrawing the late time setPosition() was called.")
+             "Get the direction of redrawing the last time setPosition() was called.")
+
+        .def("currentRedrawRight", &QPot::RedrawList::currentRedrawRight,
+             "List of particles that were redrawn to right, the last time setPosition() was called.")
+
+        .def("currentRedrawLeft", &QPot::RedrawList::currentRedrawLeft,
+             "List of particles that were redrawn to left, the last time setPosition() was called.")
 
         .def("redraw", &QPot::RedrawList::redraw<xt::xtensor<int, 1>>,
              "Force redraw (can be used to restore a sequence).",

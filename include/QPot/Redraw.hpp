@@ -188,6 +188,20 @@ public:
     xt::xtensor<int, 1> currentRedraw() const;
 
     /**
+    List of particles that were redrawn right, the last time setPosition() was called.
+
+    \return List of particles.
+    */
+    xt::xtensor<size_t, 1> currentRedrawRight() const;
+
+    /**
+    List of particles that were redrawn right, the last time setPosition() was called.
+
+    \return List of particles.
+    */
+    xt::xtensor<size_t, 1> currentRedrawLeft() const;
+
+    /**
     Force redraw (can be used to restore a sequence).
 
     \tparam T E.g. ``xt::xtensor<int, 1>``.
@@ -609,6 +623,18 @@ inline xt::xtensor<int, 1> RedrawList::currentRedraw() const
 {
     QPOT_ASSERT(!m_lock);
     return m_iredraw;
+}
+
+inline xt::xtensor<size_t, 1> RedrawList::currentRedrawRight() const
+{
+    QPOT_ASSERT(!m_lock);
+    return xt::flatten_indices(xt::argwhere(m_iredraw > 0));
+}
+
+inline xt::xtensor<size_t, 1> RedrawList::currentRedrawLeft() const
+{
+    QPOT_ASSERT(!m_lock);
+    return xt::flatten_indices(xt::argwhere(m_iredraw < 0));
 }
 
 template <class E>
