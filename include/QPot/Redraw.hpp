@@ -205,7 +205,7 @@ public:
     Force redraw (can be used to restore a sequence).
 
     \tparam T E.g. ``xt::xtensor<int, 1>``.
-    \param iredraw See iredraw().
+    \param iredraw See currentRedraw().
     */
     template <class T>
     void redraw(const T& iredraw);
