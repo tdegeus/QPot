@@ -24,7 +24,7 @@ if(USE_HDF5)
     set(HIGHFIVE_USE_XTENSOR 1)
     find_package(HighFive REQUIRED)
     target_link_libraries(${test_name} PRIVATE HighFive)
-    target_compile_definitions(${test_name} PRIVATE USE_HDF5)
+    target_compile_definitions(${test_name} PRIVATE USE_HDF5 DH5_BUILT_AS_DYNAMIC_LIB)
 endif()
 
 if(USE_XSIMD)
