@@ -68,7 +68,7 @@ jobs:
 
     - name: Build C++
       working-directory: build
-      run: cmake --build .
+      run: cmake --build . --verbose
 
     - name: Run C++ tests
       working-directory: build
