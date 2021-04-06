@@ -1,7 +1,7 @@
 /**
 Defines used in the library.
 
-\file config.h
+\file QPot/config.h
 \copyright Copyright 2020. Tom de Geus. All rights reserved.
 \license This project is released under the MIT License.
 */

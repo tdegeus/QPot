@@ -1,7 +1,7 @@
 /**
 Version information.
 
-\file version.hpp
+\file QPot/version.hpp
 \copyright Copyright 2017. Tom de Geus. All rights reserved.
 \license This project is released under the MIT License.
 */
