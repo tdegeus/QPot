@@ -1,7 +1,7 @@
 /**
 Use a static list of yielding positions.
 
-\file Redraw.hpp
+\file QPot/Static.hpp
 \copyright Copyright 2017. Tom de Geus. All rights reserved.
 \license This project is released under the MIT License.
 */
