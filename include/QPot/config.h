@@ -1,7 +1,7 @@
 /**
-Defines used in the library.
+Macros used in the library.
 
-\file QPot/config.h
+\file
 \copyright Copyright 2020. Tom de Geus. All rights reserved.
 \license This project is released under the MIT License.
 */
@@ -54,5 +54,10 @@ Assertions that cannot be disable.
 \throw std::runtime_error
 */
 #define QPOT_REQUIRE(expr) QPOT_REQUIRE_IMPL(expr, __FILE__, __LINE__)
+
+/**
+Keep track of potential energy landscape.
+*/
+namespace QPot { }
 
 #endif

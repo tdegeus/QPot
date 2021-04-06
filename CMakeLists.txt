@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.1...3.19)
 project(QPot)
 
 option(BUILD_TESTS "${PROJECT_NAME}: Build tests" OFF)
-option(BUILD_DOCS "${PROJECT_NAME}: Build docs (include dependencies)" OFF)
+option(BUILD_DOCS "${PROJECT_NAME}: Build docs" OFF)
 
 # Version
 # =======
@@ -14,23 +14,23 @@ option(BUILD_DOCS "${PROJECT_NAME}: Build docs (include dependencies)" OFF)
 execute_process(
     COMMAND python -c "from setuptools_scm import get_version; print(get_version())"
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    OUTPUT_VARIABLE QPOT_VERSION
+    OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-message(STATUS "Building ${PROJECT_NAME} ${QPOT_VERSION}")
+message(STATUS "Building ${PROJECT_NAME} ${${PROJECT_NAME}_VERSION}")
 
 # Set target
 # ==========
 
 find_package(xtensor REQUIRED)
 
-add_library(QPot INTERFACE)
+add_library(${PROJECT_NAME} INTERFACE)
 
-target_include_directories(QPot INTERFACE
+target_include_directories(${PROJECT_NAME} INTERFACE
     $<INSTALL_INTERFACE:include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
-target_link_libraries(QPot INTERFACE xtensor)
+target_link_libraries(${PROJECT_NAME} INTERFACE xtensor)
 
 # Installation
 # ============
@@ -47,22 +47,22 @@ configure_file("include/${PROJECT_NAME}/version.hpp"
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/version.hpp"
         DESTINATION "include/${PROJECT_NAME}/")
 
-install(TARGETS QPot EXPORT QPot-targets)
+install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}-targets)
 
 install(
-    EXPORT QPot-targets
-        FILE "${PROJECT_NAME}Targets.cmake"
+    EXPORT ${PROJECT_NAME}-targets
+    FILE "${PROJECT_NAME}Targets.cmake"
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
-set(_QPOT ${CMAKE_SIZEOF_VOID_P})
+set(_${PROJECT_NAME} ${CMAKE_SIZEOF_VOID_P})
 unset(CMAKE_SIZEOF_VOID_P)
 
 write_basic_package_version_file(
     "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-    VERSION ${QPOT_VERSION}
+    VERSION "${${PROJECT_NAME}_VERSION}"
     COMPATIBILITY AnyNewerVersion)
 
-set(CMAKE_SIZEOF_VOID_P ${_QPOT})
+set(CMAKE_SIZEOF_VOID_P ${_${PROJECT_NAME}})
 
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake"
               "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
@@ -113,6 +113,5 @@ if(BUILD_DOCS)
 
     set(DOXYGEN_STRIP_FROM_INC_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include")
     set(DOXYGEN_STRIP_FROM_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include")
-
     doxygen_add_docs(docs "${CMAKE_CURRENT_SOURCE_DIR}/include")
 endif()

@@ -1,7 +1,7 @@
 /**
 Use a static list of yielding positions.
 
-\file QPot/Static.hpp
+\file
 \copyright Copyright 2017. Tom de Geus. All rights reserved.
 \license This project is released under the MIT License.
 */
