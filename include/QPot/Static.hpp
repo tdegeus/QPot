@@ -31,33 +31,33 @@ public:
     Constructor.
 
     \param x Current position.
-    \param yield Sequence of yield positions.
+    \param x_yield Sequence of yield positions.
     */
-    Static(double x, const xt::xtensor<double, 1>& yield);
+    Static(double x, const xt::xtensor<double, 1>& x_yield);
 
     /**
     Yield positions.
 
     \return All yield positions [ntotal].
     */
-    xt::xtensor<double, 1> yield() const;
+    xt::xtensor<double, 1> yieldPosition() const;
 
     /**
-    Slice yield()[start: stop].
+    Slice yieldPosition()[start: stop].
 
     \param start Lower column bound.
     \param stop Upper column bound.
     \return Yield positions [stop - start].
     */
-    xt::xtensor<double, 1> yield(size_t start, size_t stop) const;
+    xt::xtensor<double, 1> yieldPosition(size_t start, size_t stop) const;
 
     /**
-    Slice yield()[i].
+    Slice yieldPosition()[i].
 
     \param i Column to select.
     \return Yield position.
     */
-    double yield(size_t i) const;
+    double yieldPosition(size_t i) const;
 
     /**
     Customise proximity search region.
@@ -76,8 +76,8 @@ public:
 
     /**
     Yielding position at an offset left/right of the current position:
-    -   offset > 0: ``yield()[current_index + offset]``
-    -   offset < 0: ``yield()[current_index + offset + 1]``
+    -   offset > 0: ``yieldPosition()[current_index + offset]``
+    -   offset < 0: ``yieldPosition()[current_index + offset + 1]``
 
     \param offset The offset.
     \return Yield position.
@@ -87,7 +87,7 @@ public:
     /**
     Yielding position left of the current position
 
-        yield()[current_index]
+        yieldPosition()[current_index]
 
     \return Yield position.
     */
@@ -96,7 +96,7 @@ public:
     /**
     Yielding position right of the current position
 
-        yield()[current_index + 1]
+        yieldPosition()[current_index + 1]
 
     \return Yield position.
     */
@@ -105,7 +105,7 @@ public:
     /**
     Yielding position at an offset left of the current position
 
-        yield()[current_index - offset]
+        yieldPosition()[current_index - offset]
 
     \param offset The offset (same for all particles).
     \return Yield position.
@@ -115,7 +115,7 @@ public:
     /**
     Yielding position at an offset right of the current position
 
-        yield()[current_index + 1 + offset]
+        yieldPosition()[current_index + 1 + offset]
 
     \param offset The offset (same for all particles).
     \return Yield position.
@@ -125,7 +125,7 @@ public:
     /**
     Slice of yielding positions at an offset left/right of the current position
 
-        yield()[current_index + left: current_index + right]
+        yieldPosition()[current_index + left: current_index + right]
 
     \param left Offset left (same for all particles).
     \param right Offset right (same for all particles).
@@ -136,8 +136,8 @@ public:
     /**
     Index of the current minimum
 
-        yield()[:, index] -> yielding position left
-        yield()[:, index + 1] -> yielding position right
+        yieldPosition()[:, index] -> yielding position left
+        yieldPosition()[:, index + 1] -> yielding position right
 
     \return Index.
     */
@@ -182,7 +182,7 @@ private:
 // Implementation
 // --------------
 
-inline Static::Static(double x, const xt::xtensor<double, 1>& yield) : m_pos(yield)
+inline Static::Static(double x, const xt::xtensor<double, 1>& x_yield) : m_pos(x_yield)
 {
     m_ntot = m_pos.size();
     m_proximity = std::min(m_proximity, m_ntot);
@@ -197,18 +197,18 @@ inline Static::Static(double x, const xt::xtensor<double, 1>& yield) : m_pos(yie
     m_right = m_pos(m_idx + 1);
 }
 
-inline xt::xtensor<double, 1> Static::yield() const
+inline xt::xtensor<double, 1> Static::yieldPosition() const
 {
     return m_pos;
 }
 
-inline xt::xtensor<double, 1> Static::yield(size_t start, size_t stop) const
+inline xt::xtensor<double, 1> Static::yieldPosition(size_t start, size_t stop) const
 {
     QPOT_ASSERT(stop <= m_ntot);
     return xt::view(m_pos, xt::range(start, stop));
 }
 
-inline double Static::yield(size_t i) const
+inline double Static::yieldPosition(size_t i) const
 {
     QPOT_ASSERT(i < m_ntot);
     return m_pos(i);

@@ -35,18 +35,18 @@ PYBIND11_MODULE(QPot, m)
              py::arg("x"),
              py::arg("yield"))
 
-        .def("yield",
-             py::overload_cast<>(&QPot::Static::yield, py::const_),
+        .def("yieldPosition",
+             py::overload_cast<>(&QPot::Static::yieldPosition, py::const_),
              "Yield positions")
 
-        .def("yield",
-             py::overload_cast<size_t>(&QPot::Static::yield, py::const_),
+        .def("yieldPosition",
+             py::overload_cast<size_t>(&QPot::Static::yieldPosition, py::const_),
              "Specific yield position",
              py::arg("i"))
 
-        .def("yield",
-             py::overload_cast<size_t, size_t>(&QPot::Static::yield, py::const_),
-             "Range of yield position",
+        .def("yieldPosition",
+             py::overload_cast<size_t, size_t>(&QPot::Static::yieldPosition, py::const_),
+             "Range of yield positions",
              py::arg("start"),
              py::arg("stop"))
 
@@ -118,17 +118,17 @@ PYBIND11_MODULE(QPot, m)
              py::arg("nbuffer") = 300,
              py::arg("noffset") = 20)
 
-        .def("yield",
-             py::overload_cast<>(&QPot::RedrawList::yield, py::const_),
+        .def("yieldPosition",
+             py::overload_cast<>(&QPot::RedrawList::yieldPosition, py::const_),
              "Yield positions")
 
-        .def("yield",
-             py::overload_cast<size_t>(&QPot::RedrawList::yield, py::const_),
+        .def("yieldPosition",
+             py::overload_cast<size_t>(&QPot::RedrawList::yieldPosition, py::const_),
              "Specific yield position",
              py::arg("i"))
 
-        .def("yield",
-             py::overload_cast<size_t, size_t>(&QPot::RedrawList::yield, py::const_),
+        .def("yieldPosition",
+             py::overload_cast<size_t, size_t>(&QPot::RedrawList::yieldPosition, py::const_),
              "Range of yield position",
              py::arg("start"),
              py::arg("stop"))
