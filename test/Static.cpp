@@ -77,16 +77,16 @@ TEST_CASE("QPot::Static", "Static.hpp")
     {
         xt::xtensor<double, 1> y = xt::linspace<double>(0, 10, 11);
         QPot::Static yield(5.5, y);
-        REQUIRE(xt::allclose(yield.yield(0), 0.0));
-        REQUIRE(xt::allclose(yield.yield(1), 1.0));
-        REQUIRE(xt::allclose(yield.yield(2), 2.0));
-        REQUIRE(xt::allclose(yield.yield(3), 3.0));
-        REQUIRE(xt::allclose(yield.yield(4), 4.0));
-        REQUIRE(xt::allclose(yield.yield(5), 5.0));
-        REQUIRE(xt::allclose(yield.yield(6), 6.0));
-        REQUIRE(xt::allclose(yield.yield(7), 7.0));
-        REQUIRE(xt::allclose(yield.yield(8), 8.0));
-        REQUIRE(xt::allclose(yield.yield(9), 9.0));
-        REQUIRE(xt::allclose(yield.yield(10), 10.0));
+        REQUIRE(xt::allclose(yield.yieldPosition(0), 0.0));
+        REQUIRE(xt::allclose(yield.yieldPosition(1), 1.0));
+        REQUIRE(xt::allclose(yield.yieldPosition(2), 2.0));
+        REQUIRE(xt::allclose(yield.yieldPosition(3), 3.0));
+        REQUIRE(xt::allclose(yield.yieldPosition(4), 4.0));
+        REQUIRE(xt::allclose(yield.yieldPosition(5), 5.0));
+        REQUIRE(xt::allclose(yield.yieldPosition(6), 6.0));
+        REQUIRE(xt::allclose(yield.yieldPosition(7), 7.0));
+        REQUIRE(xt::allclose(yield.yieldPosition(8), 8.0));
+        REQUIRE(xt::allclose(yield.yieldPosition(9), 9.0));
+        REQUIRE(xt::allclose(yield.yieldPosition(10), 10.0));
     }
 }
