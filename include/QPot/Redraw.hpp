@@ -1,7 +1,7 @@
 /**
 Dynamically redraw yielding positions.
 
-\file QPot/Redraw.hpp
+\file
 \copyright Copyright 2017. Tom de Geus. All rights reserved.
 \license This project is released under the MIT License.
 */
