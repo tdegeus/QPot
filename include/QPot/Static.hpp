@@ -61,9 +61,8 @@ public:
 
     /**
     Customise proximity search region.
-    See Static::m_proximity for default.
 
-    \param distance Width of the region to consider as proximity.
+    \param distance Width of the region to consider as proximity (default: 10).
     */
     void setProximity(size_t distance);
 

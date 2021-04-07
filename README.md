@@ -281,6 +281,12 @@ enabling *xsimd*, ...
 
 # Change-log
 
+## v0.8.0
+
+*   Simplifying CMake
+*   Minor documentation updates
+*   API change: "yield()" -> "yieldPosition()" to avoid broken Python API
+
 ## v0.7.0
 
 *   Various documentation updates.
