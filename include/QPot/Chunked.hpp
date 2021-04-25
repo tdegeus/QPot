@@ -1,5 +1,5 @@
 /**
-\todo Describe
+Class supporting the use (frozen) sequence of yield positions supplied in chunks.
 
 \file
 \copyright Copyright 2017. Tom de Geus. All rights reserved.
@@ -9,6 +9,9 @@
 #ifndef QPOT_CHUNKED_HPP
 #define QPOT_CHUNKED_HPP
 
+#include <vector>
+#include <numeric>
+
 #ifdef QPOT_ENABLE_DEBUG
 #include <xtensor/xtensor.hpp>
 #endif
@@ -17,7 +20,8 @@
 #include "version.hpp"
 
 /**
-\todo Describe
+Store sequence of yield positions (in chunks) and use it to find the yield positions
+left and right of a specific position.
 */
 namespace QPot {
 
@@ -32,6 +36,8 @@ Consider a sequence
 
     Y0  Y1  Y2  Y3  Y4  Y5  Y6  Y7  Y8  Y9  Y10 Y11 Y12 Y13 Y14 ...
 
+whereby the capital `Y` refers to the 'global' sequence and the small `y` to a chunk.
+
 The idea is to supply this sequence in chunks, e.g.:
 
     Y0  Y1  Y2  Y3  Y4                                              if Y0  <= x <= Y4
@@ -39,23 +45,45 @@ The idea is to supply this sequence in chunks, e.g.:
                                             Y10 Y11 Y12 Y13 Y14     if Y10 <= x <= Y14
                                                                     ...
 
-Whereby of more practical relevance is to 'buffer' some overlap, e.g.:
+Which look as follows in (pseudo-)code:
+
+    chuncked.set_y(    y = { Y0,  Y1,  Y2,  Y3,  Y4});
+    chuncked.rshift_y( y = { Y5,  Y6,  Y7,  Y8,  Y9});
+    chuncked.rshift_y( y = {Y10, Y11, Y12, Y13, Y14});
+
+or even more schematically:
+
+    chuncked.set_y(    y = Y[ 0:  5]);
+    chuncked.rshift_y( y = Y[ 5: 10]);
+    chuncked.rshift_y( y = Y[10: 15]);
+
+\note A word of attention, without specifying any global index concerning the new chunk,
+`rshift_y` and `rshift_dy` (or `lshift_y` and `lshift_dy`), will infer the index by assuming that the
+supplied data is exactly the next chunk on the right (or left).
+If one does not pay attention the can lead to unwanted results.
+Fortunately, Chunked allows you to specify the global index of the first item of the new chunk.
+This will enable assertions, and allow you to be loose about what data the specify:
+As long as the needed data is part of the supplied chunk, Chunked will know what to do.
+
+\section buffer Buffer
+
+It is of practical relevance to 'buffer' some overlap, e.g.:
 
     Y0  Y1  Y2  Y3  Y4                                              if Y0  <= x <= Y3
-               (Y3  Y4) Y5  Y6  Y7  Y8  Y9                          if Y3  <= x <= Y8
+               (Y3  Y4) Y5  Y6  Y7  Y8  Y9                          if Y3  <= x <= Y9
                                    (Y8  Y9) Y10 Y11 Y12 Y13 Y14     if Y8  <= x <= Y14
                                                                     ...
 
-Note thereby that buffering can be done externally, so in this case one would call:
+Which, in pseudo-code, is implemented simply as:
 
-    chuncked.set_y(    y = { Y0,  Y1,  Y2,  Y3,  Y4}            );
-    chuncked.rshift_y( y = { Y5,  Y6,  Y7,  Y8,  Y9}, buffer = 2); // buffers {Y3, Y4}
-    chuncked.rshift_y( y = {Y10, Y11, Y12, Y13, Y14}, buffer = 2); // buffers {Y8, Y9}
+    chuncked.set_y(    y = Y[ 0:  5]            );
+    chuncked.rshift_y( y = Y[ 5: 10], buffer = 2);
+    chuncked.rshift_y( y = Y[10: 15], buffer = 2);
 
 \section distances Distances & cumulative sum
 
 Instead of the sequence of yield position, one can also specify the distance between the yield
-positions, letting Chunked() compute the cumulative sum.
+positions, letting Chunked compute the cumulative sum.
 Consider the following definition:
 
     dY0 = Y0
@@ -75,49 +103,33 @@ or:
 
     Y = cumsum(dY)
 
-So if one just wants to use yield distance the above example becomes:
+So, if one just wants to use yield distance the above example becomes:
 
-    chuncked.set_dy   ( dy = { dY0,  dY1,  dY2,  dY3,  dY4}            ); // dY0 == Y0
-    chuncked.rshift_dy( dy = { dY5,  dY6,  dY7,  dY8,  dY9}, buffer = 2);
-    chuncked.rshift_dy( dy = {dY10, dY11, dY12, dY13, dY14}, buffer = 2);
+    chuncked.set_y    ( y  =  Y[ 0:  5]            );
+    chuncked.rshift_dy( dy = dY[ 5: 10], buffer = 2);
+    chuncked.rshift_dy( dy = dY[10: 15], buffer = 2);
 
 \section left Moving left
 
-Note that moving left in the sequence may not require the same chunks. E.g. to arrive back at the
-first chunk of the above example, with buffering, we would need e.g. the following:
+To arrive back at the first chunk of the above example, everything is straightforward without
+buffering. For example:
 
     Y0  Y1  Y2  Y3  Y4
-               (Y3  Y4) Y5  Y6  Y7  Y8  Y9
-                                   (Y8  Y9) Y10 Y11 Y12 Y13 Y14 Y15
-                Y3  Y4  Y5  Y6  Y7 (Y8  Y9)
-    Y0  Y1  Y2 (Y3  Y4)
+                        Y5  Y6  Y7  Y8  Y9
+                                            Y10 Y11 Y12 Y13 Y14 Y15
+                        Y5  Y6  Y7  Y8  Y9
+    Y0  Y1  Y2  Y3  Y4
 
-or in code:
+Or in code:
 
-    chuncked.set_y   ( y = { Y0,  Y1,  Y2,  Y3,  Y4}            );
-    chuncked.rshift_y( y = { Y5,  Y6,  Y7,  Y8,  Y9}, buffer = 2); // buffers {Y3, Y4}
-    chuncked.rshift_y( y = {Y10, Y11, Y12, Y13, Y14}, buffer = 2); // buffers {Y8, Y9}
-    chuncked.lshift_y( y = { Y3,  Y4,  Y5,  Y6,  Y7}, buffer = 2); // buffers {Y8, Y9}
-    chuncked.lshift_y( y = { Y0,  Y1,  Y2}          , buffer = 2); // buffers {Y3, Y4}
+    chuncked.set_y(    y = Y[ 0:  5]);
+    chuncked.rshift_y( y = Y[ 5: 10]);
+    chuncked.rshift_y( y = Y[10: 15]);
+    chuncked.lshift_y( y = Y[ 5: 10]);
+    chuncked.lshift_y( y = Y[ 0:  5]);
 
-Which again looks a bit different in terms of yield distance:
-
-    chuncked.set_dy   ( dy = { dY0,  dY1,  dY2,  dY3,  dY4}            ); // dY0 == Y0
-    chuncked.rshift_dy( dy = { dY5,  dY6,  dY7,  dY8,  dY9}, buffer = 2);
-    chuncked.rshift_dy( dy = {dY10, dY11, dY12, dY13, dY14}, buffer = 2);
-    chuncked.lshift_dy( dy = { dY4,  dY5,  dY6,  dY7,  dY8}, buffer = 2); // Y7 = Y8 - dY8, ...
-    chuncked.lshift_dy( dy = { dY1,  dY2,  dY3}            , buffer = 2); // ..., Y0 = Y1 - dY1
-
-so the same number of arguments this time, but slightly different indexes.
-
-\section index With indexes
-
-To make things more transparent one can provide information about which chunk of yield positions
-or yield distances is supplying.
-In that case you can supply too much yield positions or yield distances and let Chunked()
-ignore items where needed.
-
-In this case the above could be for example a series of the following chucks:
+With buffering, however, we should be careful what to pass.
+Consider the same example with a buffer of two:
 
     Y0  Y1  Y2  Y3  Y4
                (Y3  Y4) Y5  Y6  Y7  Y8  Y9
@@ -125,24 +137,38 @@ In this case the above could be for example a series of the following chucks:
                         Y5  Y6  Y7 (Y8  Y9)
     Y0  Y1  Y2  Y3  Y4 (Y5  Y6)
 
-which, using yield positions, corresponds to the following code
+or in code:
 
-    chuncked.set_y   ( istart = 0 , y = { Y0,  Y1,  Y2,  Y3,  Y4}            );
-    chuncked.rshift_y( istart = 5 , y = { Y5,  Y6,  Y7,  Y8,  Y9}, buffer = 2);
-    chuncked.rshift_y( istart = 10, y = {Y10, Y11, Y12, Y13, Y14}, buffer = 2);
-    chuncked.lshift_y( istart = 5 , y = { Y5,  Y6,  Y7,  Y8,  Y9}, buffer = 2); // {Y8, Y9} 'ignored'
-    chuncked.lshift_y( istart = 0 , y = { Y0,  Y1,  Y2,  Y3,  Y4}, buffer = 2);
+    chuncked.set_y   ( y = Y[ 0:  5]            );
+    chuncked.rshift_y( y = Y[ 5: 10], buffer = 2);
+    chuncked.rshift_y( y = Y[10: 15], buffer = 2);
+    chuncked.lshift_y( y = Y[ 5:  8], buffer = 2);
+    chuncked.lshift_y( y = Y[ 0:  5], buffer = 2);
 
-or using yield distances:
+This can be simplified by also supplying the starting index of the supplied chunk
+(such that it does not need to be inferred,
+and new chunks only have to encompass what Chunked needs):
 
-    chuncked.set_dy   ( istart = 0 , dy = { dY0,  dY1,  dY2,  dY3,  dY4}            );
-    chuncked.rshift_dy( istart = 5 , dy = { dY5,  dY6,  dY7,  dY8,  dY9}, buffer = 2);
-    chuncked.rshift_dy( istart = 10, dy = {dY10, dY11, dY12, dY13, dY14}, buffer = 2);
-    chuncked.lshift_dy( istart = 5 , dy = { dY5,  dY6,  dY7,  dY8,  dY9}, buffer = 2);
-    chuncked.lshift_dy( istart = 0 , dy = { dY0,  dY1,  dY2,  dY3,  dY4}, buffer = 2);
+    chuncked.set_y   ( istart =  0, y = Y[ 0:  5]            );
+    chuncked.rshift_y( istart =  5, y = Y[ 5: 10], buffer = 2);
+    chuncked.rshift_y( istart = 10, y = Y[10: 15], buffer = 2);
+    chuncked.lshift_y( istart =  5, y = Y[ 5: 10], buffer = 2);
+    chuncked.lshift_y( istart =  0, y = Y[ 0:  5], buffer = 2);
 
-\note One onlY has to supply the first index, `istart`, the rest is inferred from the size of the chunk.
-\warning Always take care of the definition `Y(i) = Y(i - 1) + dY(i)`.
+The latter strategy makes using yield distances transparent:
+
+    chuncked.set_y   ( istart =  0, y = Y[ 0:  5]            );
+    chuncked.rshift_y( istart =  5, y = Y[ 5: 10], buffer = 2);
+    chuncked.rshift_y( istart = 10, y = Y[10: 15], buffer = 2);
+    chuncked.lshift_y( istart =  5, y = Y[ 5: 10], buffer = 2);
+    chuncked.lshift_y( istart =  0, y = Y[ 0:  6], buffer = 2);
+
+\warning Be aware of the definition `Y(i) = Y(i - 1) + dY(i)`. This has the consequence that
+the slice on the last line stops at 6 (an not at 5 as when specifying yield positions),
+because Y5 = Y4 + dY5 and thus that Y4 = Y4 - dY5.
+
+\note One only has to supply the first index, `istart`,
+the rest is inferred from the size of the chunk.
 */
 class Chunked
 {
@@ -154,8 +180,9 @@ public:
     /**
     Constructor.
 
+    \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
     \param x The current position.
-    \param y A chunk of yield-positions.
+    \param y A chunk of yield positions.
     \param istart The global index of `y[0]`.
     */
     template <class T>
@@ -166,7 +193,8 @@ public:
     };
 
     /**
-    Return the global index of the yield-position directly left of the current position.
+    Return the global index of the yield-position directly left of x().
+    \return Index (signed).
     \warning The global index is generally not the index in the current chunk.
     */
     long i()
@@ -220,8 +248,19 @@ public:
     };
 
     /**
-    Get the entire current chunk of yield-positions.
-    \return List of yield-positions.
+    Get the positions of the left-most yield positions specified in the last chunk.
+    Note that ymin_chunk() >= ymin() depending on the buffer.
+    Furthermore that when specifying yield distances, the returned value may not be know externally.
+    This is why Chunked() keeps track of if.
+    */
+    double ymin_chunk() const
+    {
+        return m_ymin_data;
+    }
+
+    /**
+    Get the entire current chunk of yield positions.
+    \return List of yield positions.
     */
     std::vector<double> y() const
     {
@@ -229,15 +268,15 @@ public:
     };
 
     /**
-    Get yield-positions along a slice.
+    Get yield positions along a slice.
 
     \param start Start index of the slice (global index).
     \param stop Stop index of the slice (global index).
-    \return List of yield-positions.
+    \return List of yield positions.
 
     \warning `start` and `stop` must be in the current chunk.
     */
-    std::vector<double> y(long start, long stop) const
+    std::vector<double> Y(long start, long stop) const
     {
         QPOT_ASSERT(start <= stop);
         QPOT_ASSERT(start >= m_istart);
@@ -257,7 +296,7 @@ public:
 
     \warning `i` must be in the current chunk.
     */
-    double y(long i) const
+    double Y(long i) const
     {
         QPOT_ASSERT(i >= m_istart);
         QPOT_ASSERT(i < m_istop);
@@ -268,13 +307,15 @@ public:
     /**
     Reset the system: Overwrite the current chunk and global index.
 
+    \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
     \param istart The global index of `y[0]`.
-    \param y A chunk of yield-positions.
+    \param y A chunk of yield positions.
     */
     template <class T>
     void set_y(long istart, const T& y)
     {
-        QPOT_DEBUG(std::is_sorted(y.begin(), y.end()));
+        QPOT_DEBUG(y.size() > 1);
+        QPOT_DEBUG(std::is_sorted(y.cbegin(), y.cend()));
 
         m_n = y.size();
         m_y.resize(m_n);
@@ -282,6 +323,7 @@ public:
 
         m_istart = istart;
         m_istop = m_istart + static_cast<long>(m_n);
+        m_ymin_data = m_y.front();
 
         m_full_search = true;
         this->update();
@@ -290,7 +332,8 @@ public:
     /**
     Reset the system: Overwrite the current chunk and global index.
 
-    \param y A chunk of yield-positions.
+    \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
+    \param y A chunk of yield positions.
     \param istart The global index of `y[0]`.
     */
     template <class T>
@@ -300,16 +343,17 @@ public:
     };
 
     /**
-    Right-shift the chunk.
+    Right-shift the chunk of yield positions.
 
+    \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
     \param istart The global index of `y[0]`.
-    \param y A chunk of yield-positions (following at least partly the current chunk).
+    \param y A chunk of yield positions (following at least partly the current chunk).
     \param nbuffer Buffer the right `nbuffer` yield positions of the current chunk.
 
     \note If `istart` < istart() - `nbuffer`,
     more is 'buffered' such that the sequence starts at least at `istart`.
 
-    \tip If possible try to keep the size of the chunk constant. Verify that this is the case
+    \note If possible try to keep the size of the chunk constant. Verify that this is the case
     by checking that istop() - istart() is the same before and after this operation.
     */
     template <class T>
@@ -326,8 +370,8 @@ public:
                 size_t d = static_cast<size_t>(m_istop - istart);
                 xt::xtensor<double, 1> o = xt::empty<double>({d});
                 xt::xtensor<double, 1> n = xt::empty<double>({d});
-                std::copy(m_y.end() - d, m_y.end(), o.begin());
-                std::copy(y.begin(), y.begin() + d, n.begin());
+                std::copy(m_y.cend() - d, m_y.cend(), o.begin());
+                std::copy(y.cbegin(), y.cbegin() + d, n.begin());
                 QPOT_DEBUG(xt::allclose(o, n));
             }
         #endif
@@ -345,14 +389,15 @@ public:
         }
 
         // buffer "m_y[m_n - nbuffer:]" and take the rest of "y"
+        m_ymin_data = *y.cbegin();
         QPOT_ASSERT(nbuffer <= m_n);
-        QPOT_DEBUG(std::is_sorted(y.begin(), y.end()));
+        QPOT_DEBUG(std::is_sorted(y.cbegin(), y.cend()));
         size_t d = static_cast<size_t>(m_istop - istart); // items to skip from "y"
         m_istop = istart + static_cast<long>(y.size());
         m_n = static_cast<size_t>(m_istop - m_istart);
         QPOT_ASSERT(m_n >= nbuffer);
 
-        std::copy(m_y.end() - nbuffer, m_y.end(), m_y.begin());
+        std::copy(m_y.cend() - nbuffer, m_y.cend(), m_y.begin());
         m_y.resize(m_n);
         std::copy(y.cbegin() + d, y.cend(), m_y.begin() + nbuffer);
 
@@ -361,9 +406,10 @@ public:
     };
 
     /**
-    Right-shift the chunk.
+    Right-shift the chunk of yield positions.
 
-    \param y A chunk of yield-positions (following directly the current chunk).
+    \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
+    \param y A chunk of yield positions (following directly the current chunk).
     \param nbuffer Buffer the right `nbuffer` yield positions of the current chunk.
 
     \warning This function assumes that y[0] has global index istop().
@@ -376,10 +422,11 @@ public:
     };
 
     /**
-    Right-shift the chunk using yield-distances (rather than yield-positions).
+    Right-shift the chunk of yield positions, using yield distances.
 
+    \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
     \param istart The global index of `dy[0]`.
-    \param dy The yield-distances (following at least partly the current chunk).
+    \param dy The yield distances (following at least partly the current chunk).
     \param nbuffer Buffer a part of the current chunk.
     */
     template <class T>
@@ -390,18 +437,25 @@ public:
         QPOT_ASSERT(istart + static_cast<long>(dy.size()) >= m_istop);
 
         std::vector<double> y(dy.size());
-        std::partial_sum(dy.begin(), dy.end(), y.begin());
+        std::partial_sum(dy.cbegin(), dy.cend(), y.begin());
 
-        double d = m_y[istart - m_istart] - y[0];
+        double d;
+        if (istart == m_istop) {
+            d = m_y.back();
+        }
+        else {
+            d = m_y.back() - y[m_n - 1 - static_cast<size_t>(istart - m_istart)];
+        }
         std::transform(y.begin(), y.end(), y.begin(), [&](auto& v){ return v + d; });
 
         this->rshift_y(istart, y, nbuffer);
     };
 
     /**
-    Right-shift the chunk using yield-distances (rather than yield-positions).
+    Right-shift the chunk of yield positions, using yield distances.
 
-    \param dy The yield-distances following the current right-most yield position.
+    \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
+    \param dy The yield distances following the current right-most yield position.
     \param nbuffer Buffer a part of the current chunk.
 
     \warning This function assumes that dy[0] has global index istop().
@@ -412,7 +466,7 @@ public:
         QPOT_ASSERT(dy.size() > 0);
 
         std::vector<double> y(dy.size());
-        std::partial_sum(dy.begin(), dy.end(), y.begin());
+        std::partial_sum(dy.cbegin(), dy.cend(), y.begin());
 
         std::transform(y.begin(), y.end(), y.begin(), [&](auto& v){ return v + m_y.back(); });
 
@@ -420,13 +474,14 @@ public:
     };
 
     /**
-    Left-shift the chunk.
+    Left-shift the chunk of yield positions.
 
+    \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
     \param istart The global index of `y[0]`.
-    \param y A chunk of yield-positions (preceding at least partly the current chunk).
+    \param y A chunk of yield positions (preceding at least partly the current chunk).
     \param nbuffer Buffer the left `nbuffer` yield positions of the current chunk.
 
-    \tip If possible try to keep the size of the chunk constant. Verify that this is the case
+    \note If possible try to keep the size of the chunk constant. Verify that this is the case
     by checking that istop() - istart() is the same before and after this operation.
     */
     template <class T>
@@ -461,8 +516,9 @@ public:
         }
 
         // buffer "m_y[: nbuffer]" and take the rest of "y"
+        m_ymin_data = *y.cbegin();
         QPOT_ASSERT(nbuffer <= m_n);
-        QPOT_DEBUG(std::is_sorted(y.begin(), y.end()));
+        QPOT_DEBUG(std::is_sorted(y.cbegin(), y.cend()));
         size_t d = static_cast<size_t>(istop - m_istart); // items to skip from "y"
         m_istart = istart;
         size_t m_n = static_cast<size_t>(m_istop - m_istart);
@@ -477,9 +533,10 @@ public:
     };
 
     /**
-    Left-shift the chunk.
+    Left-shift the chunk of yield positions.
 
-    \param y A chunk of yield-positions (preceding directly the current chunk).
+    \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
+    \param y A chunk of yield positions (preceding directly the current chunk).
     \param nbuffer Buffer the left `nbuffer` yield positions of the current chunk.
 
     \warning This function assumes that y[-1] has global index istart() - 1.
@@ -492,10 +549,11 @@ public:
     };
 
     /**
-    Left-shift the chunk using yield-distances (rather than yield-positions).
+    Left-shift the chunk of yield positions, using yield distances.
 
+    \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
     \param istart The global index of `dy[0]`.
-    \param dy The yield-distances (preceding at least partly the current chunk).
+    \param dy The yield distances (preceding at least partly the current chunk).
     \param nbuffer Buffer a part of the current chunk.
     */
     template <class T>
@@ -505,7 +563,7 @@ public:
         QPOT_ASSERT(istart + static_cast<long>(dy.size()) > m_istart);
 
         std::vector<double> y(dy.size());
-        std::partial_sum(dy.begin(), dy.end(), y.begin());
+        std::partial_sum(dy.cbegin(), dy.cend(), y.begin());
 
         double d = m_y[istart + static_cast<long>(y.size()) - m_istart - 1] - y.back();
         std::transform(y.begin(), y.end(), y.begin(), [&](auto& v){ return v + d; });
@@ -514,9 +572,10 @@ public:
     };
 
     /**
-    Left-shift the chunk using yield-distances (rather than yield-positions).
+    Left-shift the chunk of yield positions, using yield distances.
 
-    \param dy The yield-distances preceding the current left-most yield position including istart().
+    \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
+    \param dy The yield distances preceding the current left-most yield position including istart().
     \param nbuffer Buffer a part of the current chunk.
 
     \warning This function assumes that dy[-1] has global index istart().
@@ -527,12 +586,56 @@ public:
         QPOT_ASSERT(dy.size() > 0);
 
         std::vector<double> y(dy.size());
-        std::partial_sum(dy.begin(), dy.end(), y.begin());
+        std::partial_sum(dy.cbegin(), dy.cend(), y.begin());
 
         double d = m_y.front() - y.back();
-        std::transform(y.begin(), y.end(), y.begin(), [&](auto& v){ return v + d; });
+        std::transform(y.cbegin(), y.cend(), y.begin(), [&](auto& v){ return v + d; });
 
         this->lshift_y(m_istart - static_cast<long>(y.size()) + 1, y, nbuffer);
+    };
+
+    /**
+    Shift chunk (left or right, but there may not be any holes compared to the current chunk).
+
+    \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
+    \param istart The global index of `dy[0]`.
+    \param y The yield positions.
+    \param nbuffer Buffer a part of the current chunk.
+    */
+    template <class T>
+    void shift_y(long istart, const T& y, size_t nbuffer = 0)
+    {
+        if (istart < m_istart) {
+            return this->lshift_y(istart, y, nbuffer);
+        }
+        return this->rshift_y(istart, y, nbuffer);
+    }
+
+    /**
+    Shift chunk chunk of yield positions.
+    The shift may be left or right, but there may not be any holes compared to the current chunk.
+
+    \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
+    \param istart The global index of `dy[0]`.
+    \param dy The yield distances.
+    \param nbuffer Buffer a part of the current chunk.
+    */
+    template <class T>
+    void shift_dy(long istart, const T& dy, size_t nbuffer = 0)
+    {
+        if (istart < m_istart) {
+            return this->lshift_dy(istart, dy, nbuffer);
+        }
+        return this->rshift_dy(istart, dy, nbuffer);
+    }
+
+    /**
+    The current position.
+    \return Position.
+    */
+    double x() const
+    {
+        return m_x;
     };
 
     /**
@@ -559,37 +662,37 @@ public:
     }
 
     /**
-    Yielding position left of the current position.
+    Yield position directly left of x().
     Same as y()[i() - istart()].
 
     \return Yield position.
     */
-    double yi_left() const
+    double yleft() const
     {
         QPOT_ASSERT(!m_lock);
         return m_left;
     }
 
     /**
-    Yielding position right of the current position.
+    Yield position directly right of x().
     Same as y()[i() - istart() + 1].
 
     \return Yield position.
     */
-    double yi_right() const
+    double yright() const
     {
         QPOT_ASSERT(!m_lock);
         return m_right;
     }
 
     /**
-    Yielding position at an offset left of the current position.
+    Yield position at an offset left of x().
     Same as y()[i() - istart() - offset].
 
     \param offset The offset.
     \return Yield position.
     */
-    double yi_left(size_t offset) const
+    double yleft(size_t offset) const
     {
         QPOT_ASSERT(!m_lock);
         QPOT_ASSERT(offset <= m_li);
@@ -597,13 +700,13 @@ public:
     }
 
     /**
-    Yielding position at an offset right of the current position.
+    Yield position at an offset right of x().
     Same as y()[i() - istart() + 1 + offset].
 
     \param offset The offset.
     \return Yield position.
     */
-    double yi_right(size_t offset) const
+    double yright(size_t offset) const
     {
         QPOT_ASSERT(!m_lock);
         QPOT_ASSERT(m_li + 1 + offset < m_n);
@@ -611,34 +714,9 @@ public:
     }
 
     /**
-    Yielding position at an offset left/right of the current position:
-    -   offset > 0: y()[i() - istart() + offset]
-    -   offset < 0: y()[i() - istart() + offset + 1]
-
-    \param offset The offset.
-    \return Yield position.
-    */
-    double yi(int offset) const
-    {
-        QPOT_ASSERT(!m_lock);
-        QPOT_ASSERT(offset != 0);
-
-        if (offset < 0) {
-            size_t shift = static_cast<size_t>(- offset);
-            QPOT_ASSERT(shift - 1 <= m_li);
-            return m_y[m_li - shift + 1];
-        }
-
-        size_t shift = static_cast<size_t>(offset);
-        QPOT_ASSERT(m_li + shift < m_n);
-        return m_y[m_li + shift];
-    }
-
-    /**
-    Check that the particle is at least ``n`` wells from the far-left.
+    Check that x() is at least `n` yield positions from the far-left.
 
     \param n Offset.
-    \return boolean.
     */
     bool boundcheck_left(size_t n = 0) const
     {
@@ -648,10 +726,9 @@ public:
     }
 
     /**
-    Check that the particle is at least ``n`` wells from the far-right.
+    Check that x() is at least `n` yield positions from the far-right.
 
     \param n Offset.
-    \return boolean.
     */
     bool boundcheck_right(size_t n = 0) const
     {
@@ -681,7 +758,7 @@ private:
         }
 
         if (m_full_search) {
-            m_li = std::lower_bound(m_y.begin(), m_y.end(), m_x) - m_y.begin() - 1;
+            m_li = std::lower_bound(m_y.cbegin(), m_y.cend(), m_x) - m_y.cbegin() - 1;
             m_left = m_y[m_li];
             m_right = m_y[m_li + 1];
             m_full_search = false;
@@ -699,7 +776,7 @@ private:
             m_li = std::lower_bound(&m_y[l], &m_y[l] + r - l, m_x) - &m_y[l] - 1 + l;
         }
         else {
-            m_li = std::lower_bound(m_y.begin(), m_y.end(), m_x) - m_y.begin() - 1;
+            m_li = std::lower_bound(m_y.cbegin(), m_y.cend(), m_x) - m_y.cbegin() - 1;
         }
 
         m_left = m_y[m_li];
@@ -717,9 +794,10 @@ private:
     int m_redraw; ///< See redraw()
     bool m_lock = true; ///< If `true` the m_x is out-of-bounds for the current chuck.
     bool m_full_search = true; ///< Update m_li by performing a global search on the chunk.
-    double m_left; ///< See yi_left()
-    double m_right; ///< See yi_right()
+    double m_left; ///< See yleft()
+    double m_right; ///< See yright()
     std::vector<double> m_y; ///< Current chunk of yield positions
+    double m_ymin_data = 0.0; ///< The value of ymin() of the supplied data (excl. buffer)
 
 }; // class Chunked
 

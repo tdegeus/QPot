@@ -5,6 +5,7 @@
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xsort.hpp>
 #include <xtensor/xio.hpp>
+#include <highfive/H5Easy.hpp>
 
 int main()
 {
@@ -59,61 +60,15 @@ int main()
         i++;
     }
 
-    // reverse sequence of positions
-    std::reverse(x.begin(), x.end());
-
-    // roll back, re-rendering exactly the same random numbers
-    for (auto& xi : x) {
-        chunk.set_x(xi);
-        while (chunk.redraw() == -1) {
-            ichunk--;
-            generator.restore(state(ichunk));
-            auto dy = generator.random<xt::xtensor<double, 1>>({chunks(ichunk + 1) + nbuffer - chunks(ichunk)});
-            chunk.shift_dy(chunks(ichunk), dy, nbuffer);
-        }
-        if (!(chunk.boundcheck_left() && chunk.boundcheck_right())) {
-            throw std::runtime_error("Out-of-bounds");
-        }
-
-        // store for checking
-        i--;
-        yl_(i) = chunk.yleft();
-        yr_(i) = chunk.yright();
-    }
-
-    if (!(xt::allclose(yl, yl_) && xt::allclose(yr, yr_))) {
-        throw std::runtime_error("Reconstruction failure");
-    }
-
-    // evaluate in a random way
-    xt::random::shuffle(x);
-
-    for (i = 0; i < x.size(); ++i) {
-
-        double xi = x(i);
-        chunk.set_x(xi);
-
-        ichunk = xt::argmax(xi < xmin)() - 1;
-
-        generator.restore(state(ichunk));
-        auto dy = generator.random<xt::xtensor<double, 1>>({chunks(ichunk + 1) + 1 - chunks(ichunk)});
-
-        dy(0) = xmin(ichunk);
-
-        chunk.set_y(chunks(ichunk), xt::cumsum(dy));
-
-        yl_(i) = chunk.yleft();
-        yr_(i) = chunk.yright();
-    }
-
-    auto idx = xt::argsort(x);
-    x = xt::view(x, xt::keep(idx));
-    yl_ = xt::view(yl_, xt::keep(idx));
-    yr_ = xt::view(yr_, xt::keep(idx));
-
-    if (!(xt::allclose(yl, yl_) && xt::allclose(yr, yr_))) {
-        throw std::runtime_error("Reconstruction failure");
-    }
+    H5Easy::File data("output.h5", H5Easy::File::Overwrite);
+    H5Easy::dump(data, "/restore/chunks", chunks);
+    H5Easy::dump(data, "/restore/state", state);
+    H5Easy::dump(data, "/restore/xmin", xmin);
+    H5Easy::dump(data, "/restore/initstate", generator.initstate<>());
+    H5Easy::dump(data, "/restore/initseq", generator.initseq<>());
+    H5Easy::dump(data, "/text/x", x);
+    H5Easy::dump(data, "/text/yl", yl);
+    H5Easy::dump(data, "/text/yr", yr);
 
     return 0;
 }
