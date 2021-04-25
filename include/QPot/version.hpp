@@ -34,7 +34,7 @@ Tip: use the environment variable ``SETUPTOOLS_SCM_PRETEND_VERSION``
 to overwrite the automatic version.
 */
 #ifndef QPOT_VERSION
-#define QPOT_VERSION "@QPot_VERSION@"
+#define QPOT_VERSION "@PROJECT_VERSION@"
 #endif
 
 namespace QPot {

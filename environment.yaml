@@ -21,6 +21,10 @@ dependencies:
   - numpy
   - h5py
 
+  # run examples
+  - prrng
+  - python-prrng
+
   # build docs
   - doxygen
   - mathjax
