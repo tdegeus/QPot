@@ -26,11 +26,11 @@ Macros used in the library.
 */
 
 /**
-All assertions are implementation as::
+All assertions are implemented as:
 
     QPOT_ASSERT(...)
 
-They can be enabled by::
+They can be enabled by:
 
     #define QPOT_ENABLE_ASSERT
 
@@ -49,11 +49,30 @@ The advantage is that:
 #endif
 
 /**
+Intensive assertions (e.g. checking if input is sorted) are implemented as:
+
+    QPOT_DEBUG(...)
+
+They can be enabled by:
+
+    #define QPOT_ENABLE_DEBUG
+
+(before including QPot).
+
+\throw std::runtime_error
+*/
+#ifdef QPOT_ENABLE_DEBUG
+#define QPOT_DEBUG(expr) QPOT_ASSERT_IMPL(expr, __FILE__, __LINE__)
+#else
+#define QPOT_DEBUG(expr)
+#endif
+
+/**
 Assertions that cannot be disable.
 
 \throw std::runtime_error
 */
-#define QPOT_REQUIRE(expr) QPOT_REQUIRE_IMPL(expr, __FILE__, __LINE__)
+#define QPOT_REQUIRE(expr) QPOT_ASSERT_IMPL(expr, __FILE__, __LINE__)
 
 /**
 Keep track of potential energy landscape.
