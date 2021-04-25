@@ -23,6 +23,7 @@ dependencies:
 
   # run examples
   - prrng
+  - python-prrng
 
   # build docs
   - doxygen
