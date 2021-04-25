@@ -8,4 +8,4 @@ find_package(QPot REQUIRED)
 find_package(prrng REQUIRED)
 
 add_executable(${PROJECT_NAME} main.cpp)
-target_link_libraries(${PROJECT_NAME} PRIVATE QPot prrng QPot::assert QPot::debug)
+target_link_libraries(${PROJECT_NAME} PRIVATE QPot prrng QPot::debug QPot::compiler_warnings)

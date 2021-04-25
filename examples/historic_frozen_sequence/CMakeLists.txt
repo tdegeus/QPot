@@ -12,4 +12,4 @@ find_package(prrng REQUIRED)
 find_package(HighFive REQUIRED)
 
 add_executable(${PROJECT_NAME} main.cpp)
-target_link_libraries(${PROJECT_NAME} PRIVATE QPot prrng QPot::assert QPot::debug HighFive)
+target_link_libraries(${PROJECT_NAME} PRIVATE QPot prrng HighFive QPot::debug QPot::compiler_warnings)

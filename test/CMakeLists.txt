@@ -17,7 +17,7 @@ add_executable(${test_name} main.cpp Chunked.cpp Redraw.cpp Static.cpp)
 find_package(Catch2 REQUIRED)
 find_package(xtensor REQUIRED)
 
-target_link_libraries(${test_name} PRIVATE Catch2::Catch2 QPot QPot::compiler_warnings QPot::assert QPot::debug)
+target_link_libraries(${test_name} PRIVATE Catch2::Catch2 QPot QPot::debug QPot::compiler_warnings)
 
 if(USE_HDF5)
     set(HIGHFIVE_USE_BOOST 0)
