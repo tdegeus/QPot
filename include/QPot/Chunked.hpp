@@ -190,7 +190,7 @@ public:
     {
         m_x = x;
         this->set_y(istart, y);
-    };
+    }
 
     /**
     Return the global index of the yield-position directly left of x().
@@ -200,7 +200,7 @@ public:
     long i()
     {
         return m_istart + static_cast<long>(m_li);
-    };
+    }
 
     /**
     Customise proximity search region.
@@ -209,7 +209,7 @@ public:
     void search_proximity(size_t distance)
     {
         m_proximity = distance;
-    };
+    }
 
     /**
     Get the global index of y()(0) = ymin() (the left-most yield position of this chunk).
@@ -218,7 +218,7 @@ public:
     long istart() const
     {
         return m_istart;
-    };
+    }
 
     /**
     Get the global index of the slice y() = Y[istart(): istop()].
@@ -227,7 +227,7 @@ public:
     long istop() const
     {
         return m_istop;
-    };
+    }
 
     /**
     Get the position of the left-most yield position of the current chunk, ymin() = y()(0).
@@ -236,7 +236,7 @@ public:
     double ymin() const
     {
         return m_y.front();
-    };
+    }
 
     /**
     Get the position of the right-most yield position of the current chunk, y()(-1) = ymax().
@@ -245,7 +245,7 @@ public:
     double ymax() const
     {
         return m_y.back();
-    };
+    }
 
     /**
     Get the positions of the left-most yield positions specified in the last chunk.
@@ -265,7 +265,7 @@ public:
     std::vector<double> y() const
     {
         return m_y;
-    };
+    }
 
     /**
     Get yield positions along a slice.
@@ -286,7 +286,7 @@ public:
         size_t j = static_cast<size_t>(stop - m_istart);
 
         return std::vector<double>(m_y.begin() + i, m_y.begin() + j);
-    };
+    }
 
     /**
     Get a specific yield-position.
@@ -302,7 +302,7 @@ public:
         QPOT_ASSERT(i < m_istop);
 
         return m_y[static_cast<size_t>(i - m_istart)];
-    };
+    }
 
     /**
     Reset the system: Overwrite the current chunk and global index.
@@ -327,7 +327,7 @@ public:
 
         m_full_search = true;
         this->update();
-    };
+    }
 
     /**
     Reset the system: Overwrite the current chunk and global index.
@@ -340,7 +340,7 @@ public:
     void set_y(const T& y, long istart = 0)
     {
         this->set_y(istart, y);
-    };
+    }
 
     /**
     Right-shift the chunk of yield positions.
@@ -403,7 +403,7 @@ public:
 
         m_full_search = true;
         this->update();
-    };
+    }
 
     /**
     Right-shift the chunk of yield positions.
@@ -419,7 +419,7 @@ public:
     {
         QPOT_ASSERT(y.size() > 0);
         this->rshift_y(m_istop, y, nbuffer);
-    };
+    }
 
     /**
     Right-shift the chunk of yield positions, using yield distances.
@@ -449,7 +449,7 @@ public:
         std::transform(y.begin(), y.end(), y.begin(), [&](auto& v){ return v + d; });
 
         this->rshift_y(istart, y, nbuffer);
-    };
+    }
 
     /**
     Right-shift the chunk of yield positions, using yield distances.
@@ -471,7 +471,7 @@ public:
         std::transform(y.begin(), y.end(), y.begin(), [&](auto& v){ return v + m_y.back(); });
 
         this->rshift_y(m_istop, y, nbuffer);
-    };
+    }
 
     /**
     Left-shift the chunk of yield positions.
@@ -530,7 +530,7 @@ public:
 
         m_full_search = true;
         this->update();
-    };
+    }
 
     /**
     Left-shift the chunk of yield positions.
@@ -546,7 +546,7 @@ public:
     {
         QPOT_ASSERT(y.size() > 0);
         return this->lshift_y(m_istart - y.size(), y, nbuffer);
-    };
+    }
 
     /**
     Left-shift the chunk of yield positions, using yield distances.
@@ -569,7 +569,7 @@ public:
         std::transform(y.begin(), y.end(), y.begin(), [&](auto& v){ return v + d; });
 
         this->lshift_y(istart, y, nbuffer);
-    };
+    }
 
     /**
     Left-shift the chunk of yield positions, using yield distances.
@@ -592,7 +592,7 @@ public:
         std::transform(y.cbegin(), y.cend(), y.begin(), [&](auto& v){ return v + d; });
 
         this->lshift_y(m_istart - static_cast<long>(y.size()) + 1, y, nbuffer);
-    };
+    }
 
     /**
     Shift chunk (left or right, but there may not be any holes compared to the current chunk).
@@ -636,7 +636,7 @@ public:
     double x() const
     {
         return m_x;
-    };
+    }
 
     /**
     Set the current position.
@@ -646,7 +646,7 @@ public:
     {
         m_x = x;
         this->update();
-    };
+    }
 
     /**
     Check for redraw:
