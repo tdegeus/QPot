@@ -7,7 +7,6 @@ endif()
 
 set(CMAKE_BUILD_TYPE Release CACHE STRING "Release mode")
 
-find_package(QPot REQUIRED)
 find_package(prrng REQUIRED)
 
 add_library(libraries INTERFACE IMPORTED)
