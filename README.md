@@ -281,6 +281,13 @@ enabling *xsimd*, ...
 
 # Change-log
 
+## v0.9.0
+
+*   Adding: Chunked storage (#23)
+*   Fixing version in doxygen docs
+*   [CI] Minor style update
+*   Updating doxygen-awesome
+
 ## v0.8.0
 
 *   Simplifying CMake
