@@ -181,6 +181,7 @@ public:
     Constructor.
 
     \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
+
     \param x The current position.
     \param y A chunk of yield positions.
     \param istart The global index of `y[0]`.
@@ -308,6 +309,7 @@ public:
     Reset the system: Overwrite the current chunk and global index.
 
     \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
+
     \param istart The global index of `y[0]`.
     \param y A chunk of yield positions.
     */
@@ -333,6 +335,7 @@ public:
     Reset the system: Overwrite the current chunk and global index.
 
     \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
+
     \param y A chunk of yield positions.
     \param istart The global index of `y[0]`.
     */
@@ -346,6 +349,7 @@ public:
     Right-shift the chunk of yield positions.
 
     \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
+
     \param istart The global index of `y[0]`.
     \param y A chunk of yield positions (following at least partly the current chunk).
     \param nbuffer Buffer the right `nbuffer` yield positions of the current chunk.
@@ -409,6 +413,7 @@ public:
     Right-shift the chunk of yield positions.
 
     \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
+
     \param y A chunk of yield positions (following directly the current chunk).
     \param nbuffer Buffer the right `nbuffer` yield positions of the current chunk.
 
@@ -425,6 +430,7 @@ public:
     Right-shift the chunk of yield positions, using yield distances.
 
     \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
+
     \param istart The global index of `dy[0]`.
     \param dy The yield distances (following at least partly the current chunk).
     \param nbuffer Buffer a part of the current chunk.
@@ -455,6 +461,7 @@ public:
     Right-shift the chunk of yield positions, using yield distances.
 
     \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
+
     \param dy The yield distances following the current right-most yield position.
     \param nbuffer Buffer a part of the current chunk.
 
@@ -477,6 +484,7 @@ public:
     Left-shift the chunk of yield positions.
 
     \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
+
     \param istart The global index of `y[0]`.
     \param y A chunk of yield positions (preceding at least partly the current chunk).
     \param nbuffer Buffer the left `nbuffer` yield positions of the current chunk.
@@ -536,6 +544,7 @@ public:
     Left-shift the chunk of yield positions.
 
     \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
+
     \param y A chunk of yield positions (preceding directly the current chunk).
     \param nbuffer Buffer the left `nbuffer` yield positions of the current chunk.
 
@@ -576,6 +585,7 @@ public:
     Left-shift the chunk of yield positions, using yield distances.
 
     \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
+
     \param dy The yield distances preceding the current left-most yield position including istart().
     \param nbuffer Buffer a part of the current chunk.
 
@@ -599,6 +609,7 @@ public:
     Shift chunk (left or right, but there may not be any holes compared to the current chunk).
 
     \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
+
     \param istart The global index of `dy[0]`.
     \param y The yield positions.
     \param nbuffer Buffer a part of the current chunk.
@@ -617,6 +628,7 @@ public:
     The shift may be left or right, but there may not be any holes compared to the current chunk.
 
     \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
+
     \param istart The global index of `dy[0]`.
     \param dy The yield distances.
     \param nbuffer Buffer a part of the current chunk.
