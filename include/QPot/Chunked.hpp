@@ -552,6 +552,7 @@ public:
     Left-shift the chunk of yield positions, using yield distances.
 
     \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
+
     \param istart The global index of `dy[0]`.
     \param dy The yield distances (preceding at least partly the current chunk).
     \param nbuffer Buffer a part of the current chunk.
