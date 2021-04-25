@@ -356,9 +356,6 @@ public:
 
     \note If `istart` < istart() - `nbuffer`,
     more is 'buffered' such that the sequence starts at least at `istart`.
-
-    \note If possible try to keep the size of the chunk constant. Verify that this is the case
-    by checking that istop() - istart() is the same before and after this operation.
     */
     template <class T>
     void rshift_y(long istart, const T& y, size_t nbuffer = 0)
@@ -488,9 +485,6 @@ public:
     \param istart The global index of `y[0]`.
     \param y A chunk of yield positions (preceding at least partly the current chunk).
     \param nbuffer Buffer the left `nbuffer` yield positions of the current chunk.
-
-    \note If possible try to keep the size of the chunk constant. Verify that this is the case
-    by checking that istop() - istart() is the same before and after this operation.
     */
     template <class T>
     void lshift_y(long istart, const T& y, size_t nbuffer = 0)
