@@ -198,7 +198,7 @@ public:
     \return Index (signed).
     \warning The global index is generally not the index in the current chunk.
     */
-    long i()
+    long i() const
     {
         return m_istart + static_cast<long>(m_li);
     }
