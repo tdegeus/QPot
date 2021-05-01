@@ -5,10 +5,11 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     find_package(QPot REQUIRED CONFIG)
 endif()
 
-option(USE_XSIMD "Use xsimd and 'march=native' optimisations" OFF)
-option(USE_HDF5 "Use xsimd and 'march=native' optimisations" ON)
+option(HDF5 "Compile HDF5-based tests" ON)
 
-set(CMAKE_BUILD_TYPE Release)
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
+endif()
 
 set(test_name "unit-tests")
 
@@ -25,11 +26,6 @@ if(USE_HDF5)
     find_package(HighFive REQUIRED)
     target_link_libraries(${test_name} PRIVATE HighFive)
     target_compile_definitions(${test_name} PRIVATE USE_HDF5)
-endif()
-
-if(USE_XSIMD)
-    find_package(xsimd REQUIRED)
-    target_link_libraries(${test_name} PRIVATE xsimd xtensor::optimize xtensor::use_xsimd)
 endif()
 
 add_test(NAME ${test_name} COMMAND ${test_name})
