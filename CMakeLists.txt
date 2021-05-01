@@ -5,6 +5,11 @@ cmake_minimum_required(VERSION 3.1...3.19)
 
 project(QPot)
 
+option(BUILD_TESTS "${PROJECT_NAME}: Build tests" OFF)
+option(BUILD_EXAMPLES "${PROJECT_NAME}: Build examples" OFF)
+option(BUILD_PYTHON "${PROJECT_NAME}: Build Python API" OFF)
+option(BUILD_DOCS "${PROJECT_NAME}: Build docs" OFF)
+
 execute_process(
     COMMAND python -c "from setuptools_scm import get_version; print(get_version())"
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -12,10 +17,6 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 message(STATUS "Building ${PROJECT_NAME} ${PROJECT_VERSION}")
-
-option(BUILD_TESTS "${PROJECT_NAME}: Build tests" OFF)
-option(BUILD_EXAMPLES "${PROJECT_NAME}: Build examples" OFF)
-option(BUILD_DOCS "${PROJECT_NAME}: Build docs" OFF)
 
 string(TOUPPER "${PROJECT_NAME}" PROJECT_NAME_UPPER)
 
@@ -95,7 +96,20 @@ if(BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
 
-# Build docs: include dependencies
+# Python API
+
+if(BUILD_PYTHON)
+    find_package(pybind11 CONFIG REQUIRED)
+    find_package(pyxtensor REQUIRED)
+
+    pybind11_add_module(python python/main.cpp)
+    set_target_properties(python PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+    target_link_libraries(python PUBLIC ${PROJECT_NAME} pybind11::module pyxtensor)
+
+    target_compile_definitions(python PRIVATE VERSION_INFO=${PROJECT_VERSION})
+endif()
+
+# Documentation
 
 if(BUILD_DOCS)
     find_package(Doxygen REQUIRED)
@@ -110,15 +124,11 @@ if(BUILD_DOCS)
     set(DOXYGEN_QUIET YES)
     set(DOXYGEN_WARN_IF_UNDOCUMENTED YES)
     set(DOXYGEN_WARN_AS_ERROR YES)
+    set(DOXYGEN_ALIASES "license=@par License:")
 
     set(DOXYGEN_HTML_EXTRA_STYLESHEET
         "${CMAKE_CURRENT_SOURCE_DIR}/docs/doxystyle/doxygen-awesome.css"
         "${CMAKE_CURRENT_SOURCE_DIR}/docs/doxystyle/custom.css")
-
-    set(DOXYGEN_ALIASES
-        "rst=\\verbatim embed:rst:leading-asterisk"
-        "endrst=\\endverbatim"
-        "license=@par License:")
 
     set(DOXYGEN_STRIP_FROM_INC_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include")
     set(DOXYGEN_STRIP_FROM_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include")
