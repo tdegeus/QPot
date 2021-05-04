@@ -804,7 +804,12 @@ private:
     double m_left; ///< See yleft()
     double m_right; ///< See yright()
     std::vector<double> m_y; ///< Current chunk of yield positions
-    double m_ymin_data = 0.0; ///< The value of ymin() of the supplied data (excl. buffer)
+
+    /**
+    The value left-most value of the last supplied `y`.
+    Note that when a buffer is used typically `m_ymin_data != m_y(0)`.
+    */
+    double m_ymin_data = 0.0;
 
 }; // class Chunked
 
