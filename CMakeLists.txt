@@ -125,6 +125,7 @@ if(BUILD_DOCS)
     set(DOXYGEN_WARN_IF_UNDOCUMENTED YES)
     set(DOXYGEN_WARN_AS_ERROR YES)
     set(DOXYGEN_ALIASES "license=@par License:")
+    set(DOXYGEN_USE_MDFILE_AS_MAINPAGE "README.md")
 
     set(DOXYGEN_HTML_EXTRA_STYLESHEET
         "${CMAKE_CURRENT_SOURCE_DIR}/docs/doxystyle/doxygen-awesome.css"
@@ -132,5 +133,5 @@ if(BUILD_DOCS)
 
     set(DOXYGEN_STRIP_FROM_INC_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include")
     set(DOXYGEN_STRIP_FROM_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include")
-    doxygen_add_docs(docs "${CMAKE_CURRENT_SOURCE_DIR}/include")
+    doxygen_add_docs(docs "${CMAKE_CURRENT_SOURCE_DIR}/include" "README.md")
 endif()
