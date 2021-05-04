@@ -39,6 +39,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
 
         REQUIRE(chunk.boundcheck_left());
         REQUIRE(chunk.boundcheck_right());
+        REQUIRE(chunk.ymin_chunk() == y(0));
 
         REQUIRE(xt::allclose(chunk.yleft(), 5.0));
         REQUIRE(xt::allclose(chunk.yright(), 6.0));
@@ -71,6 +72,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
 
         REQUIRE(chunk.boundcheck_left());
         REQUIRE(chunk.boundcheck_right());
+        REQUIRE(chunk.ymin_chunk() == y(0));
 
         REQUIRE(xt::allclose(chunk.yleft(), 6.0));
         REQUIRE(xt::allclose(chunk.yright(), 7.0));
@@ -114,6 +116,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
@@ -131,6 +134,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
@@ -163,6 +167,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
@@ -171,6 +176,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(dhunk.redraw() == 0);
         REQUIRE(dhunk.istart() == istart);
         REQUIRE(dhunk.istop() == istop);
+        REQUIRE(dhunk.ymin_chunk() == y(istart));
         REQUIRE(xt::allclose(xt::adapt(dhunk.y()), xt::view(y, xt::range(dhunk.istart(), dhunk.istop()))));
 
         chunk.set_x(13.5);
@@ -191,6 +197,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), y));
@@ -199,6 +206,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(dhunk.redraw() == 0);
         REQUIRE(dhunk.istart() == istart);
         REQUIRE(dhunk.istop() == istop);
+        REQUIRE(dhunk.ymin_chunk() == y(istart));
         REQUIRE(xt::allclose(xt::adapt(dhunk.y()), y));
 
         chunk.rshift_y(1, xt::eval(xt::view(y, xt::range(1, 21)))); // should be ignored
@@ -210,6 +218,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), y));
@@ -218,6 +227,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(dhunk.redraw() == 0);
         REQUIRE(dhunk.istart() == istart);
         REQUIRE(dhunk.istop() == istop);
+        REQUIRE(dhunk.ymin_chunk() == y(istart));
         REQUIRE(xt::allclose(xt::adapt(dhunk.y()), y));
     }
 
@@ -250,6 +260,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
@@ -258,6 +269,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(dhunk.redraw() == 0);
         REQUIRE(dhunk.istart() == istart);
         REQUIRE(dhunk.istop() == istop);
+        REQUIRE(dhunk.ymin_chunk() == y(istart));
         REQUIRE(xt::allclose(xt::adapt(dhunk.y()), xt::view(y, xt::range(dhunk.istart(), dhunk.istop()))));
 
         chunk.set_x(13.5);
@@ -278,6 +290,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
@@ -287,6 +300,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(dhunk.redraw() == 0);
         REQUIRE(dhunk.istart() == istart);
         REQUIRE(dhunk.istop() == istop);
+        REQUIRE(dhunk.ymin_chunk() == y(istart));
         REQUIRE(xt::allclose(xt::adapt(dhunk.y()), xt::view(y, xt::range(dhunk.istart(), dhunk.istop()))));
         REQUIRE(dhunk.istop() - dhunk.istart() != n);
     }
@@ -320,6 +334,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
@@ -328,6 +343,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(dhunk.redraw() == 0);
         REQUIRE(dhunk.istart() == istart);
         REQUIRE(dhunk.istop() == istop);
+        REQUIRE(dhunk.ymin_chunk() == y(istart));
         REQUIRE(xt::allclose(xt::adapt(dhunk.y()), xt::view(y, xt::range(dhunk.istart(), dhunk.istop()))));
 
         chunk.set_x(13.5);
@@ -348,6 +364,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
@@ -357,6 +374,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(dhunk.redraw() == 0);
         REQUIRE(dhunk.istart() == istart);
         REQUIRE(dhunk.istop() == istop);
+        REQUIRE(dhunk.ymin_chunk() == y(istart));
         REQUIRE(xt::allclose(xt::adapt(dhunk.y()), xt::view(y, xt::range(dhunk.istart(), dhunk.istop()))));
         REQUIRE(dhunk.istop() - dhunk.istart() == n);
     }
@@ -390,6 +408,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
@@ -398,6 +417,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(dhunk.redraw() == 0);
         REQUIRE(dhunk.istart() == istart);
         REQUIRE(dhunk.istop() == istop);
+        REQUIRE(dhunk.ymin_chunk() == y(istart));
         REQUIRE(xt::allclose(xt::adapt(dhunk.y()), xt::view(y, xt::range(dhunk.istart(), dhunk.istop()))));
 
         chunk.set_x(13.5);
@@ -419,6 +439,9 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart - static_cast<decltype(istart)>(nbuffer));
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
+        REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
+        REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
         REQUIRE(chunk.istop() - chunk.istart() != n);
 
@@ -459,6 +482,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
@@ -467,6 +491,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(dhunk.redraw() == 0);
         REQUIRE(dhunk.istart() == istart);
         REQUIRE(dhunk.istop() == istop);
+        REQUIRE(dhunk.ymin_chunk() == y(istart));
         REQUIRE(xt::allclose(xt::adapt(dhunk.y()), xt::view(y, xt::range(dhunk.istart(), dhunk.istop()))));
 
         chunk.set_x(13.5);
@@ -488,6 +513,9 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart - static_cast<decltype(istart)>(nbuffer));
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
+        REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
+        REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
         REQUIRE(chunk.istop() - chunk.istart() == n);
 
@@ -528,6 +556,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
@@ -536,6 +565,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(dhunk.redraw() == 0);
         REQUIRE(dhunk.istart() == istart);
         REQUIRE(dhunk.istop() == istop);
+        REQUIRE(dhunk.ymin_chunk() == y(istart));
         REQUIRE(xt::allclose(xt::adapt(dhunk.y()), xt::view(y, xt::range(dhunk.istart(), dhunk.istop()))));
 
         chunk.set_x(13.5);
@@ -557,6 +587,9 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart - static_cast<decltype(istart)>(nbuffer));
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart - 2)));
+        REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
+        REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
         REQUIRE(chunk.istop() - chunk.istart() != n);
 
@@ -597,6 +630,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
@@ -605,6 +639,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(dhunk.redraw() == 0);
         REQUIRE(dhunk.istart() == istart);
         REQUIRE(dhunk.istop() == istop);
+        REQUIRE(dhunk.ymin_chunk() == y(istart));
         REQUIRE(xt::allclose(xt::adapt(dhunk.y()), xt::view(y, xt::range(dhunk.istart(), dhunk.istop()))));
 
         chunk.set_x(13.5);
@@ -626,6 +661,9 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart - static_cast<decltype(istart)>(nbuffer));
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart - 2)));
+        REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
+        REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
         REQUIRE(chunk.istop() - chunk.istart() == n);
     }
@@ -657,6 +695,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
@@ -665,6 +704,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(dhunk.redraw() == 0);
         REQUIRE(dhunk.istart() == istart);
         REQUIRE(dhunk.istop() == istop);
+        REQUIRE(dhunk.ymin_chunk() == y(istart));
         REQUIRE(xt::allclose(xt::adapt(dhunk.y()), xt::view(y, xt::range(dhunk.istart(), dhunk.istop()))));
 
         chunk.set_x(5.5);
@@ -685,6 +725,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), y));
@@ -693,6 +734,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(dhunk.redraw() == 0);
         REQUIRE(dhunk.istart() == istart);
         REQUIRE(dhunk.istop() == istop);
+        REQUIRE(dhunk.ymin_chunk() == y(istart));
         REQUIRE(xt::allclose(xt::adapt(dhunk.y()), y));
 
         chunk.lshift_y(istart, xt::eval(xt::view(y, xt::range(istart, 20)))); // should be ignored
@@ -704,6 +746,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), y));
@@ -712,6 +755,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(dhunk.redraw() == 0);
         REQUIRE(dhunk.istart() == istart);
         REQUIRE(dhunk.istop() == istop);
+        REQUIRE(dhunk.ymin_chunk() == y(istart));
         REQUIRE(xt::allclose(xt::adapt(dhunk.y()), y));
     }
 
@@ -744,6 +788,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
@@ -752,6 +797,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(dhunk.redraw() == 0);
         REQUIRE(dhunk.istart() == istart);
         REQUIRE(dhunk.istop() == istop);
+        REQUIRE(dhunk.ymin_chunk() == y(istart));
         REQUIRE(xt::allclose(xt::adapt(dhunk.y()), xt::view(y, xt::range(dhunk.istart(), dhunk.istop()))));
 
         chunk.set_x(5.5);
@@ -772,6 +818,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
@@ -779,6 +826,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
 
         REQUIRE(dhunk.i() == 5);
         REQUIRE(dhunk.redraw() == 0);
+        REQUIRE(dhunk.ymin_chunk() == y(istart));
         REQUIRE(dhunk.istart() == istart);
         REQUIRE(dhunk.istop() == istop + 1);
         REQUIRE(xt::allclose(xt::adapt(dhunk.y()), xt::view(y, xt::range(dhunk.istart(), dhunk.istop()))));
@@ -814,6 +862,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
@@ -822,6 +871,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(dhunk.redraw() == 0);
         REQUIRE(dhunk.istart() == istart);
         REQUIRE(dhunk.istop() == istop);
+        REQUIRE(dhunk.ymin_chunk() == y(istart));
         REQUIRE(xt::allclose(xt::adapt(dhunk.y()), xt::view(y, xt::range(dhunk.istart(), dhunk.istop()))));
 
         chunk.set_x(5.5);
@@ -842,6 +892,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
@@ -884,6 +935,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
@@ -892,6 +944,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(dhunk.redraw() == 0);
         REQUIRE(dhunk.istart() == istart);
         REQUIRE(dhunk.istop() == istop);
+        REQUIRE(dhunk.ymin_chunk() == y(istart));
         REQUIRE(xt::allclose(xt::adapt(dhunk.y()), xt::view(y, xt::range(dhunk.istart(), dhunk.istop()))));
 
         chunk.set_x(5.5);
@@ -951,6 +1004,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
@@ -959,6 +1013,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(dhunk.redraw() == 0);
         REQUIRE(dhunk.istart() == istart);
         REQUIRE(dhunk.istop() == istop);
+        REQUIRE(dhunk.ymin_chunk() == y(istart));
         REQUIRE(xt::allclose(xt::adapt(dhunk.y()), xt::view(y, xt::range(dhunk.istart(), dhunk.istop()))));
 
         chunk.set_x(5.5);
@@ -979,6 +1034,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
@@ -1021,6 +1077,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.redraw() == 0);
         REQUIRE(chunk.istart() == istart);
         REQUIRE(chunk.istop() == istop);
+        REQUIRE(chunk.ymin_chunk() == Approx(y(istart)));
         REQUIRE(chunk.ymin() == Approx(y(chunk.istart())));
         REQUIRE(chunk.ymax() == Approx(y(chunk.istop() - 1)));
         REQUIRE(xt::allclose(xt::adapt(chunk.y()), xt::view(y, xt::range(chunk.istart(), chunk.istop()))));
@@ -1029,6 +1086,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(dhunk.redraw() == 0);
         REQUIRE(dhunk.istart() == istart);
         REQUIRE(dhunk.istop() == istop);
+        REQUIRE(dhunk.ymin_chunk() == y(istart));
         REQUIRE(xt::allclose(xt::adapt(dhunk.y()), xt::view(y, xt::range(dhunk.istart(), dhunk.istop()))));
 
         chunk.set_x(5.5);
@@ -1045,6 +1103,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         dhunk.lshift_dy(istart, xt::eval(xt::view(dy, xt::range(istart, istop + 1))), nbuffer);
 
         REQUIRE(chunk.i() == 5);
+        REQUIRE(chunk.ymin_chunk() == y(istart));
         REQUIRE(chunk.yleft() == Approx(y(chunk.i())));
         REQUIRE(chunk.yright() == Approx(y(chunk.i() + 1)));
         REQUIRE(chunk.redraw() == 0);
@@ -1054,9 +1113,11 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.istop() - chunk.istart() != n);
 
         REQUIRE(dhunk.i() == 5);
+        REQUIRE(chunk.ymin_chunk() == y(istart));
         REQUIRE(chunk.yleft() == Approx(y(chunk.i())));
         REQUIRE(chunk.yright() == Approx(y(chunk.i() + 1)));
         REQUIRE(dhunk.redraw() == 0);
+        REQUIRE(dhunk.ymin_chunk() == y(istart));
         REQUIRE(dhunk.istart() == istart);
         REQUIRE(dhunk.istop() == istop + static_cast<decltype(istart)>(nbuffer));
         REQUIRE(xt::allclose(xt::adapt(dhunk.y()), xt::view(y, xt::range(dhunk.istart(), dhunk.istop()))));
