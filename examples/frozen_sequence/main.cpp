@@ -9,7 +9,6 @@
 int main()
 {
     prrng::pcg32 generator;
-    prrng::pcg32 ref = generator;
 
     // initialise yield index for the beginning of every chunk
     xt::xtensor<size_t, 1> yindex = 1000 * xt::arange<size_t>(12);
@@ -23,8 +22,8 @@ int main()
     xt::xtensor<uint64_t, 1> state = xt::empty<uint64_t>({yindex.size() - 1});
 
     // draw first chunk and initialise "QPot::Chunked"
-    state(ichunk) = generator.state<>();
-    auto dy = generator.random<xt::xtensor<double, 1>>({yindex(ichunk + 1) - yindex(ichunk)});
+    state(ichunk) = generator.state();
+    auto dy = generator.random({yindex(ichunk + 1) - yindex(ichunk)});
 
     QPot::Chunked chunk(5.0, xt::cumsum(dy));
     xmin(ichunk) = chunk.ymin_chunk();
@@ -50,8 +49,8 @@ int main()
         chunk.set_x(xi);
         while (chunk.redraw() == +1) {
             ichunk++;
-            state(ichunk) = generator.state<>();
-            auto dy = generator.random<xt::xtensor<double, 1>>({yindex(ichunk + 1) - yindex(ichunk)});
+            state(ichunk) = generator.state();
+            auto dy = generator.random({yindex(ichunk + 1) - yindex(ichunk)});
             chunk.shift_dy(yindex(ichunk), dy, nbuffer);
             xmin(ichunk) = chunk.ymin_chunk();
         }
@@ -74,7 +73,7 @@ int main()
         while (chunk.redraw() == -1) {
             ichunk--;
             generator.restore(state(ichunk));
-            auto dy = generator.random<xt::xtensor<double, 1>>({yindex(ichunk + 1) + nbuffer - yindex(ichunk)});
+            auto dy = generator.random({yindex(ichunk + 1) + nbuffer - yindex(ichunk)});
             chunk.shift_dy(yindex(ichunk), dy, nbuffer);
         }
         if (!(chunk.boundcheck_left() && chunk.boundcheck_right())) {
@@ -102,7 +101,7 @@ int main()
         ichunk = xt::argmax(xi < xmin)() - 1;
 
         generator.restore(state(ichunk));
-        auto dy = generator.random<xt::xtensor<double, 1>>({yindex(ichunk + 1) + 1 - yindex(ichunk)});
+        auto dy = generator.random({yindex(ichunk + 1) + 1 - yindex(ichunk)});
 
         dy(0) = xmin(ichunk);
 
