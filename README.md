@@ -7,13 +7,11 @@
 
 Library to keep track of a sequential potential energy landscape.
 
-Documentation:
+Documentation: https://tdegeus.github.io/QPot
 
-*   This readme
-*   [Doxygen documentation](https://tdegeus.github.io/QPot)
-*   [The tests (in C++ and Python)](test/)
+## Overview
 
-# Disclaimer
+### Disclaimer
 
 This library is free to use under the
 [MIT license](https://github.com/tdegeus/QPot/blob/master/LICENSE).
@@ -32,9 +30,16 @@ Download:
 T.W.J. de Geus (Tom) | tom@geus.me | www.geus.me |
 [github.com/tdegeus/QPot](https://github.com/tdegeus/QPot)
 
-# Implementation
+### More information
 
-## C++ and Python
+*   The documentation of the code.
+*   The code itself.
+*   The unit tests, under [test](./test).
+*   The examples, under [examples](./examples).
+
+### Implementation
+
+#### C++ and Python
 
 The code is a C++ header-only library (see [installation notes](#c-headers)), 
 but a Python module is also provided (see [installation notes](#python-module)).
@@ -43,7 +48,34 @@ The interfaces are identical except:
 +   All *xtensor* objects (`xt::xtensor<...>`) are *NumPy* arrays in Python. 
 +   All `::` in C++ are `.` in Python.
 
-## Static.hpp
+#### Chunked.hpp
+
+Storage of a chunk of the series of yield positions, 
+including support to move along the full series by providing sequential chunks upon request.
+
+```cpp
+#include <QPot/Chunked.hpp>
+
+int main()
+{
+    xt::xtensor<double,1> y = xt::linspace<double>(-1, 10, 12);
+
+    QPot::Chunked yield(0.0, y);
+
+    std::cout << yield.i() << std::endl;
+    std::cout << yield.yleft() << std::endl;
+    std::cout << yield.yright() << std::endl;
+
+    yield.set_x(5.5);
+
+    return 0;   
+}
+```
+
+See QPot::Chunked for more information. 
+Furthermore, please find [this example](./examples/frozen_sequence/main.cpp).
+
+#### Static.hpp
 
 Static list of yield points.
 
@@ -70,23 +102,9 @@ int main()
 }
 ```
 
-To get more information about the yield positions:
+See QPot::Static for more information.
 
-*   `currentYieldRight(offset)`:
-    -   `currentYieldRight(0) == currentYieldRight()`.
-    -   `currentYieldRight(1)` gives the following yield positions to the right, etc.
-*   `currentYieldLeft(offset)`:
-    -   `currentYieldLeft(0) == currentYieldLeft()`.
-    -   `currentYieldLeft(1)` gives the following yield positions to the left, etc.
-*   `nextYield(offset)`:
-    -   `nextYield(1) == currentYieldRight() == currentYieldRight(0)`  
-    -   `nextYield(2) == currentYieldRight(1)`
-    -   etc.  
-    -   `nextYield(-1) == currentYieldLeft() == currentYieldLeft(0)`  
-    -   `nextYield(-2) == currentYieldLeft(1)`
-    -   etc.
-
-## Redraw.hpp
+#### Redraw.hpp
 
 Dynamically redraw yield points.
 
@@ -128,33 +146,19 @@ int main()
 >   y = QPot.RedrawList(x, uniform);
 >   ```
 
-To get more information about the yield positions:
+See QPot::RedrawList for more information.
 
-*   `currentYieldRight(offset)`:
-    -   `currentYieldRight(0) == currentYieldRight()`.
-    -   `currentYieldRight(1)` gives the following yield positions to the right, etc.
-*   `currentYieldLeft(offset)`:
-    -   `currentYieldLeft(0) == currentYieldLeft()`.
-    -   `currentYieldLeft(1)` gives the following yield positions to the left, etc.
-*   `nextYield(offset)`:
-    -   `nextYield(1) == currentYieldRight() == currentYieldRight(0)`  
-    -   `nextYield(2) == currentYieldRight(1)`
-    -   etc.  
-    -   `nextYield(-1) == currentYieldLeft() == currentYieldLeft(0)`  
-    -   `nextYield(-2) == currentYieldLeft(1)`
-    -   etc.
+### Installation
 
-# Installation
+#### C++ headers
 
-## C++ headers
-
-### Using conda
+##### Using conda
 
 ```bash
 conda install -c conda-forge qpot
 ```
 
-### From source
+##### From source
 
 ```bash
 # Download QPot
@@ -166,21 +170,17 @@ cmake .
 make install
 ```
 
-## Python module
+#### Python module
 
-### Using conda
+##### Using conda
 
 ```bash
 conda install -c conda-forge python-qpot
 ```
 
-Note that *xsimd* and hardware optimisations are **not enabled**. 
-To enable them you have to compile on your system, as is discussed next.
+##### From source
 
-### From source
-
->   You need *xtensor*, *pyxtensor* and optionally *xsimd* as prerequisites. 
->   Additionally, Python needs to know how to find them. 
+>   You need *xtensor*, *pyxtensor* as prerequisites. 
 >   The easiest is to use *conda* to get the prerequisites:
 > 
 >   ```bash
@@ -188,10 +188,8 @@ To enable them you have to compile on your system, as is discussed next.
 >   conda install -c conda-forge xsimd
 >   ```
 >   
->   If you then compile and install with the same environment 
->   you should be good to go. 
->   Otherwise, a bit of manual labour might be needed to
->   treat the dependencies.
+>   But any other way of installing 
+>   such that CMake can find them is possible.
 
 ```bash
 # Download QPot
@@ -199,17 +197,19 @@ git checkout https://github.com/tdegeus/QPot.git
 cd QPot
 
 # Compile and install the Python module
-python setup.py build
-python setup.py install
-# OR you can use one command (but with less readable output)
-python -m pip install .
+python -m pip install . -vvv
 ```
 
-# Compiling
+>   Note that hardware optimisations are **not enabled**. 
+>   To enable them you have to for example add the 
+>   `xtensor::use_xsimd` and `xtensor::optimize` targets 
+>   to the `python` target in `CMakeLists.txt`.
 
-## Using CMake
+### Compiling
 
-### Example
+#### Using CMake
+
+##### Example
 
 Using *QPot* your `CMakeLists.txt` can be as follows
 
@@ -221,7 +221,7 @@ add_executable(example example.cpp)
 target_link_libraries(example PRIVATE QPot)
 ```
 
-### Targets
+##### Targets
 
 The following targets are available:
 
@@ -238,9 +238,9 @@ The following targets are available:
 *   `QPot::compiler_warings`
     Enables compiler warnings (generic).
 
-### Optimisation
+##### Optimisation
 
-It is advised to think about compiler optimization and enabling *xsimd*.
+It is advised to think about compiler optimisation and enabling *xsimd*.
 Using *CMake* this can be done using the `xtensor::optimize` and `xtensor::use_xsimd` targets.
 The above example then becomes:
 
@@ -248,6 +248,8 @@ The above example then becomes:
 cmake_minimum_required(VERSION 3.1)
 project(example)
 find_package(QPot REQUIRED)
+find_package(xtensor REQUIRED)
+find_package(xsimd REQUIRED)
 add_executable(example example.cpp)
 target_link_libraries(example PRIVATE 
     QPot 
@@ -255,9 +257,9 @@ target_link_libraries(example PRIVATE
     xtensor::use_xsimd)
 ```
 
-See the [documentation of xtensor](https://xtensor.readthedocs.io/en/latest/) concerning optimization.
+See the [documentation of xtensor](https://xtensor.readthedocs.io/en/latest/) concerning optimisation.
 
-## By hand
+#### By hand
 
 Presuming that the compiler is `c++`, compile using:
 
@@ -265,10 +267,10 @@ Presuming that the compiler is `c++`, compile using:
 c++ -I/path/to/QPot/include ...
 ```
 
-Note that you have to take care of the *xtensor* dependency, the C++ version, optimization, 
+Note that you have to take care of the *xtensor* dependency, the C++ version, optimisation, 
 enabling *xsimd*, ...
 
-## Using pkg-config
+#### Using pkg-config
 
 Presuming that the compiler is `c++`, compile using:
 
@@ -279,61 +281,61 @@ c++ `pkg-config --cflags QPot` ...
 Note that you have to take care of the *xtensor* dependency, the C++ version, optimization, 
 enabling *xsimd*, ...
 
-# Change-log
+### Change-log
 
-## v0.9.0
+#### v0.9.0
 
 *   Adding: Chunked storage (#23)
 *   Fixing version in doxygen docs
 *   [CI] Minor style update
 *   Updating doxygen-awesome
 
-## v0.8.0
+#### v0.8.0
 
 *   Simplifying CMake
 *   Minor documentation updates
 *   API change: "yield()" -> "yieldPosition()" to avoid broken Python API
 
-## v0.7.0
+#### v0.7.0
 
 *   Various documentation updates.
 *   Adding (optional) HDF5 test to test platform independence of sequence restore).
 *   Allowing restoring a sequence with less data. 
 *   Allow prompt if a redraw was triggered on the last position update.
 
-## v0.6.2
+#### v0.6.2
 
 *   Python API: relaxing dependencies.
 *   RedrawList: Adding extra assertion on position.
 
-## v0.6.1
+#### v0.6.1
 
 *   Bugfix: making sure that "m_idx" is computed correctly after a redraw
 
-## v0.6.0
+#### v0.6.0
 
 *   Adding QPot::random interface to simplify RedrawList and to make reconstruction in Python possible (see test).
 *   [docs] Dark background.
 
-## v0.5.0
+#### v0.5.0
 
 *   Allow reconstruction of random RedrawList (see test-case).
 *   Adding documentation using doxygen.
 *   Switching to setuptools_scm for versioning.
 *   Minor style updates.
 
-## v0.4.0
+#### v0.4.0
 
 *   Adding `nextYield`.
 
-## v0.3.0
+#### v0.3.0
 
 *   Switching to GitHub CI.
 *   Adding `yield` to return the entire landscape or a cross-section.
 *   Adding offset overloads to `currentYieldLeft` and `currentYieldRight`.
 *   Adding `currentYield` to get the landscape around the current position.
 
-## v0.2.0
+#### v0.2.0
 
 *   Adding "checkYieldBoundLeft" and "checkYieldBoundRight" to "Static".
 *   Using Catch2 to test for floats.
