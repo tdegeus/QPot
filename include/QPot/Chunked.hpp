@@ -650,6 +650,14 @@ public:
 
     /**
     Set the current position.
+
+    \note It the positions is outside the current chunk of yield position the class will be locked.
+    To continue one has to first supply the appropriate chunk of yield positions.
+    Check the needed direction (or in general if a new chunk is needed) using redraw(), or try to
+    be ahead of running out-of-bounds using boundcheck_left() and boundcheck_right() in combination
+    with an appropriate buffer.
+    You can also use redraw(double) to perform a trial.
+
     \param x The current position.
     */
     void set_x(double x)
@@ -679,7 +687,7 @@ public:
     -   -1: To the left.
     -   +1: To the right.
 
-    Note that internally the position is not updates.
+    Note that internally the position is not updated.
 
     \return Redraw direction.
     */
