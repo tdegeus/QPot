@@ -73,15 +73,13 @@ PYBIND11_MODULE(QPot, m)
              "Return the chunk."
              "See :cpp:func:`QPot::Chunked::y`.")
 
-        .def("Y",
-             py::overload_cast<long, long>(&QPot::Chunked::Y, py::const_),
+        .def("Y", py::overload_cast<long, long>(&QPot::Chunked::Y, py::const_),
              "Return of slice of the chunk."
              "See :cpp:func:`QPot::Chunked::Y(long, long)`.",
              py::arg("start"),
              py::arg("stop"))
 
-        .def("Y",
-             py::overload_cast<long>(&QPot::Chunked::Y, py::const_),
+        .def("Y", py::overload_cast<long>(&QPot::Chunked::Y, py::const_),
              "Return of slice of the chunk."
              "See :cpp:func:`QPot::Chunked::Y(long)`.",
              py::arg("i"))
@@ -185,9 +183,14 @@ PYBIND11_MODULE(QPot, m)
              "See :cpp:func:`QPot::Chunked::set_x`.",
              py::arg("x"))
 
-        .def("redraw", &QPot::Chunked::redraw,
+        .def("redraw", py::overload_cast<>(&QPot::Chunked::redraw, py::const_),
              "Check for redraw."
              "See :cpp:func:`QPot::Chunked::redraw`.")
+
+        .def("redraw", py::overload_cast<double>(&QPot::Chunked::redraw, py::const_),
+             "Check for redraw based on a trial position."
+             "See :cpp:func:`QPot::Chunked::redraw`.",
+             py::arg("x"))
 
         .def("yleft", py::overload_cast<>(&QPot::Chunked::yleft, py::const_),
              "Yield position directly left of x()."
