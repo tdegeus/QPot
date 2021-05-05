@@ -651,14 +651,26 @@ public:
     /**
     Set the current position.
 
-    \note It the positions is outside the current chunk of yield position the class will be locked.
-    To continue one has to first supply the appropriate chunk of yield positions.
-    Check the needed direction (or in general if a new chunk is needed) using redraw(), or try to
-    be ahead of running out-of-bounds using boundcheck_left() and boundcheck_right() in combination
-    with an appropriate buffer.
-    You can also use redraw(double) to perform a trial.
-
     \param x The current position.
+
+    \b Note
+
+    If the position is outside the current chunk of yield positions, the class will be locked.
+    To continue one has to first supply the appropriate chunk of yield positions.
+    For the latter, check the needed direction to move in the sequence of yield positions
+    using redraw() (which can also be used to verify that no new chunk is needed),
+    and then use shift_y(), shift_dy() to supply a neighbouring chunk
+    (or directly using lshift_y() or lshift_dy(), and rshift_y() or rshift_dy()),
+    or set_y() to supply an arbitrary chunk.
+
+    To be ahead of running out-of-bounds one can use boundcheck_left() and boundcheck_right()
+    to register that the 'particle' is close to the left or right edge of the current chunk of
+    yield positions.
+    If that is the case, use shift_y(), shift_dy() to supply a neighbouring chunk
+    (or directly using lshift_y() or lshift_dy(), and rshift_y() or rshift_dy())
+    in combination with a buffer to make sure that the current position stays in bounds.
+
+    You can also use redraw(double) to perform a trial step.
     */
     void set_x(double x)
     {
