@@ -659,16 +659,40 @@ public:
     }
 
     /**
-    Check for redraw:
+    Based on the last specified positions,
+    check for redraw:
     -   0: No redraw needed.
     -   -1: To the left.
     -   +1: To the right.
 
-    \return Redraw direction
+    \return Redraw direction.
     */
     int redraw() const
     {
         return m_redraw;
+    }
+
+    /**
+    Based on a trial positions,
+    check for redraw:
+    -   0: No redraw needed.
+    -   -1: To the left.
+    -   +1: To the right.
+
+    Note that internally the position is not updates.
+
+    \return Redraw direction.
+    */
+    int redraw(double xtrial) const
+    {
+        if (xtrial <= m_y.front()) {
+            return -1;
+        }
+        else if (xtrial > m_y.back()) {
+            return +1;
+        }
+
+        return 0;
     }
 
     /**
