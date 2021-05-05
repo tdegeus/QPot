@@ -306,7 +306,7 @@ public:
     }
 
     /**
-    Reset the system: Overwrite the current chunk and global index.
+    Overwrite the current chunk and global index.
 
     \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
 
@@ -332,7 +332,7 @@ public:
     }
 
     /**
-    Reset the system: Overwrite the current chunk and global index.
+    Overwrite the current chunk and global index.
 
     \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
 
