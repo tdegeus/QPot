@@ -618,8 +618,11 @@ public:
     }
 
     /**
-    Shift chunk chunk of yield positions.
+    Shift chunk chunk of yield positions, by supplying the yield distances for a sequential chunk.
     The shift may be left or right, but there may not be any holes compared to the current chunk.
+    Note that the yield distances are converted to yield positions using the chunk currently held
+    in memory.
+    This is the reason why there may be not any holes between the old and new chunks.
 
     \tparam T The type of the contain `y`. Should implement `begin()` and `end()``.
 
