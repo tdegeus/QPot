@@ -48,6 +48,10 @@ PYBIND11_MODULE(QPot, m)
              "- 'index + 1' : yielding position right."
              "See :cpp:func:`QPot::Chunked::i`.")
 
+        .def("i_chunk", &QPot::Chunked::i_chunk,
+             "Get i() relative to the current chunk."
+             "See :cpp:func:`QPot::Chunked::i_chunk`.")
+
         .def("search_proximity", &QPot::Chunked::search_proximity,
              "Customise proximity search."
             "See :cpp:func:`QPot::Chunked::search_proximity`.",
