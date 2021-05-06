@@ -176,7 +176,6 @@ public:
 
     Chunked() = default;
 
-
     /**
     Constructor.
 
@@ -201,6 +200,16 @@ public:
     long i() const
     {
         return m_istart + static_cast<long>(m_li);
+    }
+
+    /**
+    Return the index of the yield-position directly left of x() relative to the stored chunk.
+    Note that this is by definition equal to i() - istart().
+    \return Index (local).
+    */
+    size_t i_chunk() const
+    {
+        return m_li;
     }
 
     /**
