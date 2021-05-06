@@ -37,6 +37,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
 
         REQUIRE(chunk.i() == 5);
 
+        REQUIRE(chunk.size() == y.size());
         REQUIRE(chunk.boundcheck_left());
         REQUIRE(chunk.boundcheck_right());
         REQUIRE(chunk.ymin_chunk() == y(0));

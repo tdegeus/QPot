@@ -278,6 +278,15 @@ public:
     }
 
     /**
+    Return the size of the current chunk.
+    \return Size (signed).
+    */
+    size_t size() const
+    {
+        return m_y.size();
+    }
+
+    /**
     Get yield positions along a slice.
 
     \param start Start index of the slice (global index).
