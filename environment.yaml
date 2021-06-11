@@ -9,6 +9,7 @@ dependencies:
 
   # build tools
   - cmake
+  - ninja
   - setuptools_scm
 
   # Python API
@@ -20,6 +21,10 @@ dependencies:
   - highfive
   - numpy
   - h5py
+
+  # run examples
+  - prrng
+  - python-prrng
 
   # build docs
   - doxygen

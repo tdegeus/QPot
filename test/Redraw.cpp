@@ -118,7 +118,7 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
         xt::xtensor<double, 1> x = {4.5, 5.5, 6.5};
         QPot::RedrawList yield(x, uniform, 30, 5, 2);
         xt::xtensor<double, 1> ret = (0.0 - (14.5 - 5.5)) * xt::ones<double>({3});
-        REQUIRE(xt::allclose(yield.yield(0), ret));
+        REQUIRE(xt::allclose(yield.yieldPosition(0), ret));
     }
 
     SECTION("Large step size")

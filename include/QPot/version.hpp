@@ -1,7 +1,7 @@
 /**
 Version information.
 
-\file version.hpp
+\file
 \copyright Copyright 2017. Tom de Geus. All rights reserved.
 \license This project is released under the MIT License.
 */
@@ -34,7 +34,7 @@ Tip: use the environment variable ``SETUPTOOLS_SCM_PRETEND_VERSION``
 to overwrite the automatic version.
 */
 #ifndef QPOT_VERSION
-#define QPOT_VERSION "@QPOT_VERSION@"
+#define QPOT_VERSION "@PROJECT_VERSION@"
 #endif
 
 namespace QPot {

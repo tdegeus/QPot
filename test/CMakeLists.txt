@@ -5,19 +5,20 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     find_package(QPot REQUIRED CONFIG)
 endif()
 
-option(USE_XSIMD "Use xsimd and 'march=native' optimisations" OFF)
-option(USE_HDF5 "Use xsimd and 'march=native' optimisations" ON)
+option(HDF5 "Compile HDF5-based tests" ON)
 
-set(CMAKE_BUILD_TYPE Release)
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
+endif()
 
 set(test_name "unit-tests")
 
-add_executable(${test_name} main.cpp Redraw.cpp Static.cpp)
+add_executable(${test_name} main.cpp Chunked.cpp Redraw.cpp Static.cpp)
 
 find_package(Catch2 REQUIRED)
 find_package(xtensor REQUIRED)
 
-target_link_libraries(${test_name} PRIVATE Catch2::Catch2 QPot QPot::compiler_warnings QPot::assert)
+target_link_libraries(${test_name} PRIVATE Catch2::Catch2 QPot QPot::debug QPot::compiler_warnings)
 
 if(USE_HDF5)
     set(HIGHFIVE_USE_BOOST 0)
@@ -25,11 +26,6 @@ if(USE_HDF5)
     find_package(HighFive REQUIRED)
     target_link_libraries(${test_name} PRIVATE HighFive)
     target_compile_definitions(${test_name} PRIVATE USE_HDF5 H5_BUILT_AS_DYNAMIC_LIB)
-endif()
-
-if(USE_XSIMD)
-    find_package(xsimd REQUIRED)
-    target_link_libraries(${test_name} PRIVATE xsimd xtensor::optimize xtensor::use_xsimd)
 endif()
 
 add_test(NAME ${test_name} COMMAND ${test_name})

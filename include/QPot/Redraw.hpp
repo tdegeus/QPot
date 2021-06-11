@@ -1,7 +1,7 @@
 /**
 Dynamically redraw yielding positions.
 
-\file Redraw.hpp
+\file
 \copyright Copyright 2017. Tom de Geus. All rights reserved.
 \license This project is released under the MIT License.
 */
@@ -67,24 +67,24 @@ public:
 
     \return All yield positions [#N, ntotal].
     */
-    xt::xtensor<double, 2> yield() const; // y
+    xt::xtensor<double, 2> yieldPosition() const; // y
 
     /**
-    Slice yield()[:, start: stop].
+    Slice yieldPosition()[:, start: stop].
 
     \param start Lower column bound.
     \param stop Upper column bound.
     \return Yield positions [#N, stop - start].
     */
-    xt::xtensor<double, 2> yield(size_t start, size_t stop) const;
+    xt::xtensor<double, 2> yieldPosition(size_t start, size_t stop) const;
 
     /**
-    Slice yield()[:, i].
+    Slice yieldPosition()[:, i].
 
     \param i Column to select.
     \return Yield positions [#N].
     */
-    xt::xtensor<double, 1> yield(size_t i) const;
+    xt::xtensor<double, 1> yieldPosition(size_t i) const;
 
     /**
     Customise proximity search region (default: ``10``).
@@ -105,8 +105,8 @@ public:
 
     /**
     Yielding positions at an offset left/right of the current position:
-    -   offset > 0: ``yield()[:, current_index + offset]``
-    -   offset < 0: ``yield()[:, current_index + offset + 1]``
+    -   offset > 0: ``yieldPosition()[:, current_index + offset]``
+    -   offset < 0: ``yieldPosition()[:, current_index + offset + 1]``
 
     \param offset The offset (same for all particles).
     \return Yield positions [#N].
@@ -116,7 +116,7 @@ public:
     /**
     Yielding positions left of the current position
 
-        yield()[:, current_index]
+        yieldPosition()[:, current_index]
 
     \return Yield positions [#N].
     */
@@ -125,7 +125,7 @@ public:
     /**
     Yielding positions right of the current position
 
-        yield()[:, current_index + 1]
+        yieldPosition()[:, current_index + 1]
 
     \return Yield positions [#N].
     */
@@ -134,7 +134,7 @@ public:
     /**
     Yielding positions at an offset left of the current position
 
-        yield()[:, current_index - offset]
+        yieldPosition()[:, current_index - offset]
 
     \param offset The offset (same for all particles).
     \return Yield positions [#N].
@@ -144,7 +144,7 @@ public:
     /**
     Yielding positions at an offset right of the current position
 
-        yield()[:, current_index + 1 + offset]
+        yieldPosition()[:, current_index + 1 + offset]
 
     \param offset The offset (same for all particles).
     \return Yield positions [#N].
@@ -154,7 +154,7 @@ public:
     /**
     Slice of yielding positions at an offset left/right of the current position
 
-        yield()[:, current_index + left: current_index + right]
+        yieldPosition()[:, current_index + left: current_index + right]
 
     \param left Offset left (same for all particles).
     \param right Offset right (same for all particles).
@@ -165,8 +165,8 @@ public:
     /**
     Index of the current minima
 
-        yield()[:, index] -> yielding positions left
-        yield()[:, index + 1] -> yielding positions right
+        yieldPosition()[:, index] -> yielding positions left
+        yieldPosition()[:, index + 1] -> yielding positions right
 
     \return Indices [#N].
     */
@@ -188,10 +188,24 @@ public:
     xt::xtensor<int, 1> currentRedraw() const;
 
     /**
+    List of particles that were redrawn right, the last time setPosition() was called.
+
+    \return List of particles.
+    */
+    xt::xtensor<size_t, 1> currentRedrawRight() const;
+
+    /**
+    List of particles that were redrawn right, the last time setPosition() was called.
+
+    \return List of particles.
+    */
+    xt::xtensor<size_t, 1> currentRedrawLeft() const;
+
+    /**
     Force redraw (can be used to restore a sequence).
 
     \tparam T E.g. ``xt::xtensor<int, 1>``.
-    \param iredraw See iredraw().
+    \param iredraw See currentRedraw().
     */
     template <class T>
     void redraw(const T& iredraw);
@@ -367,17 +381,17 @@ inline void RedrawList::setProximity(size_t proximity)
     m_proximity = proximity;
 }
 
-inline xt::xtensor<double, 2> RedrawList::yield() const
+inline xt::xtensor<double, 2> RedrawList::yieldPosition() const
 {
     return m_pos;
 }
 
-inline xt::xtensor<double, 2> RedrawList::yield(size_t start, size_t stop) const
+inline xt::xtensor<double, 2> RedrawList::yieldPosition(size_t start, size_t stop) const
 {
     return xt::view(m_pos, xt::all(), xt::range(start, stop));
 }
 
-inline xt::xtensor<double, 1> RedrawList::yield(size_t i) const
+inline xt::xtensor<double, 1> RedrawList::yieldPosition(size_t i) const
 {
     QPOT_ASSERT(i < m_ntot);
     return xt::view(m_pos, xt::all(), i);
@@ -609,6 +623,18 @@ inline xt::xtensor<int, 1> RedrawList::currentRedraw() const
 {
     QPOT_ASSERT(!m_lock);
     return m_iredraw;
+}
+
+inline xt::xtensor<size_t, 1> RedrawList::currentRedrawRight() const
+{
+    QPOT_ASSERT(!m_lock);
+    return xt::flatten_indices(xt::argwhere(m_iredraw > 0));
+}
+
+inline xt::xtensor<size_t, 1> RedrawList::currentRedrawLeft() const
+{
+    QPOT_ASSERT(!m_lock);
+    return xt::flatten_indices(xt::argwhere(m_iredraw < 0));
 }
 
 template <class E>
