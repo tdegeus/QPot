@@ -92,6 +92,8 @@ if(BUILD_TESTS OR BUILD_ALL)
     add_subdirectory(test)
 endif()
 
+# Examples
+
 if(BUILD_EXAMPLES OR BUILD_ALL)
     enable_testing()
     add_subdirectory(examples)
