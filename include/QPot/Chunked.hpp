@@ -786,27 +786,25 @@ public:
     }
 
     /**
-    Check that x() is at least `n` yield positions from the far-left.
+    Check that that there are at least `n` well left of x().
 
     \param n Offset.
     */
     bool boundcheck_left(size_t n = 0) const
     {
-        QPOT_ASSERT(!m_lock);
         QPOT_ASSERT(n < m_n);
-        return m_li > n;
+        return !(m_lock || m_li < n);
     }
 
     /**
-    Check that x() is at least `n` yield positions from the far-right.
+    Check that that there are at least `n` well right of x().
 
     \param n Offset.
     */
     bool boundcheck_right(size_t n = 0) const
     {
-        QPOT_ASSERT(!m_lock);
         QPOT_ASSERT(n < m_n);
-        return m_li < m_n - n;
+        return !(m_lock || m_li >= m_n - n -1);
     }
 
 private:
