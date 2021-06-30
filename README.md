@@ -283,6 +283,32 @@ enabling *xsimd*, ...
 
 ### Change-log
 
+#### v0.9.5
+
+*   Minor bugfix bounds-check: including assertion of lock in criterion
+*   CMake updates.
+
+#### v0.9.4
+
+*   Adding convenience function `Chunked::size`.
+
+#### v0.9.3
+
+*   Adding convenience function `i_chunk`.
+
+#### v0.9.2
+
+*   Updating docs, readme, and example.
+*   `QPot::Chunked::redraw`: Allow trial.
+*   Applying latest pcg32 features.
+*   Adding test for `Chunked::ymin_chunk`.
+
+#### v0.9.1
+
+*   Minor CMake updates.
+*   Integrating Python API in CMake.
+*   Marking `Chunked::i()` const (#24).
+
 #### v0.9.0
 
 *   Adding: Chunked storage (#23)
