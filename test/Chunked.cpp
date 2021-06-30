@@ -95,6 +95,106 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(xt::allclose(chunk.Y(chunk.i() + 3), 9.0));
     }
 
+    SECTION("Bounds check")
+    {
+        xt::xtensor<double, 1> y = xt::linspace<double>(0, 5, 6);
+
+        QPot::Chunked chunk(0.5, y);
+
+        REQUIRE(chunk.boundcheck_left());
+        REQUIRE(chunk.boundcheck_right());
+
+        chunk.set_x(-0.5);
+
+        REQUIRE(!chunk.boundcheck_left());
+        REQUIRE(!chunk.boundcheck_right());
+
+        chunk.set_x(0.5);
+
+        REQUIRE(chunk.boundcheck_left());
+        REQUIRE(!chunk.boundcheck_left(1));
+        REQUIRE(!chunk.boundcheck_left(2));
+        REQUIRE(!chunk.boundcheck_left(3));
+        REQUIRE(!chunk.boundcheck_left(4));
+        REQUIRE(!chunk.boundcheck_left(5));
+
+        REQUIRE(chunk.boundcheck_right());
+        REQUIRE(chunk.boundcheck_right(1));
+        REQUIRE(chunk.boundcheck_right(2));
+        REQUIRE(chunk.boundcheck_right(3));
+        REQUIRE(chunk.boundcheck_right(4));
+        REQUIRE(!chunk.boundcheck_right(5));
+
+        chunk.set_x(1.5);
+
+        REQUIRE(chunk.boundcheck_left());
+        REQUIRE(chunk.boundcheck_left(1));
+        REQUIRE(!chunk.boundcheck_left(2));
+        REQUIRE(!chunk.boundcheck_left(3));
+        REQUIRE(!chunk.boundcheck_left(4));
+        REQUIRE(!chunk.boundcheck_left(5));
+
+        REQUIRE(chunk.boundcheck_right());
+        REQUIRE(chunk.boundcheck_right(1));
+        REQUIRE(chunk.boundcheck_right(2));
+        REQUIRE(chunk.boundcheck_right(3));
+        REQUIRE(!chunk.boundcheck_right(4));
+        REQUIRE(!chunk.boundcheck_right(5));
+
+        chunk.set_x(2.5);
+
+        REQUIRE(chunk.boundcheck_left());
+        REQUIRE(chunk.boundcheck_left(1));
+        REQUIRE(chunk.boundcheck_left(2));
+        REQUIRE(!chunk.boundcheck_left(3));
+        REQUIRE(!chunk.boundcheck_left(4));
+        REQUIRE(!chunk.boundcheck_left(5));
+
+        REQUIRE(chunk.boundcheck_right());
+        REQUIRE(chunk.boundcheck_right(1));
+        REQUIRE(chunk.boundcheck_right(2));
+        REQUIRE(!chunk.boundcheck_right(3));
+        REQUIRE(!chunk.boundcheck_right(4));
+        REQUIRE(!chunk.boundcheck_right(5));
+
+        chunk.set_x(3.5);
+
+        REQUIRE(chunk.boundcheck_left());
+        REQUIRE(chunk.boundcheck_left(1));
+        REQUIRE(chunk.boundcheck_left(2));
+        REQUIRE(chunk.boundcheck_left(3));
+        REQUIRE(!chunk.boundcheck_left(4));
+        REQUIRE(!chunk.boundcheck_left(5));
+
+        REQUIRE(chunk.boundcheck_right());
+        REQUIRE(chunk.boundcheck_right(1));
+        REQUIRE(!chunk.boundcheck_right(2));
+        REQUIRE(!chunk.boundcheck_right(3));
+        REQUIRE(!chunk.boundcheck_right(4));
+        REQUIRE(!chunk.boundcheck_right(5));
+
+        chunk.set_x(4.5);
+
+        REQUIRE(chunk.boundcheck_left());
+        REQUIRE(chunk.boundcheck_left(1));
+        REQUIRE(chunk.boundcheck_left(2));
+        REQUIRE(chunk.boundcheck_left(3));
+        REQUIRE(chunk.boundcheck_left(4));
+        REQUIRE(!chunk.boundcheck_left(5));
+
+        REQUIRE(chunk.boundcheck_right());
+        REQUIRE(!chunk.boundcheck_right(1));
+        REQUIRE(!chunk.boundcheck_right(2));
+        REQUIRE(!chunk.boundcheck_right(3));
+        REQUIRE(!chunk.boundcheck_right(4));
+        REQUIRE(!chunk.boundcheck_right(5));
+
+        chunk.set_x(5.5);
+
+        REQUIRE(!chunk.boundcheck_left());
+        REQUIRE(!chunk.boundcheck_right());
+    }
+
     SECTION("Basic chunk features")
     {
         xt::xtensor<double, 1> dy = xt::ones<double>({21});
