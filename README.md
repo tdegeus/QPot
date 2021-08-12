@@ -22,7 +22,7 @@ Bug reports or feature requests can be filed on
 As always, the code comes with no guarantee.
 None of the developers can be held responsible for possible mistakes.
 
-Download: 
+Download:
 [.zip file](https://github.com/tdegeus/QPot/zipball/master) |
 [.tar.gz file](https://github.com/tdegeus/QPot/tarball/master).
 
@@ -41,16 +41,16 @@ T.W.J. de Geus (Tom) | tom@geus.me | www.geus.me |
 
 #### C++ and Python
 
-The code is a C++ header-only library (see [installation notes](#c-headers)), 
+The code is a C++ header-only library (see [installation notes](#c-headers)),
 but a Python module is also provided (see [installation notes](#python-module)).
 The interfaces are identical except:
 
-+   All *xtensor* objects (`xt::xtensor<...>`) are *NumPy* arrays in Python. 
++   All *xtensor* objects (`xt::xtensor<...>`) are *NumPy* arrays in Python.
 +   All `::` in C++ are `.` in Python.
 
 #### Chunked.hpp
 
-Storage of a chunk of the series of yield positions, 
+Storage of a chunk of the series of yield positions,
 including support to move along the full series by providing sequential chunks upon request.
 
 ```cpp
@@ -68,11 +68,11 @@ int main()
 
     yield.set_x(5.5);
 
-    return 0;   
+    return 0;
 }
 ```
 
-See QPot::Chunked for more information. 
+See QPot::Chunked for more information.
 Furthermore, please find [this example](./examples/frozen_sequence/main.cpp).
 
 #### Static.hpp
@@ -98,7 +98,7 @@ int main()
     std::cout << yield.currentYieldLeft() << std::endl;
     std::cout << yield.currentYieldRight() << std::endl;
 
-    return 0;   
+    return 0;
 }
 ```
 
@@ -132,16 +132,16 @@ int main()
     std::cout << yield.currentYieldLeft() << std::endl;
     std::cout << yield.currentYieldRight() << std::endl;
 
-    return 0;   
+    return 0;
 }
 ```
 
 >   From Python one can use:
->   
+>
 >   ```python
 >   def uniform(shape):
 >       return np.ones(shape)
->   
+>
 >   x = np.random.rand([100])
 >   y = QPot.RedrawList(x, uniform);
 >   ```
@@ -180,15 +180,15 @@ conda install -c conda-forge python-qpot
 
 ##### From source
 
->   You need *xtensor*, *pyxtensor* as prerequisites. 
+>   You need *xtensor*, *pyxtensor* as prerequisites.
 >   The easiest is to use *conda* to get the prerequisites:
-> 
+>
 >   ```bash
 >   conda install -c conda-forge pyxtensor
 >   conda install -c conda-forge xsimd
 >   ```
->   
->   But any other way of installing 
+>
+>   But any other way of installing
 >   such that CMake can find them is possible.
 
 ```bash
@@ -200,9 +200,9 @@ cd QPot
 python -m pip install . -vvv
 ```
 
->   Note that hardware optimisations are **not enabled**. 
->   To enable them you have to for example add the 
->   `xtensor::use_xsimd` and `xtensor::optimize` targets 
+>   Note that hardware optimisations are **not enabled**.
+>   To enable them you have to for example add the
+>   `xtensor::use_xsimd` and `xtensor::optimize` targets
 >   to the `python` target in `CMakeLists.txt`.
 
 ### Compiling
@@ -232,7 +232,7 @@ The following targets are available:
     Enables assertions by defining `QPOT_ENABLE_ASSERT`.
 
 *   `QPot::debug`
-    Enables all assertions by defining 
+    Enables all assertions by defining
     `QPOT_ENABLE_ASSERT` and `XTENSOR_ENABLE_ASSERT`.
 
 *   `QPot::compiler_warings`
@@ -251,9 +251,9 @@ find_package(QPot REQUIRED)
 find_package(xtensor REQUIRED)
 find_package(xsimd REQUIRED)
 add_executable(example example.cpp)
-target_link_libraries(example PRIVATE 
-    QPot 
-    xtensor::optimize 
+target_link_libraries(example PRIVATE
+    QPot
+    xtensor::optimize
     xtensor::use_xsimd)
 ```
 
@@ -267,7 +267,7 @@ Presuming that the compiler is `c++`, compile using:
 c++ -I/path/to/QPot/include ...
 ```
 
-Note that you have to take care of the *xtensor* dependency, the C++ version, optimisation, 
+Note that you have to take care of the *xtensor* dependency, the C++ version, optimisation,
 enabling *xsimd*, ...
 
 #### Using pkg-config
@@ -278,10 +278,19 @@ Presuming that the compiler is `c++`, compile using:
 c++ `pkg-config --cflags QPot` ...
 ```
 
-Note that you have to take care of the *xtensor* dependency, the C++ version, optimization, 
+Note that you have to take care of the *xtensor* dependency, the C++ version, optimization,
 enabling *xsimd*, ...
 
 ### Change-log
+
+#### v0.9.6
+
+*   [setup.py] Adding missing import
+*   [CI] Changing dummy version
+*   Adding global CMake options (+ updating CI)
+*   Adding missing include
+*   Avoiding *setuptools_scm* dependency if `SETUPTOOLS_SCM_PRETEND_VERSION` is defined
+*   Building docs on release
 
 #### v0.9.5
 
@@ -326,7 +335,7 @@ enabling *xsimd*, ...
 
 *   Various documentation updates.
 *   Adding (optional) HDF5 test to test platform independence of sequence restore).
-*   Allowing restoring a sequence with less data. 
+*   Allowing restoring a sequence with less data.
 *   Allow prompt if a redraw was triggered on the last position update.
 
 #### v0.6.2
