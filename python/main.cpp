@@ -9,10 +9,6 @@
 #include <pybind11/stl.h>
 #include <pyxtensor/pyxtensor.hpp>
 
-// Enable basic assertions on matrix shape
-// (doesn't cost a lot of time, but avoids segmentation faults)
-#define QPOT_ENABLE_ASSERT
-
 #include <QPot/Chunked.hpp>
 #include <QPot/Static.hpp>
 #include <QPot/Redraw.hpp>
