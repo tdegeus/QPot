@@ -44,15 +44,18 @@ jobs:
     - name: Set dummy version
       run: echo "SETUPTOOLS_SCM_PRETEND_VERSION=ci" >> $GITHUB_ENV
 
+    - name: Set CMake options
+      run: echo "CMAKE_ARGS=-DUSE_ASSERT=1" >> $GITHUB_ENV
+
     - name: Configure using CMake (!Windows)
       if: runner.os != 'Windows'
-      run: cmake -Bbuild ${{ matrix.config }}
+      run: cmake -Bbuild ${{ matrix.config }} ${CMAKE_ARGS}
 
     - name: Configure using CMake (Windows)
       if: runner.os == 'Windows'
       run: |
         micromamba install -c conda-forge clang_win-64 ninja
-        cmake -Bbuild -G Ninja ${{ matrix.config }} -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+        cmake -Bbuild -G Ninja ${{ matrix.config }} ${CMAKE_ARGS} -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
 
     - name: Build C++
       working-directory: build

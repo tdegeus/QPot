@@ -5,8 +5,20 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     find_package(QPot REQUIRED CONFIG)
 endif()
 
-if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
+if(NOT USE_ASSERT)
+    set(USE_ASSERT 1)
+endif()
+
+if(NOT USE_DEBUG)
+    set(USE_DEBUG 1)
+endif()
+
+if(NOT USE_SIMD)
+    set(USE_SIMD 0)
+endif()
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
 endif()
 
 find_package(prrng REQUIRED)
@@ -14,6 +26,22 @@ find_package(prrng REQUIRED)
 add_library(libraries INTERFACE IMPORTED)
 
 target_link_libraries(libraries INTERFACE QPot prrng QPot::debug QPot::compiler_warnings)
+
+if(USE_ASSERT)
+    target_link_libraries(libraries INTERFACE QPot::assert)
+    message(STATUS "Compiling ${PROJECT_NAME}-test with QPot::assert")
+endif()
+
+if(USE_DEBUG)
+    target_link_libraries(libraries INTERFACE QPot::debug)
+    message(STATUS "Compiling ${PROJECT_NAME}-test with QPot::debug")
+endif()
+
+if(USE_SIMD)
+    find_package(xsimd REQUIRED)
+    target_link_libraries(libraries INTERFACE xtensor::use_xsimd xtensor::optimize)
+    message(STATUS "Compiling ${PROJECT_NAME}-test with hardware optimization")
+endif()
 
 set(exec "frozen_sequence")
 set(source "frozen_sequence/main.cpp")
