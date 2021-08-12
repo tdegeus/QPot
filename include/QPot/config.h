@@ -9,16 +9,20 @@ Macros used in the library.
 #ifndef QPOT_CONFIG_H
 #define QPOT_CONFIG_H
 
+#include <stdexcept>
+#include <string>
+
 /**
 \cond
 */
 #define Q(x) #x
 #define QUOTE(x) Q(x)
 
-#define QPOT_ASSERT_IMPL(expr, file, line) \
+#define QPOT_ASSERT_IMPL(expr, file, line, function) \
     if (!(expr)) { \
         throw std::runtime_error( \
-            std::string(file) + ':' + std::to_string(line) + \
+            std::string(file) + ":" + std::to_string(line) + \
+            " (" + std::string(function) + ")" + \
             ": assertion failed (" #expr ") \n\t"); \
     }
 /**
@@ -43,7 +47,7 @@ The advantage is that:
 \throw std::runtime_error
 */
 #ifdef QPOT_ENABLE_ASSERT
-#define QPOT_ASSERT(expr) QPOT_ASSERT_IMPL(expr, __FILE__, __LINE__)
+#define QPOT_ASSERT(expr) QPOT_ASSERT_IMPL(expr, __FILE__, __LINE__, __FUNCTION__)
 #else
 #define QPOT_ASSERT(expr)
 #endif
@@ -62,7 +66,7 @@ They can be enabled by:
 \throw std::runtime_error
 */
 #ifdef QPOT_ENABLE_DEBUG
-#define QPOT_DEBUG(expr) QPOT_ASSERT_IMPL(expr, __FILE__, __LINE__)
+#define QPOT_DEBUG(expr) QPOT_ASSERT_IMPL(expr, __FILE__, __LINE__, __FUNCTION__)
 #else
 #define QPOT_DEBUG(expr)
 #endif
@@ -72,7 +76,7 @@ Assertions that cannot be disable.
 
 \throw std::runtime_error
 */
-#define QPOT_REQUIRE(expr) QPOT_ASSERT_IMPL(expr, __FILE__, __LINE__)
+#define QPOT_REQUIRE(expr) QPOT_ASSERT_IMPL(expr, __FILE__, __LINE__, __FUNCTION__)
 
 /**
 Keep track of potential energy landscape.
