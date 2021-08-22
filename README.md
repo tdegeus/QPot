@@ -178,34 +178,38 @@ make install
 conda install -c conda-forge python-qpot
 ```
 
+Note that *xsimd* and hardware optimisation are **not enabled**.
+To enable them you have to compile on your system, as is discussed next.
+
 ##### From source
 
->   You need *xtensor*, *pyxtensor* as prerequisites.
+>   You need *xtensor*, *xtensor-python* and optionally *xsimd* as prerequisites.
 >   The easiest is to use *conda* to get the prerequisites:
 >
 >   ```bash
->   conda install -c conda-forge pyxtensor
+>   conda install -c conda-forge xtensor-python
 >   conda install -c conda-forge xsimd
 >   ```
 >
->   But any other way of installing
->   such that CMake can find them is possible.
+>   If you then compile and install with the same environment
+>   you should be good to go.
+>   Otherwise, a bit of manual labour might be needed to
+>   treat the dependencies.
 
 ```bash
 # Download QPot
 git checkout https://github.com/tdegeus/QPot.git
 cd QPot
 
+# Only if you want to use hardware optimisation:
+export CMAKE_ARGS="-DUSE_SIMD=1"
+
 # Compile and install the Python module
-python -m pip install . -vvv
+# (-vv can be omitted as is controls just the verbosity)
+python -m pip install . -vv
 ```
 
->   Note that hardware optimisations are **not enabled**.
->   To enable them you have to for example add the
->   `xtensor::use_xsimd` and `xtensor::optimize` targets
->   to the `python` target in `CMakeLists.txt`.
-
-### Compiling
+### Compiling user-code
 
 #### Using CMake
 
