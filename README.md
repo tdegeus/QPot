@@ -287,6 +287,14 @@ enabling *xsimd*, ...
 
 ### Change-log
 
+#### v0.9.7
+
+*   [docs] Minor readme updates
+*   [CMake] Minor style updates (#35)
+*   [CMake] Improving handling options
+*   [Python] Switching to xtensor-python : avoids copies (#33)
+
+
 #### v0.9.6
 
 *   [setup.py] Adding missing import
