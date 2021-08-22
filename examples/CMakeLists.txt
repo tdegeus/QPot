@@ -3,18 +3,9 @@ cmake_minimum_required(VERSION 3.1..3.19)
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     project(QPot-examples)
     find_package(QPot REQUIRED CONFIG)
-endif()
-
-if(NOT USE_ASSERT)
-    set(USE_ASSERT 1)
-endif()
-
-if(NOT USE_DEBUG)
-    set(USE_DEBUG 1)
-endif()
-
-if(NOT USE_SIMD)
-    set(USE_SIMD 0)
+    option(USE_ASSERT "${PROJECT_NAME}: Build with QPot::assert" ON)
+    option(USE_DEBUG "${PROJECT_NAME}: Build with QPot::debug" OFF)
+    option(USE_SIMD "${PROJECT_NAME}: Use xsimd and -march=native if available" OFF)
 endif()
 
 if(NOT CMAKE_BUILD_TYPE)
