@@ -1,13 +1,13 @@
-cmake_minimum_required(VERSION 3.1..3.19)
+cmake_minimum_required(VERSION 3.1..3.21)
 
 set(MYPROJECT "${PROJECT_NAME}-examples")
 
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     project(QPot-examples)
     find_package(QPot REQUIRED CONFIG)
-    option(USE_ASSERT "${PROJECT_NAME}: Build with QPot::assert" ON)
-    option(USE_DEBUG "${PROJECT_NAME}: Build with QPot::debug" OFF)
-    option(USE_SIMD "${PROJECT_NAME}: Use xsimd and -march=native if available" OFF)
+    option(USE_ASSERT "${PROJECT_NAME}: Build with assertions" ON)
+    option(USE_DEBUG "${PROJECT_NAME}: Build in debug mode" OFF)
+    option(USE_SIMD "${PROJECT_NAME}: Build with hardware optimization" OFF)
     set(MYPROJECT "${PROJECT_NAME}")
 endif()
 
