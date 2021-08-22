@@ -1,13 +1,17 @@
-/*
+/**
+Python API.
 
-(c - MIT) T.W.J. de Geus (Tom) | www.geus.me | github.com/tdegeus/QPot
-
+\file
+\copyright Copyright 2017. Tom de Geus. All rights reserved.
+\license This project is released under the MIT License.
 */
 
 #include <pybind11/pybind11.h>
 #include <pybind11/functional.h>
 #include <pybind11/stl.h>
-#include <pyxtensor/pyxtensor.hpp>
+
+#define FORCE_IMPORT_ARRAY
+#include <xtensor-python/pytensor.hpp>
 
 #include <QPot/Chunked.hpp>
 #include <QPot/Static.hpp>
@@ -19,6 +23,7 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(QPot, m)
 {
+    xt::import_numpy();
 
     m.doc() = "Library to keep track of a sequential potential energy landscape.";
 
@@ -31,7 +36,7 @@ PYBIND11_MODULE(QPot, m)
              "Chunked yield sequence."
              "See :cpp:class:`QPot::Chunked`.")
 
-        .def(py::init<double, std::vector<double>, long>(),
+        .def(py::init<double, xt::xtensor<double, 1>, long>(),
              "Chunked yield sequence."
              "See :cpp:class:`QPot::Chunked`.",
              py::arg("x"),
@@ -89,21 +94,21 @@ PYBIND11_MODULE(QPot, m)
              py::arg("i"))
 
         .def("set_y",
-             py::overload_cast<long, const std::vector<double>&>(&QPot::Chunked::set_y<std::vector<double>>),
+             py::overload_cast<long, const xt::xtensor<double, 1>&>(&QPot::Chunked::set_y<xt::xtensor<double, 1>>),
              "Reset the chunk."
              "See :cpp:func:`QPot::Chunked::set_y(long, const T&)`.",
              py::arg("istart"),
              py::arg("y"))
 
         .def("set_y",
-             py::overload_cast<const std::vector<double>&, long>(&QPot::Chunked::set_y<std::vector<double>>),
+             py::overload_cast<const xt::xtensor<double, 1>&, long>(&QPot::Chunked::set_y<xt::xtensor<double, 1>>),
              "Reset the chunk."
              "See :cpp:func:`QPot::Chunked::set_y(const T&, long)`.",
              py::arg("y"),
              py::arg("istart") = 0)
 
         .def("rshift_y",
-             py::overload_cast<long, const std::vector<double>&, size_t>(&QPot::Chunked::rshift_y<std::vector<double>>),
+             py::overload_cast<long, const xt::xtensor<double, 1>&, size_t>(&QPot::Chunked::rshift_y<xt::xtensor<double, 1>>),
              "Right-shift chunk."
              "See :cpp:func:`QPot::Chunked::rshift_y(long, const T&, size_t)`.",
              py::arg("istart"),
@@ -111,14 +116,14 @@ PYBIND11_MODULE(QPot, m)
              py::arg("nbuffer") = 0)
 
         .def("rshift_y",
-             py::overload_cast<const std::vector<double>&, size_t>(&QPot::Chunked::rshift_y<std::vector<double>>),
+             py::overload_cast<const xt::xtensor<double, 1>&, size_t>(&QPot::Chunked::rshift_y<xt::xtensor<double, 1>>),
              "Right-shift chunk."
              "See :cpp:func:`QPot::Chunked::rshift_y(const T&, size_t)`.",
              py::arg("y"),
              py::arg("nbuffer") = 0)
 
         .def("rshift_dy",
-             py::overload_cast<long, const std::vector<double>&, size_t>(&QPot::Chunked::rshift_dy<std::vector<double>>),
+             py::overload_cast<long, const xt::xtensor<double, 1>&, size_t>(&QPot::Chunked::rshift_dy<xt::xtensor<double, 1>>),
              "Right-shift chunk."
              "See :cpp:func:`QPot::Chunked::rshift_dy(long, const T&, size_t)`.",
              py::arg("istart"),
@@ -126,14 +131,14 @@ PYBIND11_MODULE(QPot, m)
              py::arg("nbuffer") = 0)
 
         .def("rshift_dy",
-             py::overload_cast<const std::vector<double>&, size_t>(&QPot::Chunked::rshift_dy<std::vector<double>>),
+             py::overload_cast<const xt::xtensor<double, 1>&, size_t>(&QPot::Chunked::rshift_dy<xt::xtensor<double, 1>>),
              "Right-shift chunk."
              "See :cpp:func:`QPot::Chunked::rshift_dy(const T&, size_t)`.",
              py::arg("dy"),
              py::arg("nbuffer") = 0)
 
         .def("lshift_y",
-             py::overload_cast<long, const std::vector<double>&, size_t>(&QPot::Chunked::lshift_y<std::vector<double>>),
+             py::overload_cast<long, const xt::xtensor<double, 1>&, size_t>(&QPot::Chunked::lshift_y<xt::xtensor<double, 1>>),
              "Left-shift chunk."
              "See :cpp:func:`QPot::Chunked::lshift_y(long, const T&, size_t)`.",
              py::arg("istart"),
@@ -141,14 +146,14 @@ PYBIND11_MODULE(QPot, m)
              py::arg("nbuffer") = 0)
 
         .def("lshift_y",
-             py::overload_cast<const std::vector<double>&, size_t>(&QPot::Chunked::lshift_y<std::vector<double>>),
+             py::overload_cast<const xt::xtensor<double, 1>&, size_t>(&QPot::Chunked::lshift_y<xt::xtensor<double, 1>>),
              "Left-shift chunk."
              "See :cpp:func:`QPot::Chunked::lshift_y(const T&, size_t)`.",
              py::arg("y"),
              py::arg("nbuffer") = 0)
 
         .def("lshift_dy",
-             py::overload_cast<long, const std::vector<double>&, size_t>(&QPot::Chunked::lshift_dy<std::vector<double>>),
+             py::overload_cast<long, const xt::xtensor<double, 1>&, size_t>(&QPot::Chunked::lshift_dy<xt::xtensor<double, 1>>),
              "Left-shift chunk."
              "See :cpp:func:`QPot::Chunked::lshift_dy(long, const T&, size_t)`.",
              py::arg("istart"),
@@ -156,14 +161,14 @@ PYBIND11_MODULE(QPot, m)
              py::arg("nbuffer") = 0)
 
         .def("lshift_dy",
-             py::overload_cast<const std::vector<double>&, size_t>(&QPot::Chunked::lshift_dy<std::vector<double>>),
+             py::overload_cast<const xt::xtensor<double, 1>&, size_t>(&QPot::Chunked::lshift_dy<xt::xtensor<double, 1>>),
              "Left-shift chunk."
              "See :cpp:func:`QPot::Chunked::lshift_dy(const T&, size_t)`.",
              py::arg("dy"),
              py::arg("nbuffer") = 0)
 
         .def("shift_y",
-             py::overload_cast<long, const std::vector<double>&, size_t>(&QPot::Chunked::shift_y<std::vector<double>>),
+             py::overload_cast<long, const xt::xtensor<double, 1>&, size_t>(&QPot::Chunked::shift_y<xt::xtensor<double, 1>>),
              "Shift chunk."
              "See :cpp:func:`QPot::Chunked::shift_y(long, const T&, size_t)`.",
              py::arg("istart"),
@@ -171,7 +176,7 @@ PYBIND11_MODULE(QPot, m)
              py::arg("nbuffer") = 0)
 
         .def("shift_dy",
-             py::overload_cast<long, const std::vector<double>&, size_t>(&QPot::Chunked::shift_dy<std::vector<double>>),
+             py::overload_cast<long, const xt::xtensor<double, 1>&, size_t>(&QPot::Chunked::shift_dy<xt::xtensor<double, 1>>),
              "Shift chunk."
              "See :cpp:func:`QPot::Chunked::shift_dy(long, const T&, size_t)`.",
              py::arg("istart"),
