@@ -91,8 +91,7 @@ class CMakeBuild(build_ext):
                 cmake_args += ["-DCMAKE_OSX_ARCHITECTURES={}".format(";".join(archs))]
 
         if "CMAKE_ARGS" in os.environ:
-            print("Using environment variable CMAKE_ARGS = ", os.environ["CMAKE_ARGS"])
-            cmake_args += [os.environ["CMAKE_ARGS"]]
+            cmake_args += os.environ["CMAKE_ARGS"].split(" ")
 
         # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level
         # across all generators.
@@ -106,9 +105,11 @@ class CMakeBuild(build_ext):
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
 
+        print(["cmake", ext.sourcedir] + cmake_args)
         subprocess.check_call(
             ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp
         )
+        print(["cmake", "--build", "."] + build_args)
         subprocess.check_call(
             ["cmake", "--build", "."] + build_args, cwd=self.build_temp
         )
