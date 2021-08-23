@@ -13,6 +13,7 @@ dependencies:
   - pybind11
   - python
   - python-prrng
+  - scikit-build
   - setuptools_scm
   - xsimd
   - xtensor

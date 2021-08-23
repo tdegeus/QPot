@@ -48,44 +48,48 @@ target_compile_definitions(${PROJECT_NAME} INTERFACE
 # Installation
 # ============
 
-include(CMakePackageConfigHelpers)
-include(GNUInstallDirs)
+if(NOT SKBUILD)
 
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" DESTINATION include)
+    include(CMakePackageConfigHelpers)
+    include(GNUInstallDirs)
 
-configure_file("include/${PROJECT_NAME}/version.hpp"
-               "${CMAKE_CURRENT_BINARY_DIR}/version.hpp"
-                @ONLY)
+    install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" DESTINATION include)
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/version.hpp"
-        DESTINATION "include/${PROJECT_NAME}/")
+    configure_file("include/${PROJECT_NAME}/version.hpp"
+                   "${CMAKE_CURRENT_BINARY_DIR}/version.hpp"
+                    @ONLY)
 
-install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}-targets)
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/version.hpp"
+            DESTINATION "include/${PROJECT_NAME}/")
 
-install(
-    EXPORT ${PROJECT_NAME}-targets
-    FILE "${PROJECT_NAME}Targets.cmake"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+    install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}-targets)
 
-set(${PROJECT_NAME}_TMP ${CMAKE_SIZEOF_VOID_P})
-unset(CMAKE_SIZEOF_VOID_P)
-
-write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-    VERSION "${PROJECT_VERSION}"
-    COMPATIBILITY AnyNewerVersion)
-
-set(CMAKE_SIZEOF_VOID_P ${${PROJECT_NAME}_TMP})
-
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake"
-              "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+    install(
+        EXPORT ${PROJECT_NAME}-targets
+        FILE "${PROJECT_NAME}Targets.cmake"
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.pc.in"
-               "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc" @ONLY)
+    set(${PROJECT_NAME}_TMP ${CMAKE_SIZEOF_VOID_P})
+    unset(CMAKE_SIZEOF_VOID_P)
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig/")
+    write_basic_package_version_file(
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+        VERSION "${PROJECT_VERSION}"
+        COMPATIBILITY AnyNewerVersion)
+
+    set(CMAKE_SIZEOF_VOID_P ${${PROJECT_NAME}_TMP})
+
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake"
+                  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.pc.in"
+                   "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc" @ONLY)
+
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig/")
+
+endif()
 
 # Add builds
 # ==========
@@ -95,30 +99,35 @@ include(CTest)
 
 # Tests
 
-if(BUILD_TESTS OR BUILD_ALL)
-    enable_testing()
-    add_subdirectory(test)
+if(NOT SKBUILD)
+    if(BUILD_TESTS OR BUILD_ALL)
+        enable_testing()
+        add_subdirectory(test)
+    endif()
 endif()
 
 # Examples
 
-if(BUILD_EXAMPLES OR BUILD_ALL)
-    enable_testing()
-    add_subdirectory(examples)
+if(NOT SKBUILD)
+    if(BUILD_EXAMPLES OR BUILD_ALL)
+        enable_testing()
+        add_subdirectory(examples)
+    endif()
 endif()
 
 # Python API
 
-if(BUILD_PYTHON OR BUILD_ALL)
+if(BUILD_PYTHON OR BUILD_ALL OR SKBUILD)
     if(NOT CMAKE_BUILD_TYPE)
         set(CMAKE_BUILD_TYPE Release)
     endif()
-    find_package(Python REQUIRED COMPONENTS Interpreter Development NumPy)
     find_package(pybind11 REQUIRED CONFIG)
+    find_package(NumPy REQUIRED)
     find_package(xtensor-python REQUIRED)
-    pybind11_add_module(mypymod python/main.cpp)
+    pybind11_add_module(mypymod MODULE python/main.cpp)
     set_target_properties(mypymod PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
-    target_link_libraries(mypymod PUBLIC ${PROJECT_NAME} pybind11::module Python::NumPy xtensor-python)
+    target_link_libraries(mypymod PUBLIC ${PROJECT_NAME} xtensor-python)
+    target_include_directories(mypymod PUBLIC ${NumPy_INCLUDE_DIRS})
     target_compile_definitions(mypymod PRIVATE VERSION_INFO=${PROJECT_VERSION})
     if (USE_ASSERT)
         target_link_libraries(mypymod PUBLIC QPot::assert)
@@ -134,31 +143,36 @@ if(BUILD_PYTHON OR BUILD_ALL)
         target_link_libraries(mypymod PUBLIC xtensor::optimize xtensor::use_xsimd)
         message(STATUS "Compiling ${PROJECT_NAME}-Python with hardware optimization")
     endif()
+    if (SKBUILD)
+        install(TARGETS mypymod LIBRARY DESTINATION ${PROJECT_NAME})
+    endif()
 endif()
 
 # Documentation
 
-if(BUILD_DOCS OR BUILD_ALL)
-    find_package(Doxygen REQUIRED)
+if(NOT SKBUILD)
+    if(BUILD_DOCS OR BUILD_ALL)
+        find_package(Doxygen REQUIRED)
 
-    set(DOXYGEN_EXCLUDE_SYMBOLS detail)
-    set(DOXYGEN_CASE_SENSE_NAMES YES)
-    set(DOXYGEN_USE_MATHJAX YES)
-    set(DOXYGEN_GENERATE_TREEVIEW YES)
-    set(DOXYGEN_JAVADOC_AUTOBRIEF YES)
-    set(DOXYGEN_MACRO_EXPANSION YES)
-    set(DOXYGEN_SOURCE_BROWSER YES)
-    set(DOXYGEN_QUIET YES)
-    set(DOXYGEN_WARN_IF_UNDOCUMENTED YES)
-    set(DOXYGEN_WARN_AS_ERROR YES)
-    set(DOXYGEN_ALIASES "license=@par License:")
-    set(DOXYGEN_USE_MDFILE_AS_MAINPAGE "README.md")
+        set(DOXYGEN_EXCLUDE_SYMBOLS detail)
+        set(DOXYGEN_CASE_SENSE_NAMES YES)
+        set(DOXYGEN_USE_MATHJAX YES)
+        set(DOXYGEN_GENERATE_TREEVIEW YES)
+        set(DOXYGEN_JAVADOC_AUTOBRIEF YES)
+        set(DOXYGEN_MACRO_EXPANSION YES)
+        set(DOXYGEN_SOURCE_BROWSER YES)
+        set(DOXYGEN_QUIET YES)
+        set(DOXYGEN_WARN_IF_UNDOCUMENTED YES)
+        set(DOXYGEN_WARN_AS_ERROR YES)
+        set(DOXYGEN_ALIASES "license=@par License:")
+        set(DOXYGEN_USE_MDFILE_AS_MAINPAGE "README.md")
 
-    set(DOXYGEN_HTML_EXTRA_STYLESHEET
-        "${CMAKE_CURRENT_SOURCE_DIR}/docs/doxystyle/doxygen-awesome.css"
-        "${CMAKE_CURRENT_SOURCE_DIR}/docs/doxystyle/custom.css")
+        set(DOXYGEN_HTML_EXTRA_STYLESHEET
+            "${CMAKE_CURRENT_SOURCE_DIR}/docs/doxystyle/doxygen-awesome.css"
+            "${CMAKE_CURRENT_SOURCE_DIR}/docs/doxystyle/custom.css")
 
-    set(DOXYGEN_STRIP_FROM_INC_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include")
-    set(DOXYGEN_STRIP_FROM_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include")
-    doxygen_add_docs(docs "${CMAKE_CURRENT_SOURCE_DIR}/include" "README.md")
+        set(DOXYGEN_STRIP_FROM_INC_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include")
+        set(DOXYGEN_STRIP_FROM_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include")
+        doxygen_add_docs(docs "${CMAKE_CURRENT_SOURCE_DIR}/include" "README.md")
+    endif()
 endif()
