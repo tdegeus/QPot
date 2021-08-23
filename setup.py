@@ -91,7 +91,8 @@ class CMakeBuild(build_ext):
                 cmake_args += ["-DCMAKE_OSX_ARCHITECTURES={}".format(";".join(archs))]
 
         if "CMAKE_ARGS" in os.environ:
-            cmake_args += os.environ["CMAKE_ARGS"].split(" ")
+            print("Using environment variable CMAKE_ARGS = ", os.environ["CMAKE_ARGS"])
+            cmake_args += [os.environ["CMAKE_ARGS"]]
 
         # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level
         # across all generators.
