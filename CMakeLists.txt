@@ -141,14 +141,24 @@ if(BUILD_PYTHON OR BUILD_ALL)
     endif()
 
     find_package(pybind11 REQUIRED CONFIG)
-    find_package(NumPy REQUIRED)
     find_package(xtensor-python REQUIRED)
+
+    if (SKBUILD)
+        find_package(NumPy REQUIRED)
+    else()
+        find_package(Python REQUIRED COMPONENTS Interpreter Development NumPy)
+    endif()
 
     pybind11_add_module(${PYPROJECT_NAME} python/main.cpp)
 
-    target_link_libraries(${PYPROJECT_NAME} PUBLIC ${PROJECT_NAME} xtensor-python)
-    target_include_directories(${PYPROJECT_NAME} PUBLIC ${NumPy_INCLUDE_DIRS})
     target_compile_definitions(${PYPROJECT_NAME} PUBLIC VERSION_INFO=${PROJECT_VERSION})
+    target_link_libraries(${PYPROJECT_NAME} PUBLIC ${PROJECT_NAME} xtensor-python)
+
+    if (SKBUILD)
+        target_include_directories(${PYPROJECT_NAME} PUBLIC ${NumPy_INCLUDE_DIRS})
+    else()
+        target_link_libraries(${PYPROJECT_NAME} PUBLIC ${PROJECT_NAME} pybind11::module Python::NumPy)
+    endif()
 
     if (USE_ASSERT)
         target_link_libraries(${PYPROJECT_NAME} PUBLIC QPot::assert)
