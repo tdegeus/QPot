@@ -21,7 +21,7 @@ Python API.
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(QPot, m)
+PYBIND11_MODULE(_QPot, m)
 {
     xt::import_numpy();
 

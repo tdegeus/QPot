@@ -9,8 +9,9 @@ from setuptools_scm import get_version
 cmake_args = []
 
 if "CMAKE_ARGS" in os.environ:
-    if len(os.environ["CMAKE_ARGS"].split(" ")) > 0:
-        cmake_args += os.environ["CMAKE_ARGS"].split(" ")
+    o = list(filter(None, os.environ["CMAKE_ARGS"].split(" ")))
+    if len(o) > 0:
+        cmake_args += o
 
 setup(
     name = 'QPot',
@@ -21,6 +22,9 @@ setup(
     author = 'Tom de Geus',
     author_email = 'tom@geus.me',
     url = 'https://github.com/tdegeus/QPot',
+    packages = ['QPot'],
+    package_dir = {'': 'python'},
+    cmake_install_dir = 'python/QPot',
     cmake_args = cmake_args,
-    zip_safe = False,
+    cmake_minimum_required_version = "3.13...3.21",
 )
