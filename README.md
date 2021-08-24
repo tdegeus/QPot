@@ -9,6 +9,53 @@ Library to keep track of a sequential potential energy landscape.
 
 Documentation: https://tdegeus.github.io/QPot
 
+## Contents
+
+<!-- MarkdownTOC -->
+
+- [Overview](#overview)
+    - [Disclaimer](#disclaimer)
+    - [More information](#more-information)
+    - [Implementation](#implementation)
+        - [C++ and Python](#c-and-python)
+        - [Chunked.hpp](#chunkedhpp)
+        - [Static.hpp](#statichpp)
+        - [Redraw.hpp](#redrawhpp)
+    - [Installation](#installation)
+        - [C++ headers](#c-headers)
+            - [Using conda](#using-conda)
+            - [From source](#from-source)
+        - [Python module](#python-module)
+            - [Using conda](#using-conda-1)
+            - [From source](#from-source-1)
+    - [Compiling user-code](#compiling-user-code)
+        - [Using CMake](#using-cmake)
+            - [Example](#example)
+            - [Targets](#targets)
+            - [Optimisation](#optimisation)
+        - [By hand](#by-hand)
+        - [Using pkg-config](#using-pkg-config)
+    - [Change-log](#change-log)
+        - [v0.9.7](#v097)
+        - [v0.9.6](#v096)
+        - [v0.9.5](#v095)
+        - [v0.9.4](#v094)
+        - [v0.9.3](#v093)
+        - [v0.9.2](#v092)
+        - [v0.9.1](#v091)
+        - [v0.9.0](#v090)
+        - [v0.8.0](#v080)
+        - [v0.7.0](#v070)
+        - [v0.6.2](#v062)
+        - [v0.6.1](#v061)
+        - [v0.6.0](#v060)
+        - [v0.5.0](#v050)
+        - [v0.4.0](#v040)
+        - [v0.3.0](#v030)
+        - [v0.2.0](#v020)
+
+<!-- /MarkdownTOC -->
+
 ## Overview
 
 ### Disclaimer
@@ -184,11 +231,13 @@ To enable them you have to compile on your system, as is discussed next.
 ##### From source
 
 >   You need *xtensor*, *xtensor-python* and optionally *xsimd* as prerequisites.
+>   In addition *scikit-build* is needed to control the build from Python.
 >   The easiest is to use *conda* to get the prerequisites:
 >
 >   ```bash
 >   conda install -c conda-forge xtensor-python
 >   conda install -c conda-forge xsimd
+>   conda install -c conda-forge scikit-build
 >   ```
 >
 >   If you then compile and install with the same environment
@@ -201,12 +250,13 @@ To enable them you have to compile on your system, as is discussed next.
 git checkout https://github.com/tdegeus/QPot.git
 cd QPot
 
-# Only if you want to use hardware optimisation:
-export CMAKE_ARGS="-DUSE_SIMD=1"
-
 # Compile and install the Python module
 # (-vv can be omitted as is controls just the verbosity)
-python -m pip install . -vv
+python setup.py install --build-type Release -vv
+
+# OR, Compile and install the Python module with hardware optimisation
+# (with scikit-build CMake options can just be added as command-line arguments)
+python setup.py install --build-type Release -DUSE_SIMDD=1 -vv
 ```
 
 ### Compiling user-code
