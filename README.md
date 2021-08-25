@@ -36,6 +36,7 @@ Documentation: https://tdegeus.github.io/QPot
         - [By hand](#by-hand)
         - [Using pkg-config](#using-pkg-config)
     - [Change-log](#change-log)
+        - [v0.9.9](#v099)
         - [v0.9.8](#v098)
         - [v0.9.7](#v097)
         - [v0.9.6](#v096)
@@ -337,6 +338,10 @@ Note that you have to take care of the *xtensor* dependency, the C++ version, op
 enabling *xsimd*, ...
 
 ### Change-log
+
+#### v0.9.9
+
+*   [CMake] Minor style updates (#37)
 
 #### v0.9.8
 
