@@ -1,15 +1,14 @@
 cmake_minimum_required(VERSION 3.1..3.21)
 
-set(MYPROJECT "${PROJECT_NAME}-examples")
-
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    project(QPot-examples)
+    project(QPot)
     find_package(QPot REQUIRED CONFIG)
     option(USE_ASSERT "${PROJECT_NAME}: Build with assertions" ON)
     option(USE_DEBUG "${PROJECT_NAME}: Build in debug mode" OFF)
     option(USE_SIMD "${PROJECT_NAME}: Build with hardware optimization" OFF)
-    set(MYPROJECT "${PROJECT_NAME}")
 endif()
+
+set(MYPROJECT "${PROJECT_NAME}-examples")
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
@@ -19,15 +18,15 @@ find_package(prrng REQUIRED)
 
 add_library(mytarget INTERFACE IMPORTED)
 
-target_link_libraries(mytarget INTERFACE QPot prrng QPot::debug QPot::compiler_warnings)
+target_link_libraries(mytarget INTERFACE ${PROJECT_NAME} ${PROJECT_NAME}::compiler_warnings prrng)
 
 if(USE_ASSERT)
-    target_link_libraries(mytarget INTERFACE QPot::assert)
+    target_link_libraries(mytarget INTERFACE ${PROJECT_NAME}::assert)
     message(STATUS "Compiling ${MYPROJECT} with assertions")
 endif()
 
 if(USE_DEBUG)
-    target_link_libraries(mytarget INTERFACE QPot::debug)
+    target_link_libraries(mytarget INTERFACE ${PROJECT_NAME}::debug)
     message(STATUS "Compiling ${MYPROJECT} in debug mode")
 endif()
 

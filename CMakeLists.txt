@@ -113,7 +113,7 @@ endif()
 if(BUILD_TESTS OR BUILD_ALL)
 
     enable_testing()
-    add_subdirectory(test)
+    add_subdirectory(tests)
 
 endif()
 
@@ -161,12 +161,12 @@ if(BUILD_PYTHON OR BUILD_ALL)
     endif()
 
     if (USE_ASSERT)
-        target_link_libraries(${PYPROJECT_NAME} PUBLIC QPot::assert)
+        target_link_libraries(${PYPROJECT_NAME} PUBLIC ${PROJECT_NAME}::assert)
         message(STATUS "Compiling ${PROJECT_NAME}-Python with assertions")
     endif()
 
     if (USE_DEBUG)
-        target_link_libraries(${PYPROJECT_NAME} PUBLIC QPot::debug)
+        target_link_libraries(${PYPROJECT_NAME} PUBLIC ${PROJECT_NAME}::debug)
         message(STATUS "Compiling ${PROJECT_NAME}-Python in debug mode")
     endif()
 

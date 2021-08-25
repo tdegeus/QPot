@@ -1,6 +1,7 @@
 build
-*.egg-info
 dist
+*.egg-info
+_skbuild
 
 # Prerequisites
 *.d
