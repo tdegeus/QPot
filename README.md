@@ -215,7 +215,8 @@ git checkout https://github.com/tdegeus/QPot.git
 cd QPot
 
 # Install headers, CMake and pkg-config support
-cmake .
+cmake -Bbuild .
+cd build
 make install
 ```
 

@@ -31,6 +31,7 @@ if(USE_DEBUG)
 endif()
 
 if(USE_SIMD)
+    find_package(xtensor REQUIRED)
     find_package(xsimd REQUIRED)
     target_link_libraries(mytarget INTERFACE xtensor::use_xsimd xtensor::optimize)
     message(STATUS "Compiling ${MYPROJECT} with hardware optimization")
