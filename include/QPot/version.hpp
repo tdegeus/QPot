@@ -9,8 +9,8 @@ Version information.
 #ifndef QPOT_VERSION_H
 #define QPOT_VERSION_H
 
-#include <string>
 #include <algorithm>
+#include <string>
 
 #include "config.h"
 
@@ -29,9 +29,9 @@ Either:
 
     From the root of this project. This is what ``setup.py`` does.
 
-Note that both ``CMakeLists.txt`` and ``setup.py`` will construct the version using ``setuptools_scm``.
-Tip: use the environment variable ``SETUPTOOLS_SCM_PRETEND_VERSION``
-to overwrite the automatic version.
+Note that both ``CMakeLists.txt`` and ``setup.py`` will construct the version using
+``setuptools_scm``. Tip: use the environment variable ``SETUPTOOLS_SCM_PRETEND_VERSION`` to
+overwrite the automatic version.
 */
 #ifndef QPOT_VERSION
 #define QPOT_VERSION "@PROJECT_VERSION@"
@@ -67,14 +67,14 @@ inline std::vector<std::string> version_dependencies();
 
 namespace detail {
 
-    inline std::string unquote(const std::string& arg)
-    {
-        std::string ret = arg;
-        ret.erase(std::remove(ret.begin(), ret.end(), '\"'), ret.end());
-        return ret;
-    }
-
+inline std::string unquote(const std::string& arg)
+{
+    std::string ret = arg;
+    ret.erase(std::remove(ret.begin(), ret.end(), '\"'), ret.end());
+    return ret;
 }
+
+} // namespace detail
 
 inline std::string version()
 {
@@ -87,8 +87,8 @@ inline std::vector<std::string> version_dependencies()
 
     ret.push_back("goosefem=" + version());
 
-    ret.push_back("xtensor=" +
-        detail::unquote(std::string(QUOTE(XTENSOR_VERSION_MAJOR))) + "." +
+    ret.push_back(
+        "xtensor=" + detail::unquote(std::string(QUOTE(XTENSOR_VERSION_MAJOR))) + "." +
         detail::unquote(std::string(QUOTE(XTENSOR_VERSION_MINOR))) + "." +
         detail::unquote(std::string(QUOTE(XTENSOR_VERSION_PATCH))));
 

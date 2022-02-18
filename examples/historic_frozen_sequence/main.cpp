@@ -1,11 +1,11 @@
 #include <QPot/Chunked.hpp>
-#include <prrng.h>
-#include <xtensor/xtensor.hpp>
-#include <xtensor/xrandom.hpp>
-#include <xtensor/xadapt.hpp>
-#include <xtensor/xsort.hpp>
-#include <xtensor/xio.hpp>
 #include <highfive/H5Easy.hpp>
+#include <prrng.h>
+#include <xtensor/xadapt.hpp>
+#include <xtensor/xio.hpp>
+#include <xtensor/xrandom.hpp>
+#include <xtensor/xsort.hpp>
+#include <xtensor/xtensor.hpp>
 
 int main()
 {
@@ -46,7 +46,8 @@ int main()
         while (chunk.redraw() == +1) {
             ichunk++;
             state(ichunk) = generator.state<>();
-            auto dy = generator.random<xt::xtensor<double, 1>>({chunks(ichunk + 1) - chunks(ichunk)});
+            auto dy =
+                generator.random<xt::xtensor<double, 1>>({chunks(ichunk + 1) - chunks(ichunk)});
             chunk.shift_dy(chunks(ichunk), dy, nbuffer);
             xmin(ichunk) = chunk.ymin_chunk();
         }

@@ -9,8 +9,8 @@ Wrapper around xtensor/xrandom.hpp
 #ifndef QPOT_RANDOM_HPP
 #define QPOT_RANDOM_HPP
 
-#include <xtensor/xtensor.hpp>
 #include <xtensor/xrandom.hpp>
+#include <xtensor/xtensor.hpp>
 
 #include "config.h"
 #include "version.hpp"
@@ -38,11 +38,9 @@ Return a function to generate a matrix (rank 2 array) of ones.
 
 \param scale Scale factor.
 */
-inline std::function<xt::xtensor<double, 2>(std::array<size_t, 2>)>
-UniformList(double scale = 1.0)
+inline std::function<xt::xtensor<double, 2>(std::array<size_t, 2>)> UniformList(double scale = 1.0)
 {
-    return [=](std::array<size_t, 2> shape) {
-        return xt::eval(scale * xt::ones<double>(shape)); };
+    return [=](std::array<size_t, 2> shape) { return xt::eval(scale * xt::ones<double>(shape)); };
 };
 
 /**
@@ -51,11 +49,11 @@ taken from a uniform distribution between 0 and 1.
 
 \param scale Scale factor.
 */
-inline std::function<xt::xtensor<double, 2>(std::array<size_t, 2>)>
-RandList(double scale = 1.0)
+inline std::function<xt::xtensor<double, 2>(std::array<size_t, 2>)> RandList(double scale = 1.0)
 {
     return [=](std::array<size_t, 2> shape) {
-        return xt::eval(scale * xt::random::rand<double>(shape)); };
+        return xt::eval(scale * xt::random::rand<double>(shape));
+    };
 };
 
 /**
@@ -69,7 +67,8 @@ inline std::function<xt::xtensor<double, 2>(std::array<size_t, 2>)>
 WeibullList(double a = 1.0, double b = 1.0)
 {
     return [=](std::array<size_t, 2> shape) {
-        return xt::eval(xt::random::weibull<double>(shape, a, b)); };
+        return xt::eval(xt::random::weibull<double>(shape, a, b));
+    };
 };
 
 /**
@@ -83,7 +82,8 @@ inline std::function<xt::xtensor<double, 2>(std::array<size_t, 2>)>
 GammaList(double alpha = 1.0, double beta = 1.0)
 {
     return [=](std::array<size_t, 2> shape) {
-        return xt::eval(xt::random::gamma<double>(shape, alpha, beta)); };
+        return xt::eval(xt::random::gamma<double>(shape, alpha, beta));
+    };
 };
 
 } // namespace random

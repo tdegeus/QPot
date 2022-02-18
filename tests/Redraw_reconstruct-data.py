@@ -1,10 +1,11 @@
+import time
+
 import h5py
 import numpy as np
-import time
 import QPot
 
 seed = int(time.time())
-x = 5.0 * np.random.random((30)) - 2.5
+x = 5.0 * np.random.random(30) - 2.5
 n = 100
 ntotal = 40
 nbuffer = 10
@@ -35,4 +36,3 @@ with h5py.File("Redraw_reconstruct-data.h5", "w") as data:
     data["/currentYieldLeft"] = this.currentYieldLeft()
     data["/currentYieldRight"] = this.currentYieldRight()
     data["/currentIndex"] = this.currentIndex()
-

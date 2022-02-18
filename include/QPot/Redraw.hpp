@@ -9,9 +9,9 @@ Dynamically redraw yielding positions.
 #ifndef QPOT_REDRAW_HPP
 #define QPOT_REDRAW_HPP
 
+#include <xtensor/xnoalias.hpp>
 #include <xtensor/xtensor.hpp>
 #include <xtensor/xview.hpp>
-#include <xtensor/xnoalias.hpp>
 
 #include "config.h"
 #include "version.hpp"
@@ -21,10 +21,8 @@ namespace QPot {
 /**
 Yielding positions (that are dynamically redrawn) for a list of particles.
 */
-class RedrawList
-{
+class RedrawList {
 public:
-
     RedrawList() = default;
 
     /**
@@ -271,7 +269,6 @@ public:
         const xt::xtensor<long, 1>& idx_t);
 
 private:
-
     /**
     Compute the current #m_idx for all particles.
     Internally the following rules are used:
@@ -285,7 +282,6 @@ private:
     void computeIndex(const E& x);
 
 private:
-
     size_t m_N; ///< Number of points
     size_t m_ntot; ///< Number of yield positions to keep in memory at all times.
     size_t m_nbuf; ///< Number of yield positions to buffer.
@@ -312,11 +308,14 @@ private:
 
     xt::xtensor<double, 2> m_val; ///< Drawn random values.
     xt::xtensor<size_t, 1> m_idx; ///< Current "index": since the last shift.
-    xt::xtensor<long, 1> m_idx_t; ///< Current "index": total up to the last shift (can be negative).
+    xt::xtensor<long, 1>
+        m_idx_t; ///< Current "index": total up to the last shift (can be negative).
     xt::xtensor<double, 1> m_max; ///< Maximum yielding positions.
     xt::xtensor<double, 1> m_min; ///< Minimum yielding positions.
-    xt::xtensor<double, 1> m_left; ///< Current yielding positions to the left ``== m_pos[:, m_idx]``.
-    xt::xtensor<double, 1> m_right; ///< Current yielding positions to the right ``== m_pos[:, m_idx + 1]``.
+    xt::xtensor<double, 1>
+        m_left; ///< Current yielding positions to the left ``== m_pos[:, m_idx]``.
+    xt::xtensor<double, 1>
+        m_right; ///< Current yielding positions to the right ``== m_pos[:, m_idx + 1]``.
 
     /**
     Function to (re)draw yield positions.
@@ -364,7 +363,8 @@ inline RedrawList::RedrawList(const E& x, F draw, size_t ntotal, size_t nbuffer,
 
     // compute current index (updates "m_idx" only, "m_idx_t" is only changed at redraw)
     for (size_t p = 0; p < m_N; ++p) {
-        size_t i = std::lower_bound(&m_pos(p,0), &m_pos(p,0) + m_pos.shape(1), x(p)) - &m_pos(p,0) - 1;
+        size_t i =
+            std::lower_bound(&m_pos(p, 0), &m_pos(p, 0) + m_pos.shape(1), x(p)) - &m_pos(p, 0) - 1;
         m_idx(p) = i;
         m_left(p) = m_pos(p, i);
         m_right(p) = m_pos(p, i + 1);
@@ -425,7 +425,7 @@ inline xt::xtensor<double, 1> RedrawList::nextYield(int offset) const
     QPOT_ASSERT(offset != 0);
 
     if (offset < 0) {
-        size_t shift = static_cast<size_t>(- offset);
+        size_t shift = static_cast<size_t>(-offset);
         QPOT_ASSERT(shift - 1 <= xt::amin(m_idx)());
         xt::xtensor<double, 1> ret = xt::empty<double>({m_N});
         for (size_t p = 0; p < m_N; ++p) {
@@ -452,7 +452,8 @@ inline xt::xtensor<double, 2> RedrawList::currentYield(int left, int right) cons
     for (size_t p = 0; p < m_N; ++p) {
         QPOT_ASSERT(static_cast<int>(m_idx(p)) + left >= 0);
         QPOT_ASSERT(static_cast<int>(m_idx(p)) + right < static_cast<int>(m_ntot));
-        xt::view(ret, p, xt::all()) = xt::view(m_pos, p, xt::range(m_idx(p) + left, m_idx(p) + right));
+        xt::view(ret, p, xt::all()) =
+            xt::view(m_pos, p, xt::range(m_idx(p) + left, m_idx(p) + right));
     }
     return ret;
 }
@@ -559,8 +560,7 @@ inline void RedrawList::computeIndex(const E& x)
     using position_type = typename E::value_type;
 
     if (!m_redraw) {
-        for (size_t p = 0; p < m_N; ++p)
-        {
+        for (size_t p = 0; p < m_N; ++p) {
             index_type i = m_idx(p);
             position_type xp = x(p);
 
@@ -572,10 +572,10 @@ inline void RedrawList::computeIndex(const E& x)
             index_type r = std::min(i + m_proximity, m_ntot - 1);
 
             if (m_pos(p, l) < xp && m_pos(p, r) >= xp) {
-                i = std::lower_bound(&m_pos(p,l), &m_pos(p,l) + r - l, xp) - &m_pos(p,l) - 1 + l;
+                i = std::lower_bound(&m_pos(p, l), &m_pos(p, l) + r - l, xp) - &m_pos(p, l) - 1 + l;
             }
             else {
-                i = std::lower_bound(&m_pos(p,0), &m_pos(p,0) + m_ntot, xp) - &m_pos(p,0) - 1;
+                i = std::lower_bound(&m_pos(p, 0), &m_pos(p, 0) + m_ntot, xp) - &m_pos(p, 0) - 1;
             }
 
             m_idx(p) = i;
@@ -584,8 +584,7 @@ inline void RedrawList::computeIndex(const E& x)
         }
     }
     else {
-        for (size_t p = 0; p < m_N; ++p)
-        {
+        for (size_t p = 0; p < m_N; ++p) {
             index_type i = m_idx(p);
             position_type xp = x(p);
             bool redraw = m_iredraw(p) != 0;
@@ -598,10 +597,10 @@ inline void RedrawList::computeIndex(const E& x)
             index_type r = std::min(i + m_proximity, m_ntot - 1);
 
             if (m_pos(p, l) < xp && m_pos(p, r) >= xp && !redraw) {
-                i = std::lower_bound(&m_pos(p,l), &m_pos(p,l) + r - l, xp) - &m_pos(p,l) - 1 + l;
+                i = std::lower_bound(&m_pos(p, l), &m_pos(p, l) + r - l, xp) - &m_pos(p, l) - 1 + l;
             }
             else {
-                i = std::lower_bound(&m_pos(p,0), &m_pos(p,0) + m_ntot, xp) - &m_pos(p,0) - 1;
+                i = std::lower_bound(&m_pos(p, 0), &m_pos(p, 0) + m_ntot, xp) - &m_pos(p, 0) - 1;
             }
 
             m_idx(p) = i;
@@ -655,21 +654,19 @@ inline bool RedrawList::setPosition(const E& x)
     }
 
     // extend right (use the opportunity to redraw multiple rows)
-    if (xt::any(x >= m_max))
-    {
-        xt::xtensor<size_t, 1> index = xt::flatten_indices(xt::argwhere(
-            x >= xt::view(m_pos, xt::all(), m_ntot - m_noff)));
+    if (xt::any(x >= m_max)) {
+        xt::xtensor<size_t, 1> index =
+            xt::flatten_indices(xt::argwhere(x >= xt::view(m_pos, xt::all(), m_ntot - m_noff)));
 
         this->redrawRight(index);
     }
 
     // extend left (use the opportunity to redraw multiple rows)
-    if (xt::any(x <= m_min))
-    {
+    if (xt::any(x <= m_min)) {
         // get rows for which a redraw is needed
         // use the opportunity to redraw multiple rows
-        xt::xtensor<size_t, 1> index = xt::flatten_indices(xt::argwhere(
-            x <= xt::view(m_pos, xt::all(), m_noff)));
+        xt::xtensor<size_t, 1> index =
+            xt::flatten_indices(xt::argwhere(x <= xt::view(m_pos, xt::all(), m_noff)));
 
         this->redrawLeft(index);
     }

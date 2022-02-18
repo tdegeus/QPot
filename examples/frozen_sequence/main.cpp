@@ -1,10 +1,10 @@
 #include <QPot/Chunked.hpp>
 #include <prrng.h>
-#include <xtensor/xtensor.hpp>
-#include <xtensor/xrandom.hpp>
 #include <xtensor/xadapt.hpp>
-#include <xtensor/xsort.hpp>
 #include <xtensor/xio.hpp>
+#include <xtensor/xrandom.hpp>
+#include <xtensor/xsort.hpp>
+#include <xtensor/xtensor.hpp>
 
 int main()
 {

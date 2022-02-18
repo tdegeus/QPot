@@ -1,9 +1,10 @@
 import unittest
+
 import numpy as np
 import QPot
 
-class Test_main(unittest.TestCase):
 
+class Test_main(unittest.TestCase):
     def test_Basic(self):
 
         y = QPot.Static(5.5, np.linspace(0, 10, 11))
@@ -22,6 +23,7 @@ class Test_main(unittest.TestCase):
         self.assertTrue(y.currentYieldLeft() == 6.0)
         self.assertTrue(y.currentYieldRight() == 7.0)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
 
     unittest.main()

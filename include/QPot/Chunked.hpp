@@ -9,8 +9,8 @@ Class supporting the use (frozen) sequence of yield positions supplied in chunks
 #ifndef QPOT_CHUNKED_HPP
 #define QPOT_CHUNKED_HPP
 
-#include <vector>
 #include <numeric>
+#include <vector>
 
 #ifdef QPOT_ENABLE_DEBUG
 #include <xtensor/xtensor.hpp>
@@ -58,12 +58,11 @@ or even more schematically:
     chuncked.rshift_y( y = Y[10: 15]);
 
 \note A word of attention, without specifying any global index concerning the new chunk,
-`rshift_y` and `rshift_dy` (or `lshift_y` and `lshift_dy`), will infer the index by assuming that the
-supplied data is exactly the next chunk on the right (or left).
-If one does not pay attention the can lead to unwanted results.
-Fortunately, Chunked allows you to specify the global index of the first item of the new chunk.
-This will enable assertions, and allow you to be loose about what data the specify:
-As long as the needed data is part of the supplied chunk, Chunked will know what to do.
+`rshift_y` and `rshift_dy` (or `lshift_y` and `lshift_dy`), will infer the index by assuming that
+the supplied data is exactly the next chunk on the right (or left). If one does not pay attention
+the can lead to unwanted results. Fortunately, Chunked allows you to specify the global index of the
+first item of the new chunk. This will enable assertions, and allow you to be loose about what data
+the specify: As long as the needed data is part of the supplied chunk, Chunked will know what to do.
 
 \section buffer Buffer
 
@@ -170,10 +169,8 @@ because Y5 = Y4 + dY5 and thus that Y4 = Y4 - dY5.
 \note One only has to supply the first index, `istart`,
 the rest is inferred from the size of the chunk.
 */
-class Chunked
-{
+class Chunked {
 public:
-
     Chunked() = default;
 
     /**
@@ -382,18 +379,18 @@ public:
         QPOT_ASSERT(istart <= m_istop);
         QPOT_ASSERT(istart >= m_istart); // otherwise the function does not what it's name suggests
 
-        // if there is overlap between the chunks of Y in memory and input:
-        // check that the values are indeed the same
-        #ifdef QPOT_ENABLE_DEBUG
-            if (istart < m_istop) {
-                size_t d = static_cast<size_t>(m_istop - istart);
-                xt::xtensor<double, 1> o = xt::empty<double>({d});
-                xt::xtensor<double, 1> n = xt::empty<double>({d});
-                std::copy(m_y.cend() - d, m_y.cend(), o.begin());
-                std::copy(y.cbegin(), y.cbegin() + d, n.begin());
-                QPOT_DEBUG(xt::allclose(o, n));
-            }
-        #endif
+// if there is overlap between the chunks of Y in memory and input:
+// check that the values are indeed the same
+#ifdef QPOT_ENABLE_DEBUG
+        if (istart < m_istop) {
+            size_t d = static_cast<size_t>(m_istop - istart);
+            xt::xtensor<double, 1> o = xt::empty<double>({d});
+            xt::xtensor<double, 1> n = xt::empty<double>({d});
+            std::copy(m_y.cend() - d, m_y.cend(), o.begin());
+            std::copy(y.cbegin(), y.cbegin() + d, n.begin());
+            QPOT_DEBUG(xt::allclose(o, n));
+        }
+#endif
 
         // supplied chunk smaller than the chunk in memory
         if (istart >= m_istart && istart + static_cast<long>(y.size()) <= m_istop) {
@@ -467,7 +464,7 @@ public:
         else {
             d = m_y.back() - y[m_n - 1 - static_cast<size_t>(istart - m_istart)];
         }
-        std::transform(y.begin(), y.end(), y.begin(), [&](auto& v){ return v + d; });
+        std::transform(y.begin(), y.end(), y.begin(), [&](auto& v) { return v + d; });
 
         this->rshift_y(istart, y, nbuffer);
     }
@@ -490,7 +487,7 @@ public:
         std::vector<double> y(dy.size());
         std::partial_sum(dy.cbegin(), dy.cend(), y.begin());
 
-        std::transform(y.begin(), y.end(), y.begin(), [&](auto& v){ return v + m_y.back(); });
+        std::transform(y.begin(), y.end(), y.begin(), [&](auto& v) { return v + m_y.back(); });
 
         this->rshift_y(m_istop, y, nbuffer);
     }
@@ -512,16 +509,16 @@ public:
         QPOT_ASSERT(istart <= m_istart);
         QPOT_ASSERT(istop >= m_istart);
 
-        #ifdef QPOT_ENABLE_DEBUG
-            if (istop > m_istart) {
-                size_t d = static_cast<size_t>(istop - m_istart);
-                xt::xtensor<double, 1> o = xt::empty<double>({d});
-                xt::xtensor<double, 1> n = xt::empty<double>({d});
-                std::copy(m_y.begin(), m_y.begin() + d, o.begin());
-                std::copy(y.end() - d, y.end(), n.begin());
-                QPOT_DEBUG(xt::allclose(o, n));
-            }
-        #endif
+#ifdef QPOT_ENABLE_DEBUG
+        if (istop > m_istart) {
+            size_t d = static_cast<size_t>(istop - m_istart);
+            xt::xtensor<double, 1> o = xt::empty<double>({d});
+            xt::xtensor<double, 1> n = xt::empty<double>({d});
+            std::copy(m_y.begin(), m_y.begin() + d, o.begin());
+            std::copy(y.end() - d, y.end(), n.begin());
+            QPOT_DEBUG(xt::allclose(o, n));
+        }
+#endif
 
         // supplied chunk smaller than the chunk in memory
         if (istart >= m_istart && istart + static_cast<long>(y.size()) <= m_istop) {
@@ -588,7 +585,7 @@ public:
         std::partial_sum(dy.cbegin(), dy.cend(), y.begin());
 
         double d = m_y[istart + static_cast<long>(y.size()) - m_istart - 1] - y.back();
-        std::transform(y.begin(), y.end(), y.begin(), [&](auto& v){ return v + d; });
+        std::transform(y.begin(), y.end(), y.begin(), [&](auto& v) { return v + d; });
 
         this->lshift_y(istart, y, nbuffer);
     }
@@ -612,7 +609,7 @@ public:
         std::partial_sum(dy.cbegin(), dy.cend(), y.begin());
 
         double d = m_y.front() - y.back();
-        std::transform(y.cbegin(), y.cend(), y.begin(), [&](auto& v){ return v + d; });
+        std::transform(y.cbegin(), y.cend(), y.begin(), [&](auto& v) { return v + d; });
 
         this->lshift_y(m_istart - static_cast<long>(y.size()) + 1, y, nbuffer);
     }
@@ -804,11 +801,10 @@ public:
     bool boundcheck_right(size_t n = 0) const
     {
         QPOT_ASSERT(n < m_n);
-        return !(m_lock || m_li >= m_n - n -1);
+        return !(m_lock || m_li >= m_n - n - 1);
     }
 
 private:
-
     void update()
     {
         if (m_x <= m_y.front()) {
@@ -854,7 +850,6 @@ private:
     }
 
 private:
-
     double m_x = 0.0; ///< Current positions
     size_t m_li; ///< Local index for the position of m_x in m_y
     size_t m_n; ///< Number of yield positions
@@ -879,9 +874,3 @@ private:
 } // namespace QPot
 
 #endif
-
-
-
-
-
-
