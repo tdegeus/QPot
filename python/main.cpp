@@ -21,8 +21,33 @@ Python API.
 
 namespace py = pybind11;
 
+/**
+Overrides the `__name__` of a module.
+Classes defined by pybind11 use the `__name__` of the module as of the time they are defined,
+which affects the `__repr__` of the class type objects.
+*/
+class ScopedModuleNameOverride {
+public:
+    explicit ScopedModuleNameOverride(py::module m, std::string name) : module_(std::move(m))
+    {
+        original_name_ = module_.attr("__name__");
+        module_.attr("__name__") = name;
+    }
+    ~ScopedModuleNameOverride()
+    {
+        module_.attr("__name__") = original_name_;
+    }
+
+private:
+    py::module module_;
+    py::object original_name_;
+};
+
 PYBIND11_MODULE(_QPot, m)
 {
+    // Ensure members to display as `QPot.X` (not `QPot._QPot.X`)
+    ScopedModuleNameOverride name_override(m, "QPot");
+
     xt::import_numpy();
 
     m.doc() = "Library to keep track of a sequential potential energy landscape.";
