@@ -1,7 +1,7 @@
 import h5py
 import numpy as np
-from QPot import Chunked
 from prrng import pcg32
+from QPot import Chunked
 
 with h5py.File("output.h5", "r") as data:
     chunks = data["/restore/chunks"][...]

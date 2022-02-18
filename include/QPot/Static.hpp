@@ -9,9 +9,9 @@ Use a static list of yielding positions.
 #ifndef QPOT_STATIC_HPP
 #define QPOT_STATIC_HPP
 
+#include <xtensor/xnoalias.hpp>
 #include <xtensor/xtensor.hpp>
 #include <xtensor/xview.hpp>
-#include <xtensor/xnoalias.hpp>
 
 #include "config.h"
 #include "version.hpp"
@@ -21,10 +21,8 @@ namespace QPot {
 /**
 Yielding positions for one particle.
 */
-class Static
-{
+class Static {
 public:
-
     Static() = default;
 
     /**
@@ -159,14 +157,12 @@ public:
     bool checkYieldBoundRight(size_t n = 0) const;
 
 private:
-
     /**
     Initialisation.
     */
     void init();
 
 private:
-
     size_t m_proximity = 10; ///< Size of neighbourhood to search first.
     xt::xtensor<double, 1> m_pos; ///< Yielding positions.
     size_t m_ntot; ///< Len(m_pos).
@@ -239,7 +235,7 @@ inline double Static::nextYield(int offset) const
     QPOT_ASSERT(offset != 0);
 
     if (offset < 0) {
-        size_t shift = static_cast<size_t>(- offset);
+        size_t shift = static_cast<size_t>(-offset);
         QPOT_ASSERT(shift - 1 <= m_idx);
         return m_pos(m_idx - shift + 1);
     }

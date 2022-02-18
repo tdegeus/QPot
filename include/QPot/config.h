@@ -21,8 +21,7 @@ Macros used in the library.
 #define QPOT_ASSERT_IMPL(expr, file, line, function) \
     if (!(expr)) { \
         throw std::runtime_error( \
-            std::string(file) + ":" + std::to_string(line) + \
-            " (" + std::string(function) + ")" + \
+            std::string(file) + ":" + std::to_string(line) + " (" + std::string(function) + ")" + \
             ": assertion failed (" #expr ") \n\t"); \
     }
 /**
@@ -81,6 +80,7 @@ Assertions that cannot be disable.
 /**
 Keep track of potential energy landscape.
 */
-namespace QPot { }
+namespace QPot {
+}
 
 #endif

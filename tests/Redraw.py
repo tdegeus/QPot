@@ -1,41 +1,42 @@
-import unittest
-import numpy as np
-import h5py
 import time
+import unittest
+
+import h5py
+import numpy as np
 import QPot
 
-class Test_main(unittest.TestCase):
 
+class Test_main(unittest.TestCase):
     def test_Basic(self):
 
         x = np.array([-1.0, 0.0, 1.0])
-        l = np.array([-1.5, -0.5, 0.5])
-        r = l + 1.0
+        lft = np.array([-1.5, -0.5, 0.5])
+        rgt = lft + 1.0
         i = np.array([13, 14, 15])
 
         def uniform(shape):
             return np.ones(shape)
 
-        y = QPot.RedrawList(x, uniform, 30, 5, 2);
+        y = QPot.RedrawList(x, uniform, 30, 5, 2)
 
         for j in range(20):
             x += 1.0
-            l += 1.0
-            r += 1.0
+            lft += 1.0
+            rgt += 1.0
             i += 1
             y.setPosition(x)
-            self.assertTrue(np.all(np.equal(y.currentYieldLeft(), l)))
-            self.assertTrue(np.all(np.equal(y.currentYieldRight(), r)))
+            self.assertTrue(np.all(np.equal(y.currentYieldLeft(), lft)))
+            self.assertTrue(np.all(np.equal(y.currentYieldRight(), rgt)))
             self.assertTrue(np.all(np.equal(y.currentIndex(), i)))
 
         for j in range(40):
             x -= 1.0
-            l -= 1.0
-            r -= 1.0
+            lft -= 1.0
+            rgt -= 1.0
             i -= 1
             y.setPosition(x)
-            self.assertTrue(np.all(np.equal(y.currentYieldLeft(), l)))
-            self.assertTrue(np.all(np.equal(y.currentYieldRight(), r)))
+            self.assertTrue(np.all(np.equal(y.currentYieldLeft(), lft)))
+            self.assertTrue(np.all(np.equal(y.currentYieldRight(), rgt)))
             self.assertTrue(np.all(np.equal(y.currentIndex(), i)))
 
     def test_Reconstruct_positions(self):
@@ -161,7 +162,9 @@ class Test_main(unittest.TestCase):
             redraw = data["/redraw"][...]
             x = data["/x"][...]
 
-            this = QPot.RedrawList(x, rand, data["/ntotal"][...], data["/nbuffer"][...], data["/noffset"][...])
+            this = QPot.RedrawList(
+                x, rand, data["/ntotal"][...], data["/nbuffer"][...], data["/noffset"][...]
+            )
 
             for i in range(n):
                 this.redraw(redraw[:, i])
@@ -173,6 +176,7 @@ class Test_main(unittest.TestCase):
             self.assertTrue(np.allclose(this.currentYieldRight(), data["/currentYieldRight"][...]))
             self.assertTrue(np.all(np.equal(this.currentIndex(), data["/currentIndex"][...])))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
 
     unittest.main()

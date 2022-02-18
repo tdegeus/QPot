@@ -1,6 +1,6 @@
-#define CATCH_CONFIG_MAIN  // tells Catch to provide a main() - only do this in one cpp file
-#include <catch2/catch.hpp>
+#define CATCH_CONFIG_MAIN // tells Catch to provide a main() - only do this in one cpp file
 #include <QPot/Static.hpp>
+#include <catch2/catch.hpp>
 
 TEST_CASE("QPot::Static", "Static.hpp")
 {

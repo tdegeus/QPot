@@ -1,7 +1,7 @@
-#define CATCH_CONFIG_MAIN  // tells Catch to provide a main() - only do this in one cpp file
-#include <catch2/catch.hpp>
+#define CATCH_CONFIG_MAIN // tells Catch to provide a main() - only do this in one cpp file
 #include <QPot/Redraw.hpp>
 #include <QPot/random.hpp>
+#include <catch2/catch.hpp>
 #include <xtensor/xio.hpp>
 #include <xtensor/xrandom.hpp>
 #ifdef USE_HDF5
@@ -105,10 +105,7 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
         auto uniform = QPot::random::UniformList();
         xt::xtensor<double, 1> x = {4.5, 5.5, 6.5};
         QPot::RedrawList yield(x, uniform, 30, 5, 2);
-        xt::xtensor<double, 2> ret = {
-            {2, 3, 4, 5, 6},
-            {3, 4, 5, 6, 7},
-            {4, 5, 6, 7, 8}};
+        xt::xtensor<double, 2> ret = {{2, 3, 4, 5, 6}, {3, 4, 5, 6, 7}, {4, 5, 6, 7, 8}};
         REQUIRE(xt::allclose(yield.currentYield(-2, 3), ret));
     }
 
@@ -324,7 +321,9 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
         auto redraw = H5Easy::load<xt::xtensor<int, 2>>(data, "/redraw");
         auto x = H5Easy::load<xt::xtensor<double, 1>>(data, "/x");
 
-        QPot::RedrawList self(x, rand,
+        QPot::RedrawList self(
+            x,
+            rand,
             H5Easy::load<size_t>(data, "/ntotal"),
             H5Easy::load<size_t>(data, "/nbuffer"),
             H5Easy::load<size_t>(data, "/noffset"));
@@ -336,10 +335,16 @@ TEST_CASE("QPot::RedrawList", "Redraw.hpp")
 
         self.setPosition((double)(n - 1) * x);
 
-        REQUIRE(xt::allclose(self.raw_pos(), H5Easy::load<xt::xtensor<double, 2>>(data, "/raw_pos")));
-        REQUIRE(xt::allclose(self.currentYieldLeft(), H5Easy::load<xt::xtensor<double, 1>>(data, "/currentYieldLeft")));
-        REQUIRE(xt::allclose(self.currentYieldRight(), H5Easy::load<xt::xtensor<double, 1>>(data, "/currentYieldRight")));
-        REQUIRE(xt::allclose(self.currentIndex(), H5Easy::load<xt::xtensor<long, 1>>(data, "/currentIndex")));
+        REQUIRE(
+            xt::allclose(self.raw_pos(), H5Easy::load<xt::xtensor<double, 2>>(data, "/raw_pos")));
+        REQUIRE(xt::allclose(
+            self.currentYieldLeft(),
+            H5Easy::load<xt::xtensor<double, 1>>(data, "/currentYieldLeft")));
+        REQUIRE(xt::allclose(
+            self.currentYieldRight(),
+            H5Easy::load<xt::xtensor<double, 1>>(data, "/currentYieldRight")));
+        REQUIRE(xt::allclose(
+            self.currentIndex(), H5Easy::load<xt::xtensor<long, 1>>(data, "/currentIndex")));
     }
 #endif
 }
