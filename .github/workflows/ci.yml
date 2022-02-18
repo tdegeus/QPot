@@ -21,7 +21,7 @@ jobs:
         - runs-on: macos-latest
           config: -DCMAKE_BUILD_TYPE=Release -DUSE_ASSERT=1 -DBUILD_TESTS=1 -DBUILD_EXAMPLES=1
         - runs-on: windows-latest
-          config: -DCMAKE_BUILD_TYPE=Release -DUSE_ASSERT=1 -DBUILD_TESTS=1 -DBUILD_EXAMPLES=1
+          config: -DCMAKE_BUILD_TYPE=Release -DUSE_ASSERT=1 -DBUILD_TESTS=1 -DBUILD_EXAMPLES=1 -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
 
     defaults:
       run:
