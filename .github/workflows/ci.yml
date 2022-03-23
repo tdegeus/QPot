@@ -5,7 +5,7 @@ on:
   pull_request:
   push:
     branches:
-    - master
+    - main
 
 jobs:
 
@@ -40,6 +40,7 @@ jobs:
       with:
         environment-file: environment.yaml
         environment-name: myenv
+        cache-env: true
 
     - name: Install clang
       if: runner.os == 'Windows'
@@ -50,6 +51,11 @@ jobs:
 
     - name: Configure using CMake
       run: cmake -Bbuild ${{ matrix.config }}
+
+    - name: Build doxygen-docs (error on warning)
+      if: runner.os == 'Linux'
+      working-directory: build
+      run: make html
 
     - name: Build C++ ${{ matrix.prop }}
       working-directory: build
@@ -72,8 +78,3 @@ jobs:
       working-directory: examples/historic_frozen_sequence
       run: |
         python restore.py
-
-    - name: Build doxygen-docs (error on warning)
-      if: runner.os == 'Linux'
-      working-directory: build
-      run: make html
