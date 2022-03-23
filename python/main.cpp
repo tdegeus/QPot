@@ -117,6 +117,12 @@ PYBIND11_MODULE(_QPot, m)
             "See :cpp:func:`QPot::Chunked::ymax`.")
 
         .def(
+            "ymin_chunk",
+            &QPot::Chunked::ymin_chunk,
+            "Get the position of the left-most yield positions specified in the last chunk."
+            "See :cpp:func:`QPot::Chunked::ymin_chunk`.")
+
+        .def(
             "size",
             &QPot::Chunked::size,
             "Size of the current the chunk."
