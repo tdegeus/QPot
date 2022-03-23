@@ -39,8 +39,8 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(chunk.i() == 5);
 
         REQUIRE(chunk.size() == y.size());
-        REQUIRE(chunk.boundcheck_left());
-        REQUIRE(chunk.boundcheck_right());
+        REQUIRE(chunk.inbounds_left());
+        REQUIRE(chunk.inbounds_right());
         REQUIRE(chunk.ymin_chunk() == y(0));
 
         REQUIRE(xt::allclose(chunk.yleft(), 5.0));
@@ -72,8 +72,8 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
 
         REQUIRE(chunk.i() == 6);
 
-        REQUIRE(chunk.boundcheck_left());
-        REQUIRE(chunk.boundcheck_right());
+        REQUIRE(chunk.inbounds_left());
+        REQUIRE(chunk.inbounds_right());
         REQUIRE(chunk.ymin_chunk() == y(0));
 
         REQUIRE(xt::allclose(chunk.yleft(), 6.0));
@@ -102,98 +102,98 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
 
         QPot::Chunked chunk(0.5, y);
 
-        REQUIRE(chunk.boundcheck_left());
-        REQUIRE(chunk.boundcheck_right());
+        REQUIRE(chunk.inbounds_left());
+        REQUIRE(chunk.inbounds_right());
 
         chunk.set_x(-0.5);
 
-        REQUIRE(!chunk.boundcheck_left());
-        REQUIRE(!chunk.boundcheck_right());
+        REQUIRE(!chunk.inbounds_left());
+        REQUIRE(!chunk.inbounds_right());
 
         chunk.set_x(0.5);
 
-        REQUIRE(chunk.boundcheck_left());
-        REQUIRE(!chunk.boundcheck_left(1));
-        REQUIRE(!chunk.boundcheck_left(2));
-        REQUIRE(!chunk.boundcheck_left(3));
-        REQUIRE(!chunk.boundcheck_left(4));
-        REQUIRE(!chunk.boundcheck_left(5));
+        REQUIRE(chunk.inbounds_left());
+        REQUIRE(!chunk.inbounds_left(1));
+        REQUIRE(!chunk.inbounds_left(2));
+        REQUIRE(!chunk.inbounds_left(3));
+        REQUIRE(!chunk.inbounds_left(4));
+        REQUIRE(!chunk.inbounds_left(5));
 
-        REQUIRE(chunk.boundcheck_right());
-        REQUIRE(chunk.boundcheck_right(1));
-        REQUIRE(chunk.boundcheck_right(2));
-        REQUIRE(chunk.boundcheck_right(3));
-        REQUIRE(chunk.boundcheck_right(4));
-        REQUIRE(!chunk.boundcheck_right(5));
+        REQUIRE(chunk.inbounds_right());
+        REQUIRE(chunk.inbounds_right(1));
+        REQUIRE(chunk.inbounds_right(2));
+        REQUIRE(chunk.inbounds_right(3));
+        REQUIRE(chunk.inbounds_right(4));
+        REQUIRE(!chunk.inbounds_right(5));
 
         chunk.set_x(1.5);
 
-        REQUIRE(chunk.boundcheck_left());
-        REQUIRE(chunk.boundcheck_left(1));
-        REQUIRE(!chunk.boundcheck_left(2));
-        REQUIRE(!chunk.boundcheck_left(3));
-        REQUIRE(!chunk.boundcheck_left(4));
-        REQUIRE(!chunk.boundcheck_left(5));
+        REQUIRE(chunk.inbounds_left());
+        REQUIRE(chunk.inbounds_left(1));
+        REQUIRE(!chunk.inbounds_left(2));
+        REQUIRE(!chunk.inbounds_left(3));
+        REQUIRE(!chunk.inbounds_left(4));
+        REQUIRE(!chunk.inbounds_left(5));
 
-        REQUIRE(chunk.boundcheck_right());
-        REQUIRE(chunk.boundcheck_right(1));
-        REQUIRE(chunk.boundcheck_right(2));
-        REQUIRE(chunk.boundcheck_right(3));
-        REQUIRE(!chunk.boundcheck_right(4));
-        REQUIRE(!chunk.boundcheck_right(5));
+        REQUIRE(chunk.inbounds_right());
+        REQUIRE(chunk.inbounds_right(1));
+        REQUIRE(chunk.inbounds_right(2));
+        REQUIRE(chunk.inbounds_right(3));
+        REQUIRE(!chunk.inbounds_right(4));
+        REQUIRE(!chunk.inbounds_right(5));
 
         chunk.set_x(2.5);
 
-        REQUIRE(chunk.boundcheck_left());
-        REQUIRE(chunk.boundcheck_left(1));
-        REQUIRE(chunk.boundcheck_left(2));
-        REQUIRE(!chunk.boundcheck_left(3));
-        REQUIRE(!chunk.boundcheck_left(4));
-        REQUIRE(!chunk.boundcheck_left(5));
+        REQUIRE(chunk.inbounds_left());
+        REQUIRE(chunk.inbounds_left(1));
+        REQUIRE(chunk.inbounds_left(2));
+        REQUIRE(!chunk.inbounds_left(3));
+        REQUIRE(!chunk.inbounds_left(4));
+        REQUIRE(!chunk.inbounds_left(5));
 
-        REQUIRE(chunk.boundcheck_right());
-        REQUIRE(chunk.boundcheck_right(1));
-        REQUIRE(chunk.boundcheck_right(2));
-        REQUIRE(!chunk.boundcheck_right(3));
-        REQUIRE(!chunk.boundcheck_right(4));
-        REQUIRE(!chunk.boundcheck_right(5));
+        REQUIRE(chunk.inbounds_right());
+        REQUIRE(chunk.inbounds_right(1));
+        REQUIRE(chunk.inbounds_right(2));
+        REQUIRE(!chunk.inbounds_right(3));
+        REQUIRE(!chunk.inbounds_right(4));
+        REQUIRE(!chunk.inbounds_right(5));
 
         chunk.set_x(3.5);
 
-        REQUIRE(chunk.boundcheck_left());
-        REQUIRE(chunk.boundcheck_left(1));
-        REQUIRE(chunk.boundcheck_left(2));
-        REQUIRE(chunk.boundcheck_left(3));
-        REQUIRE(!chunk.boundcheck_left(4));
-        REQUIRE(!chunk.boundcheck_left(5));
+        REQUIRE(chunk.inbounds_left());
+        REQUIRE(chunk.inbounds_left(1));
+        REQUIRE(chunk.inbounds_left(2));
+        REQUIRE(chunk.inbounds_left(3));
+        REQUIRE(!chunk.inbounds_left(4));
+        REQUIRE(!chunk.inbounds_left(5));
 
-        REQUIRE(chunk.boundcheck_right());
-        REQUIRE(chunk.boundcheck_right(1));
-        REQUIRE(!chunk.boundcheck_right(2));
-        REQUIRE(!chunk.boundcheck_right(3));
-        REQUIRE(!chunk.boundcheck_right(4));
-        REQUIRE(!chunk.boundcheck_right(5));
+        REQUIRE(chunk.inbounds_right());
+        REQUIRE(chunk.inbounds_right(1));
+        REQUIRE(!chunk.inbounds_right(2));
+        REQUIRE(!chunk.inbounds_right(3));
+        REQUIRE(!chunk.inbounds_right(4));
+        REQUIRE(!chunk.inbounds_right(5));
 
         chunk.set_x(4.5);
 
-        REQUIRE(chunk.boundcheck_left());
-        REQUIRE(chunk.boundcheck_left(1));
-        REQUIRE(chunk.boundcheck_left(2));
-        REQUIRE(chunk.boundcheck_left(3));
-        REQUIRE(chunk.boundcheck_left(4));
-        REQUIRE(!chunk.boundcheck_left(5));
+        REQUIRE(chunk.inbounds_left());
+        REQUIRE(chunk.inbounds_left(1));
+        REQUIRE(chunk.inbounds_left(2));
+        REQUIRE(chunk.inbounds_left(3));
+        REQUIRE(chunk.inbounds_left(4));
+        REQUIRE(!chunk.inbounds_left(5));
 
-        REQUIRE(chunk.boundcheck_right());
-        REQUIRE(!chunk.boundcheck_right(1));
-        REQUIRE(!chunk.boundcheck_right(2));
-        REQUIRE(!chunk.boundcheck_right(3));
-        REQUIRE(!chunk.boundcheck_right(4));
-        REQUIRE(!chunk.boundcheck_right(5));
+        REQUIRE(chunk.inbounds_right());
+        REQUIRE(!chunk.inbounds_right(1));
+        REQUIRE(!chunk.inbounds_right(2));
+        REQUIRE(!chunk.inbounds_right(3));
+        REQUIRE(!chunk.inbounds_right(4));
+        REQUIRE(!chunk.inbounds_right(5));
 
         chunk.set_x(5.5);
 
-        REQUIRE(!chunk.boundcheck_left());
-        REQUIRE(!chunk.boundcheck_right());
+        REQUIRE(!chunk.inbounds_left());
+        REQUIRE(!chunk.inbounds_right());
     }
 
     SECTION("Basic chunk features")
