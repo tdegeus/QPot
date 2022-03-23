@@ -255,7 +255,7 @@ public:
     }
 
     /**
-    Get the positions of the left-most yield positions specified in the last chunk.
+    Get the position of the left-most yield positions specified in the last chunk.
     Note that ymin_chunk() >= ymin() depending on the buffer.
     Furthermore that when specifying yield distances, the returned value may not be know externally.
     This is why Chunked() keeps track of if.
