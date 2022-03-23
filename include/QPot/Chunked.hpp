@@ -787,7 +787,29 @@ public:
 
     \param n Offset.
     */
-    bool boundcheck_left(size_t n = 0) const
+    [[deprecated]] bool boundcheck_left(size_t n = 0) const
+    {
+        QPOT_WARNING_PYTHON("boundcheck_left -> inbounds_left");
+        return inbounds_left(n);
+    }
+
+    /**
+    Check that that there are at least `n` well right of x().
+
+    \param n Offset.
+    */
+    [[deprecated]] bool boundcheck_right(size_t n = 0) const
+    {
+        QPOT_WARNING_PYTHON("boundcheck_right -> inbounds_right");
+        return inbounds_right(n);
+    }
+
+    /**
+    Check that that there are at least `n` well left of x().
+
+    \param n Offset.
+    */
+    bool inbounds_left(size_t n = 0) const
     {
         QPOT_ASSERT(n < m_n);
         return !(m_lock || m_li < n);
@@ -798,10 +820,20 @@ public:
 
     \param n Offset.
     */
-    bool boundcheck_right(size_t n = 0) const
+    bool inbounds_right(size_t n = 0) const
     {
         QPOT_ASSERT(n < m_n);
         return !(m_lock || m_li >= m_n - n - 1);
+    }
+
+    /**
+    Check that that there are at least `n` well right of x().
+
+    \param n Offset.
+    */
+    bool inbounds(size_t n = 0) const
+    {
+        return inbounds_left(n) && inbounds_right(n);
     }
 
 private:

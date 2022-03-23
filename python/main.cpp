@@ -13,6 +13,7 @@ Python API.
 #define FORCE_IMPORT_ARRAY
 #include <xtensor-python/pytensor.hpp>
 
+#define QPOT_ENABLE_WARNING_PYTHON
 #include <QPot/Chunked.hpp>
 #include <QPot/Redraw.hpp>
 #include <QPot/Static.hpp>
@@ -320,6 +321,27 @@ PYBIND11_MODULE(_QPot, m)
             &QPot::Chunked::boundcheck_right,
             "Check that x() is at least `n` yield positions from the far-right."
             "See :cpp:func:`QPot::Chunked::boundcheck_right`.",
+            py::arg("n") = 0)
+
+        .def(
+            "inbounds_left",
+            &QPot::Chunked::inbounds_left,
+            "Check that x() is at least `n` yield positions from the far-left."
+            "See :cpp:func:`QPot::Chunked::inbounds_left`.",
+            py::arg("n") = 0)
+
+        .def(
+            "inbounds_right",
+            &QPot::Chunked::inbounds_right,
+            "Check that x() is at least `n` yield positions from the far-right."
+            "See :cpp:func:`QPot::Chunked::inbounds_right`.",
+            py::arg("n") = 0)
+
+        .def(
+            "inbounds",
+            &QPot::Chunked::inbounds,
+            "Check that x() is at least `n` yield positions from the far-left and far-right."
+            "See :cpp:func:`QPot::Chunked::inbounds`.",
             py::arg("n") = 0)
 
         .def("__repr__", [](const QPot::Chunked&) { return "<QPot.Chunked>"; });
