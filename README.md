@@ -3,7 +3,6 @@
 [![CI](https://github.com/tdegeus/QPot/workflows/CI/badge.svg)](https://github.com/tdegeus/QPot/actions)
 [![Doxygen -> gh-pages](https://github.com/tdegeus/QPot/workflows/gh-pages/badge.svg)](https://tdegeus.github.io/QPot)
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/qpot.svg)](https://anaconda.org/conda-forge/qpot)
-[![Conda Version](https://img.shields.io/conda/vn/conda-forge/python-qpot.svg)](https://anaconda.org/conda-forge/python-qpot)
 
 Library to keep track of a sequential potential energy landscape.
 
