@@ -54,7 +54,7 @@ int main()
             chunk.shift_dy(yindex(ichunk), dy, nbuffer);
             xmin(ichunk) = chunk.ymin_chunk();
         }
-        if (!(chunk.boundcheck_left() && chunk.boundcheck_right())) {
+        if (!chunk.inbounds()) {
             throw std::runtime_error("Out-of-bounds");
         }
 
@@ -76,7 +76,7 @@ int main()
             auto dy = generator.random({yindex(ichunk + 1) + nbuffer - yindex(ichunk)});
             chunk.shift_dy(yindex(ichunk), dy, nbuffer);
         }
-        if (!(chunk.boundcheck_left() && chunk.boundcheck_right())) {
+        if (!chunk.inbounds()) {
             throw std::runtime_error("Out-of-bounds");
         }
 
