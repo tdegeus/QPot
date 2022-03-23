@@ -2,6 +2,7 @@ build
 dist
 *.egg-info
 _skbuild
+_cmake_test_compile
 
 # Prerequisites
 *.d
