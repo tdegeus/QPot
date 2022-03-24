@@ -9,7 +9,9 @@ Class supporting the use (frozen) sequence of yield positions supplied in chunks
 #ifndef QPOT_CHUNKED_HPP
 #define QPOT_CHUNKED_HPP
 
+#include <iterator>
 #include <numeric>
+#include <type_traits>
 #include <vector>
 
 #ifdef QPOT_ENABLE_DEBUG
@@ -24,6 +26,22 @@ Store sequence of yield positions (in chunks) and use it to find the yield posit
 left and right of a specific position.
 */
 namespace QPot {
+
+namespace detail {
+
+template <typename T, typename = void>
+struct is_iterator {
+    static constexpr bool value = false;
+};
+
+template <typename T>
+struct is_iterator<
+    T,
+    typename std::enable_if<
+        !std::is_same<typename std::iterator_traits<T>::value_type, void>::value>::type> {
+    static constexpr bool value = true;
+};
+} // namespace detail
 
 /**
 \brief Class supporting the use (frozen) sequence of yield positions supplied in chunks.
@@ -190,6 +208,25 @@ public:
     }
 
     /**
+    Constructor.
+
+    \param x The current position.
+    \param begin Iterator to a chunk of yield positions.
+    \param end Iterator to a chunk of yield positions.
+    \param istart The global index of `begin`.
+    */
+    template <class T>
+    Chunked(double x, T begin, T end, long istart = 0)
+    {
+        static_assert(
+            std::is_pointer<T>::value || detail::is_iterator<T>::value,
+            "T must be pointer/iterator");
+
+        m_x = x;
+        this->set_y(istart, begin, end);
+    }
+
+    /**
     Return the global index of the yield-position directly left of x().
     \return Index (signed).
     \warning The global index is generally not the index in the current chunk.
@@ -275,6 +312,42 @@ public:
     }
 
     /**
+    Get `begin()` of the underlying storage.
+    \return Iterator.
+    */
+    auto begin()
+    {
+        return m_y.begin();
+    }
+
+    /**
+    Get `end()` of the underlying storage.
+    \return Iterator.
+    */
+    auto end()
+    {
+        return m_y.end();
+    }
+
+    /**
+    Get `cbegin()` of the underlying storage.
+    \return Iterator.
+    */
+    auto cbegin()
+    {
+        return m_y.cbegin();
+    }
+
+    /**
+    Get `cend()` of the underlying storage.
+    \return Iterator.
+    */
+    auto cend()
+    {
+        return m_y.cend();
+    }
+
+    /**
     Return the size of the current chunk.
     \return Size (signed).
     */
@@ -331,12 +404,29 @@ public:
     template <class T>
     void set_y(long istart, const T& y)
     {
-        QPOT_DEBUG(y.size() > 1);
-        QPOT_DEBUG(std::is_sorted(y.cbegin(), y.cend()));
+        return this->set_y(istart, y.cbegin(), y.cend());
+    }
 
-        m_n = y.size();
+    /**
+    Same as set_y(long, const T&) but for iterator interface.
+
+    \param istart The global index of `begin`.
+    \param begin Iterator to a chunk of yield positions.
+    \param end Iterator to a chunk of yield positions.
+    */
+    template <class T>
+    void set_y(long istart, T begin, T end)
+    {
+        static_assert(
+            std::is_pointer<T>::value || detail::is_iterator<T>::value,
+            "T must be pointer/iterator");
+
+        QPOT_DEBUG(end - begin > 1);
+        QPOT_DEBUG(std::is_sorted(begin, end));
+
+        m_n = end - begin;
         m_y.resize(m_n);
-        std::copy(y.begin(), y.end(), m_y.begin());
+        std::copy(begin, end, m_y.begin());
 
         m_istart = istart;
         m_istop = m_istart + static_cast<long>(m_n);
@@ -450,12 +540,30 @@ public:
     template <class T>
     void rshift_dy(long istart, const T& dy, size_t nbuffer = 0)
     {
-        QPOT_ASSERT(dy.size() > 0);
-        QPOT_ASSERT(istart >= m_istart && istart <= m_istop);
-        QPOT_ASSERT(istart + static_cast<long>(dy.size()) >= m_istop);
+        return this->rshift_dy(istart, dy.cbegin(), dy.cend(), nbuffer);
+    }
 
-        std::vector<double> y(dy.size());
-        std::partial_sum(dy.cbegin(), dy.cend(), y.begin());
+    /**
+    Same as rshift_dy(long, const T&, size_t) but for iterator input.
+
+    \param istart The global index of `begin`.
+    \param begin Iterator to the yield distances (following at least partly the current chunk).
+    \param end Iterator to the yield distances (following at least partly the current chunk).
+    \param nbuffer Buffer a part of the current chunk.
+    */
+    template <class T>
+    void rshift_dy(long istart, T begin, T end, size_t nbuffer = 0)
+    {
+        static_assert(
+            std::is_pointer<T>::value || detail::is_iterator<T>::value,
+            "T must be pointer/iterator");
+
+        QPOT_ASSERT(end - begin > 0);
+        QPOT_ASSERT(istart >= m_istart && istart <= m_istop);
+        QPOT_ASSERT(istart + static_cast<long>(end - begin) >= m_istop);
+
+        std::vector<double> y(end - begin);
+        std::partial_sum(begin, end, y.begin());
 
         double d;
         if (istart == m_istop) {
@@ -578,11 +686,29 @@ public:
     template <class T>
     void lshift_dy(long istart, const T& dy, size_t nbuffer = 0)
     {
-        QPOT_ASSERT(dy.size() > 0);
-        QPOT_ASSERT(istart + static_cast<long>(dy.size()) > m_istart);
+        return this->lshift_dy(istart, dy.cbegin(), dy.cend(), nbuffer);
+    }
 
-        std::vector<double> y(dy.size());
-        std::partial_sum(dy.cbegin(), dy.cend(), y.begin());
+    /**
+    Same as lshift_dy(long, const T&, size_t) but for iterator input.
+
+    \param istart The global index of `begin`.
+    \param begin Iterator to the yield distances (preceding at least partly the current chunk).
+    \param end Iterator to the yield distances (preceding at least partly the current chunk).
+    \param nbuffer Buffer a part of the current chunk.
+    */
+    template <class T>
+    void lshift_dy(long istart, T begin, T end, size_t nbuffer = 0)
+    {
+        static_assert(
+            std::is_pointer<T>::value || detail::is_iterator<T>::value,
+            "T must be pointer/iterator");
+
+        QPOT_ASSERT(end - begin > 0);
+        QPOT_ASSERT(istart + static_cast<long>(end - begin) > m_istart);
+
+        std::vector<double> y(end - begin);
+        std::partial_sum(begin, end, y.begin());
 
         double d = m_y[istart + static_cast<long>(y.size()) - m_istart - 1] - y.back();
         std::transform(y.begin(), y.end(), y.begin(), [&](auto& v) { return v + d; });
@@ -648,10 +774,24 @@ public:
     template <class T>
     void shift_dy(long istart, const T& dy, size_t nbuffer = 0)
     {
+        return this->shift_dy(istart, dy.cbegin(), dy.cend(), nbuffer);
+    }
+
+    /**
+    Same as shift_dy() but with an iterator interface for `dy`.
+
+    \param istart The global index of `begin`.
+    \param begin Iterator for the yield distances.
+    \param end Iterator for the yield distances.
+    \param nbuffer Buffer a part of the current chunk.
+    */
+    template <class S, class T>
+    void shift_dy(long istart, const S& begin, const T& end, size_t nbuffer = 0)
+    {
         if (istart < m_istart) {
-            return this->lshift_dy(istart, dy, nbuffer);
+            return this->lshift_dy(istart, begin, end, nbuffer);
         }
-        return this->rshift_dy(istart, dy, nbuffer);
+        return this->rshift_dy(istart, begin, end, nbuffer);
     }
 
     /**

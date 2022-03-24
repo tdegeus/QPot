@@ -33,9 +33,7 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
     SECTION("Basic behaviour")
     {
         xt::xtensor<double, 1> y = xt::linspace<double>(0, 10, 11);
-
         QPot::Chunked chunk(5.5, y);
-
         REQUIRE(chunk.i() == 5);
 
         REQUIRE(chunk.size() == y.size());
@@ -94,6 +92,22 @@ TEST_CASE("QPot::Chunked", "Chunked.hpp")
         REQUIRE(xt::allclose(chunk.Y(chunk.i() + 1), chunk.yright()));
         REQUIRE(xt::allclose(chunk.Y(chunk.i() + 2), 8.0));
         REQUIRE(xt::allclose(chunk.Y(chunk.i() + 3), 9.0));
+    }
+
+    SECTION("Basic behaviour - iterator")
+    {
+        xt::xtensor<double, 1> dy = xt::random::rand<double>({100});
+        auto yref = xt::cumsum(dy);
+        yref -= 0.5 * yref(1);
+        QPot::Chunked chunk(0.0, yref.cbegin(), yref.cbegin() + 10);
+        REQUIRE(chunk.i() == 0);
+
+        for (size_t j = 0; j < 5; ++j) {
+            auto i = chunk.istop();
+            chunk.shift_dy(i, &dy(i), &dy(i) + 10, 0);
+            auto y = xt::adapt(chunk.y());
+            REQUIRE(xt::allclose(y, xt::view(yref, xt::range(chunk.istart(), chunk.istop()))));
+        }
     }
 
     SECTION("Bounds check")
