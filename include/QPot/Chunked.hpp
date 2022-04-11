@@ -759,7 +759,7 @@ public:
     }
 
     /**
-    Shift chunk chunk of yield positions, by supplying the yield distances for a sequential chunk.
+    Shift chunk of yield positions, by supplying the yield distances for a sequential chunk.
     The shift may be left or right, but there may not be any holes compared to the current chunk.
     Note that the yield distances are converted to yield positions using the chunk currently held
     in memory.
