@@ -10,53 +10,6 @@ Documentation: https://tdegeus.github.io/QPot
 
 ## Contents
 
-<!-- MarkdownTOC -->
-
-- [Overview](#overview)
-    - [Disclaimer](#disclaimer)
-    - [More information](#more-information)
-    - [Implementation](#implementation)
-        - [C++ and Python](#c-and-python)
-        - [Chunked.hpp](#chunkedhpp)
-        - [Static.hpp](#statichpp)
-        - [Redraw.hpp](#redrawhpp)
-    - [Installation](#installation)
-        - [C++ headers](#c-headers)
-            - [Using conda](#using-conda)
-            - [From source](#from-source)
-        - [Python module](#python-module)
-            - [Using conda](#using-conda-1)
-            - [From source](#from-source-1)
-    - [Compiling user-code](#compiling-user-code)
-        - [Using CMake](#using-cmake)
-            - [Example](#example)
-            - [Targets](#targets)
-            - [Optimisation](#optimisation)
-        - [By hand](#by-hand)
-        - [Using pkg-config](#using-pkg-config)
-    - [Change-log](#change-log)
-        - [v0.9.9](#v099)
-        - [v0.9.8](#v098)
-        - [v0.9.7](#v097)
-        - [v0.9.6](#v096)
-        - [v0.9.5](#v095)
-        - [v0.9.4](#v094)
-        - [v0.9.3](#v093)
-        - [v0.9.2](#v092)
-        - [v0.9.1](#v091)
-        - [v0.9.0](#v090)
-        - [v0.8.0](#v080)
-        - [v0.7.0](#v070)
-        - [v0.6.2](#v062)
-        - [v0.6.1](#v061)
-        - [v0.6.0](#v060)
-        - [v0.5.0](#v050)
-        - [v0.4.0](#v040)
-        - [v0.3.0](#v030)
-        - [v0.2.0](#v020)
-
-<!-- /MarkdownTOC -->
-
 ## Overview
 
 ### Disclaimer
@@ -89,8 +42,8 @@ T.W.J. de Geus (Tom) | tom@geus.me | www.geus.me |
 
 #### C++ and Python
 
-The code is a C++ header-only library (see [installation notes](#c-headers)),
-but a Python module is also provided (see [installation notes](#python-module)).
+The code is a C++ header-only library (see installation notes),
+but a Python module is also provided (see installation notes).
 The interfaces are identical except:
 
 +   All *xtensor* objects (`xt::xtensor<...>`) are *NumPy* arrays in Python.

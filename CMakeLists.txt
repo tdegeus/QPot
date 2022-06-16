@@ -8,8 +8,6 @@ string(TOUPPER "${PROJECT_NAME}" PROJECT_NAME_UPPER)
 # ====================
 
 option(BUILD_ALL "${PROJECT_NAME}: Build tests, Python API & docs" OFF)
-option(BUILD_TESTS "${PROJECT_NAME}: Build tests" OFF)
-option(BUILD_EXAMPLES "${PROJECT_NAME}: Build examples" OFF)
 option(BUILD_PYTHON "${PROJECT_NAME}: Build Python API" OFF)
 option(BUILD_DOCS "${PROJECT_NAME}: Build docs" OFF)
 option(USE_ASSERT "${PROJECT_NAME}: Build with assertions" ON)
@@ -18,8 +16,6 @@ option(USE_SIMD "${PROJECT_NAME}: Build with hardware optimization" OFF)
 
 if(SKBUILD)
     set(BUILD_ALL 0)
-    set(BUILD_TESTS 0)
-    set(BUILD_EXAMPLES 0)
     set(BUILD_PYTHON 1)
     set(BUILD_DOCS 0)
 endif()
@@ -69,14 +65,12 @@ include("${PROJECT_NAME}Config.cmake")
 
 if(NOT SKBUILD)
 
-    install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" DESTINATION include)
-
-    configure_file("include/${PROJECT_NAME}/version.hpp"
-                   "${CMAKE_CURRENT_BINARY_DIR}/version.hpp"
+    configure_file("include/${PROJECT_NAME}.h"
+                   "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.h"
                     @ONLY)
 
-    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/version.hpp"
-            DESTINATION "include/${PROJECT_NAME}/")
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.h"
+            DESTINATION "include/")
 
     install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}-targets)
 
@@ -104,26 +98,6 @@ if(NOT SKBUILD)
 
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
             DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig/")
-
-endif()
-
-# Build tests
-# ===========
-
-if(BUILD_TESTS OR BUILD_ALL)
-
-    enable_testing()
-    add_subdirectory(tests)
-
-endif()
-
-# Build examples
-# ==============
-
-if(BUILD_EXAMPLES OR BUILD_ALL)
-
-    enable_testing()
-    add_subdirectory(examples)
 
 endif()
 
