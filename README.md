@@ -292,6 +292,10 @@ enabling *xsimd*, ...
 
 ### Change-log
 
+#### v0.10.0
+
+*   Great simplification: only two free-functions are left (#43).
+
 #### v0.9.9
 
 *   [CMake] Minor style updates (#37)
