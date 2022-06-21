@@ -292,7 +292,7 @@ enabling *xsimd*, ...
 
 ### Change-log
 
-#### v0.10.0
+#### v0.12.0
 
 *   Great simplification: only two free-functions are left (#43).
 
