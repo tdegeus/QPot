@@ -74,7 +74,7 @@ PYBIND11_MODULE(_QPot, m)
 
     m_inplace.def(
         "lower_bound",
-        &QPot::lower_bound<xt::pyarray<double>, xt::pyarray<double>, xt::pyarray<long>>,
+        &QPot::inplace::lower_bound<xt::pyarray<double>, xt::pyarray<double>, xt::pyarray<long>>,
         "Find column for each row.",
         py::arg("matrix"),
         py::arg("value"),
@@ -83,7 +83,7 @@ PYBIND11_MODULE(_QPot, m)
 
     m_inplace.def(
         "cumsum_chunk",
-        &QPot::cumsum_chunk<xt::pyarray<double>, xt::pyarray<long>>,
+        &QPot::inplace::cumsum_chunk<xt::pyarray<double>, xt::pyarray<long>>,
         "Compute chunk of chunked cumsum",
         py::arg("cumsum"),
         py::arg("delta"),
