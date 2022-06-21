@@ -32,6 +32,13 @@ class Test_find(unittest.TestCase):
         self.assertTrue(QPot.lower_bound(a, 1.5) == 1)
         self.assertTrue(QPot.lower_bound(a, 100) == a.size - 1)
 
+        i = QPot.lower_bound(a, -1.0)
+        i = QPot.lower_bound(a, -1.0, i)
+        self.assertTrue(i == 0)
+
+        i = QPot.lower_bound(a, 100.0, i)
+        self.assertTrue(i == a.size - 1)
+
 
 if __name__ == "__main__":
 
