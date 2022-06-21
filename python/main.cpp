@@ -55,7 +55,20 @@ PYBIND11_MODULE(_QPot, m)
 
     m.def(
         "lower_bound",
-        &QPot::lower_bound<xt::pyarray<double>, xt::pyarray<double>, xt::pyarray<long>>,
+        py::overload_cast<const xt::pyarray<double>&, const xt::pyarray<double>&>(
+            &QPot::lower_bound<xt::pyarray<double>, xt::pyarray<double>, xt::pyarray<long>>),
+        "Find column for each row.",
+        py::arg("matrix"),
+        py::arg("value"));
+
+    m.def(
+        "lower_bound",
+        py::overload_cast<
+            const xt::pyarray<double>&,
+            const xt::pyarray<double>&,
+            const xt::pyarray<long>&,
+            size_t>(
+            &QPot::lower_bound<xt::pyarray<double>, xt::pyarray<double>, xt::pyarray<long>>),
         "Find column for each row.",
         py::arg("matrix"),
         py::arg("value"),
@@ -70,9 +83,9 @@ PYBIND11_MODULE(_QPot, m)
         py::arg("delta"),
         py::arg("shift"));
 
-    py::module m_inplace = m.def_submodule("inplace", "In-place operations");
+    py::module minplace = m.def_submodule("inplace", "In-place operations");
 
-    m_inplace.def(
+    minplace.def(
         "lower_bound",
         &QPot::inplace::lower_bound<xt::pyarray<double>, xt::pyarray<double>, xt::pyarray<long>>,
         "Find column for each row.",
@@ -81,7 +94,7 @@ PYBIND11_MODULE(_QPot, m)
         py::arg("index"),
         py::arg("proximity") = 10);
 
-    m_inplace.def(
+    minplace.def(
         "cumsum_chunk",
         &QPot::inplace::cumsum_chunk<xt::pyarray<double>, xt::pyarray<long>>,
         "Compute chunk of chunked cumsum",
