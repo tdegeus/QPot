@@ -23,6 +23,15 @@ class Test_find(unittest.TestCase):
             i = QPot.lower_bound(a, value, i)
             self.assertTrue(np.all(np.equal(tests[:, col], i)))
 
+    def test_out_of_bounds(self):
+
+        a = np.arange(10).astype(np.float64)
+        self.assertTrue(QPot.lower_bound(a, -1.0) == 0)
+        self.assertTrue(QPot.lower_bound(a, 0.0) == 0)
+        self.assertTrue(QPot.lower_bound(a, 0.5) == 0)
+        self.assertTrue(QPot.lower_bound(a, 1.5) == 1)
+        self.assertTrue(QPot.lower_bound(a, 100) == a.size - 1)
+
 
 if __name__ == "__main__":
 

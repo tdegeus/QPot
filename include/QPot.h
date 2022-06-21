@@ -214,6 +214,9 @@ inline R
 lower_bound(const It first, const It last, const T& value, R guess = 0, size_t proximity = 10)
 {
     if (proximity == 0) {
+        if (value <= *(first)) {
+            return 0;
+        }
         return std::lower_bound(first, last, value) - first - 1;
     }
 
@@ -226,6 +229,9 @@ lower_bound(const It first, const It last, const T& value, R guess = 0, size_t p
 
     if (*(first + l) < value && *(first + r) >= value) {
         return std::lower_bound(first + l, first + r, value) - first - 1;
+    }
+    else if (value <= *(first)) {
+        return 0;
     }
     else {
         return std::lower_bound(first, last, value) - first - 1;
