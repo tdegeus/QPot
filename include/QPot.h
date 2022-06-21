@@ -330,7 +330,12 @@ inline void cumsum_chunk(V& cumsum, const V& delta, const I& shift)
 } // namespace inplace
 
 /**
-Similar to `lower_bound` but on the last axis of an nd-array (e.g. per row of a rank 2 matrix).
+Iterating on the last axis of an nd-array (e.g. per row of a rank 2 matrix):
+Return index of the first element in the range [first, last) such that `element < value` is `false`
+(i.e. greater or equal to), or last if no such element is found.
+
+This function allows for a guess of the index and a proximity search around.
+This could be efficient for finding items in large arrays.
 
 \param matrix The matrix defining a range per row.
 \param value The value to find (per row).
@@ -343,6 +348,23 @@ inline R lower_bound(const T& matrix, const V& value, const R& index, size_t pro
 {
     R ret = index;
     inplace::lower_bound(matrix, value, ret, proximity);
+    return ret;
+}
+
+/**
+Iterating on the last axis of an nd-array (e.g. per row of a rank 2 matrix):
+Return index of the first element in the range [first, last) such that `element < value` is `false`
+(i.e. greater or equal to), or last if no such element is found.
+
+\param matrix The matrix defining a range per row.
+\param value The value to find (per row).
+\return Same shape as `value`.
+*/
+template <class T, class V, class R>
+inline R lower_bound(const T& matrix, const V& value)
+{
+    R ret = xt::zeros<typename R::value_type>(value.shape());
+    inplace::lower_bound(matrix, value, ret, 0);
     return ret;
 }
 
