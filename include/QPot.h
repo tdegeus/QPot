@@ -220,7 +220,7 @@ lower_bound(const It first, const It last, const T& value, R guess = 0, size_t p
         return std::lower_bound(first, last, value) - first - 1;
     }
 
-    if (*(first + guess) < value && *(first + guess + 1) >= value) {
+    if (*(first + guess) < value && value <= *(first + guess + 1)) {
         return guess;
     }
 
